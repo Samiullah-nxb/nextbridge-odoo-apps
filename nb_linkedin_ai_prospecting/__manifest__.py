@@ -17,6 +17,8 @@ created in CRM; post drafting and scheduling; live dashboard with an offline pro
     "maintainer": "Nextbridge",
     "company": "Nextbridge",
     "website": "https://www.nextbridge.pk",
+    "support": "samiullah.3277@nxb.com.pk",
+
     "license": "OPL-1",
     "price": 500.00,
     "currency": "USD",
