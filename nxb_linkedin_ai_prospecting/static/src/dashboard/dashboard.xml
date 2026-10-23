@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="nxb_linkedin_ai_prospecting.Dashboard">
+        <div class="o_li_dash o_action h-100 overflow-auto">
+            <t t-set="d" t-value="state.data"/>
+            <!-- Filters: one row above the charts -->
+            <div class="o_li_filters d-flex flex-wrap gap-2 align-items-center">
+                <h2 class="me-auto mb-0">LinkedIn Sales</h2>
+                <select class="form-select form-select-sm w-auto" t-on-change="(ev) => this.onFilter(ev, 'profileId')"
+                        aria-label="LinkedIn account">
+                    <option value="">All accounts</option>
+                    <t t-foreach="d.filters.profiles" t-as="p" t-key="p.id">
+                        <option t-att-value="p.id" t-att-selected="p.id === state.profileId" t-esc="p.name"/>
+                    </t>
+                </select>
+                <select class="form-select form-select-sm w-auto" t-on-change="(ev) => this.onFilter(ev, 'personaId')"
+                        aria-label="Persona">
+                    <option value="">All personas</option>
+                    <t t-foreach="d.filters.personas" t-as="p" t-key="p.id">
+                        <option t-att-value="p.id" t-att-selected="p.id === state.personaId" t-esc="p.name"/>
+                    </t>
+                </select>
+                <select class="form-select form-select-sm w-auto" t-on-change="(ev) => this.onFilter(ev, 'days')"
+                        aria-label="Period">
+                    <option value="7" t-att-selected="state.days === 7">Last 7 days</option>
+                    <option value="30" t-att-selected="state.days === 30">Last 30 days</option>
+                    <option value="90" t-att-selected="state.days === 90">Last 90 days</option>
+                </select>
+                <span class="o_li_muted small">Refreshed <t t-esc="d.refreshed"/> UTC · every minute</span>
+            </div>
+
+            <!-- KPI tiles -->
+            <div class="o_li_kpis">
+                <div class="o_li_kpi"><div class="o_li_kpi_label">Invited</div><div class="o_li_kpi_value" t-esc="d.kpis.invited"/></div>
+                <div class="o_li_kpi"><div class="o_li_kpi_label">Acceptance rate</div>
+                    <div class="o_li_kpi_value"><t t-esc="d.kpis.acceptance_rate"/>%</div>
+                    <div class="o_li_kpi_sub"><t t-esc="d.kpis.accepted"/> accepted · <t t-esc="d.kpis.already_connected"/> already connected</div></div>
+                <div class="o_li_kpi"><div class="o_li_kpi_label">Reply rate</div>
+                    <div class="o_li_kpi_value"><t t-esc="d.kpis.reply_rate"/>%</div>
+                    <div class="o_li_kpi_sub"><t t-esc="d.kpis.replied"/> replied</div></div>
+                <div class="o_li_kpi"><div class="o_li_kpi_label">Messages sent</div><div class="o_li_kpi_value" t-esc="d.kpis.messages_sent"/></div>
+                <div class="o_li_kpi o_li_clickable" t-on-click="() => this.openProspects([['lead_id', '!=', false]])">
+                    <div class="o_li_kpi_label">Warm leads</div><div class="o_li_kpi_value" t-esc="d.kpis.leads"/></div>
+                <div class="o_li_kpi o_li_clickable" t-on-click="() => this.openProspects([['flag_check', '=', true]])">
+                    <div class="o_li_kpi_label">Need a person</div>
+                    <div class="o_li_kpi_value"><i t-if="d.kpis.flagged" class="fa fa-exclamation-triangle o_li_warn me-1" aria-hidden="true"/><t t-esc="d.kpis.flagged"/></div>
+                    <div class="o_li_kpi_sub">flagged to check</div></div>
+            </div>
+
+            <div class="o_li_grid">
+                <!-- Account health -->
+                <div class="o_li_card" data-card="accounts">
+                    <h3>Account health</h3>
+                    <div t-if="!d.accounts.length" class="o_li_muted">No LinkedIn account yet.
+                        <a href="#" t-on-click.prevent="() => this.openAction('nxb_linkedin_ai_prospecting.action_li_profile')">Add one</a></div>
+                    <table class="table table-sm mb-0" t-if="d.accounts.length">
+                        <thead><tr><th>Account</th><th>Mode</th><th>Status</th><th>Pages</th><th>Ready</th></tr></thead>
+                        <tbody>
+                            <tr t-foreach="d.accounts" t-as="a" t-key="a.id">
+                                <td><t t-esc="a.name"/>
+                                    <div t-if="a.paused_until" class="small o_li_warn"><i class="fa fa-pause-circle me-1" aria-hidden="true"/>Invites paused: <t t-esc="a.pause_reason"/></div></td>
+                                <td><t t-esc="a.mode === 'engine' ? 'Engine' : 'Browser agent'"/></td>
+                                <td>
+                                    <span t-attf-class="o_li_status o_li_status_{{a.state}}">
+                                        <i t-attf-class="fa {{a.state === 'connected' ? 'fa-check-circle' : (a.state === 'draft' ? 'fa-circle-o' : 'fa-exclamation-circle')}} me-1" aria-hidden="true"/>
+                                        <t t-esc="a.state === 'connected' ? 'Connected' : (a.state === 'reconnect' ? 'Reconnect' : (a.state === 'restricted' ? 'Restricted' : 'Not connected'))"/>
+                                    </span>
+                                    <div t-if="a.engine" class="small o_li_muted">engine <t t-esc="a.engine"/></div>
+                                </td>
+                                <td class="o_li_num" t-esc="a.pages"/>
+                                <td class="o_li_num" t-esc="a.ready"/>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Work queue & last AI run -->
+                <div class="o_li_card" data-card="work">
+                    <h3>Work queue</h3>
+                    <div class="o_li_rows">
+                        <div class="o_li_clickable" t-on-click="() => this.openProspects([['needs_reply', '=', true]])"><span>Replies waiting for AI</span><b t-esc="d.work_queue.waiting_for_ai"/></div>
+                        <div class="o_li_clickable" t-on-click="() => this.openAction('nxb_linkedin_ai_prospecting.action_li_queue')"><span>Ready to send</span><b t-esc="d.work_queue.ready_to_send"/></div>
+                        <div><span>Unknown outcome (check)</span><b t-esc="d.work_queue.unknown"/></div>
+                        <div class="o_li_clickable" t-on-click="() => this.openAction('nxb_linkedin_ai_prospecting.action_li_post')"><span>Posts to approve</span><b t-esc="d.work_queue.posts_to_approve"/></div>
+                    </div>
+                    <h3 class="mt-3">Last AI run</h3>
+                    <div t-if="!d.last_run" class="o_li_muted">No run yet. Copy a prompt from Settings into your AI assistant.</div>
+                    <div t-if="d.last_run" class="small">
+                        <b t-esc="d.last_run.name"/> · <t t-esc="d.last_run.written"/> of <t t-esc="d.last_run.given"/> texts written
+                        · <t t-esc="d.last_run.state"/>
+                        <div t-if="d.last_run.errors" class="o_li_warn"><i class="fa fa-exclamation-circle me-1" aria-hidden="true"/><t t-esc="d.last_run.errors"/></div>
+                    </div>
+                </div>
+
+                <!-- Funnel -->
+                <div class="o_li_card" data-card="funnel">
+                    <h3>Funnel (all time)</h3>
+                    <div t-foreach="funnel" t-as="f" t-key="f.label" class="o_li_funnel_row"
+                         t-on-mousemove="(ev) => this.showTip(ev, f.label + ': ' + f.count + (f.conv ? ' (' + f.conv + ' of previous)' : ''))" t-on-mouseleave="hideTip">
+                        <div class="o_li_funnel_label"><span t-esc="f.label"/><span class="o_li_num"><t t-esc="f.count"/> <span class="o_li_muted" t-if="f.conv">· <t t-esc="f.conv"/></span></span></div>
+                        <div class="o_li_track"><div class="o_li_fill" t-att-style="'width:' + Math.max(f.pct, f.count ? 1 : 0) + '%'"/></div>
+                    </div>
+                    <div t-if="state.tip and state.tip.card === 'funnel'" class="o_li_tip" t-att-style="'left:' + state.tip.x + 'px;top:' + state.tip.y + 'px'" t-esc="state.tip.text"/>
+                </div>
+
+                <!-- Invites per day: single series, no legend -->
+                <div class="o_li_card o_li_wide" data-card="perday">
+                    <h3>Invites sent per day</h3>
+                    <t t-set="pd" t-value="perDay"/>
+                    <svg t-att-viewBox="'0 0 ' + pd.W + ' ' + pd.H" class="o_li_svg" role="img" aria-label="Invites per day, last 14 days">
+                        <t t-foreach="pd.ticks" t-as="tk" t-key="tk_index">
+                            <line t-att-x1="24" t-att-x2="pd.W" t-att-y1="pd.H - 18 - (tk / pd.max) * (pd.H - 30)"
+                                  t-att-y2="pd.H - 18 - (tk / pd.max) * (pd.H - 30)" class="o_li_grid_line"/>
+                            <text x="0" t-att-y="pd.H - 14 - (tk / pd.max) * (pd.H - 30)" class="o_li_axis" t-esc="tk"/>
+                        </t>
+                        <t t-foreach="pd.bars" t-as="b" t-key="b.day">
+                            <rect t-att-x="b.x" t-att-y="b.y" t-att-width="b.w" t-att-height="b.h" rx="4" class="o_li_bar"/>
+                            <rect t-att-x="b.x" y="0" t-att-width="b.w + 2" t-att-height="pd.H - 18" fill="transparent"
+                                  t-on-mousemove="(ev) => this.showTip(ev, b.day + ': ' + b.count + ' invites')" t-on-mouseleave="hideTip"/>
+                            <text t-if="b.showLabel" t-att-x="b.x + b.w / 2" t-att-y="b.labelY" text-anchor="middle" class="o_li_axis" t-esc="b.day"/>
+                        </t>
+                    </svg>
+                    <div t-if="state.tip and state.tip.card === 'perday'" class="o_li_tip" t-att-style="'left:' + state.tip.x + 'px;top:' + state.tip.y + 'px'" t-esc="state.tip.text"/>
+                </div>
+
+                <!-- Stages -->
+                <div class="o_li_card" data-card="stages">
+                    <h3>Prospects by stage</h3>
+                    <div class="o_li_rows">
+                        <t t-foreach="d.stages" t-as="s" t-key="s.key">
+                            <div t-if="s.count" class="o_li_clickable" t-on-click="() => this.openStage(s.key)"><span t-esc="s.label"/><b t-esc="s.count"/></div>
+                        </t>
+                    </div>
+                </div>
+
+                <!-- Results per persona -->
+                <div class="o_li_card o_li_full" data-card="personas">
+                    <h3>Results per persona</h3>
+                    <table class="table table-sm mb-0">
+                        <thead><tr><th>Persona</th><th class="text-end">Invited</th><th class="text-end">Accepted</th><th class="text-end">Leads</th></tr></thead>
+                        <tbody>
+                            <tr t-foreach="d.personas" t-as="p" t-key="p_index">
+                                <td><t t-esc="p.name"/> <span class="small o_li_muted" t-esc="p.account"/></td>
+                                <td class="o_li_num" t-esc="p.invited"/><td class="o_li_num" t-esc="p.accepted"/><td class="o_li_num" t-esc="p.leads"/>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Map -->
+                <div class="o_li_card o_li_full" data-card="map">
+                    <div class="d-flex align-items-center">
+                        <h3 class="me-auto">Where your prospects are</h3>
+                        <button class="btn btn-sm btn-link" t-on-click="() => this.state.showTable = !this.state.showTable"
+                                t-esc="state.showTable ? 'Show map' : 'Show as table'"/>
+                    </div>
+                    <div class="o_li_legend" t-if="!state.showTable">
+                        <t t-foreach="['pipeline', 'talking', 'lead', 'closed']" t-as="g" t-key="g">
+                            <span><i t-attf-class="o_li_dot o_li_g_{{g}}"/><t t-esc="groupLabel[g]"/></span>
+                        </t>
+                        <span class="o_li_muted">· <t t-esc="d.points.length"/> located (city or country centre)</span>
+                    </div>
+                    <svg t-if="!state.showTable" viewBox="0 30 1000 390" class="o_li_svg o_li_map" role="img" aria-label="World map of prospects">
+                        <path t-att-d="landPath" class="o_li_land"/>
+                        <t t-foreach="mapPoints" t-as="p" t-key="p.id">
+                            <circle t-att-cx="p.x" t-att-cy="p.y" r="4.5" t-attf-class="o_li_pt o_li_g_{{p.group}}"/>
+                            <circle t-att-cx="p.x" t-att-cy="p.y" r="11" fill="transparent" class="o_li_clickable"
+                                    t-on-mousemove="(ev) => this.showMapTip(ev, p)" t-on-mouseleave="() => this.state.mapTip = null"
+                                    t-on-click="() => this.openProspect(p.id)"/>
+                        </t>
+                    </svg>
+                    <div t-if="state.mapTip and !state.showTable" class="o_li_tip" t-att-style="'left:' + state.mapTip.x + 'px;top:' + state.mapTip.y + 'px'">
+                        <b t-esc="state.mapTip.p.name"/><div t-esc="state.mapTip.p.headline"/><div class="o_li_muted" t-esc="state.mapTip.p.location"/>
+                        <div><i t-attf-class="o_li_dot o_li_g_{{state.mapTip.p.group}}"/><t t-esc="groupLabel[state.mapTip.p.group]"/> · click to open</div>
+                    </div>
+                    <table t-if="state.showTable" class="table table-sm">
+                        <thead><tr><th>Name</th><th>Location</th><th>Stage</th></tr></thead>
+                        <tbody><tr t-foreach="d.points" t-as="p" t-key="p.id" class="o_li_clickable" t-on-click="() => this.openProspect(p.id)">
+                            <td t-esc="p.name"/><td t-esc="p.location"/><td t-esc="p.stage"/></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="nxb_linkedin_ai_prospecting.RemoteLogin">
+        <div class="o_li_remote p-3">
+            <div class="d-flex gap-2 align-items-center mb-2">
+                <span class="me-auto small o_li_muted">
+                    This is LinkedIn's real sign-in page, running in this server's engine. Click and type in it as usual
+                    (2-step code too). Nothing typed here is logged or stored by Odoo.
+                </span>
+                <span t-if="state.loggedIn" class="o_li_status o_li_status_connected"><i class="fa fa-check-circle me-1"/>Signed in</span>
+                <button class="btn btn-primary btn-sm" t-on-click="finish" t-att-disabled="state.busy">I'm signed in — finish</button>
+            </div>
+            <div class="o_li_screen" tabindex="0" t-ref="screen" t-on-keydown="onKey" t-on-paste="onPaste">
+                <img t-if="state.image" t-att-src="'data:image/jpeg;base64,' + state.image" t-on-click="onClick"
+                     t-on-wheel="onWheel" alt="LinkedIn sign-in"/>
+                <div t-if="!state.image" class="p-5 text-center o_li_muted"><i class="fa fa-spinner fa-spin me-2"/>Opening LinkedIn…</div>
+            </div>
+            <div t-if="state.error" class="alert alert-warning mt-2" t-esc="state.error"/>
+            <div class="small o_li_muted mt-1">Click the picture first so your keyboard goes to it. Paste works for the 2-step code.</div>
+        </div>
+    </t>
+</templates>

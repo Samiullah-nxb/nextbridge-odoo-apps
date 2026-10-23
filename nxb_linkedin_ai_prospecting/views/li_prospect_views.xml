@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_li_prospect_list" model="ir.ui.view">
+        <field name="name">li.prospect.list</field>
+        <field name="model">li.prospect</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="flag_check" decoration-info="needs_reply">
+                <field name="name"/>
+                <field name="headline" optional="show"/>
+                <field name="company_name" optional="hide"/>
+                <field name="location" optional="show"/>
+                <field name="persona_id"/>
+                <field name="profile_id" optional="show"/>
+                <field name="stage" widget="badge"/>
+                <field name="invited_at" optional="hide"/>
+                <field name="accepted_at" optional="hide"/>
+                <field name="last_inbound_at" optional="show"/>
+                <field name="needs_reply" optional="hide"/>
+                <field name="taken_over" optional="hide"/>
+                <field name="flag_check" optional="hide"/>
+                <field name="lead_id" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_li_prospect_kanban" model="ir.ui.view">
+        <field name="name">li.prospect.kanban</field>
+        <field name="model">li.prospect</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="stage" quick_create="false" group_create="false" group_delete="false"
+                    records_draggable="false">
+                <field name="needs_reply"/>
+                <field name="flag_check"/>
+                <field name="taken_over"/>
+                <templates>
+                    <t t-name="card">
+                        <field name="name" class="fw-bold"/>
+                        <field name="headline" class="text-muted small"/>
+                        <div class="small">
+                            <i class="fa fa-map-marker me-1" title="Location"/><field name="location"/>
+                        </div>
+                        <footer>
+                            <field name="persona_id" class="small"/>
+                            <div class="ms-auto">
+                                <span t-if="record.needs_reply.raw_value" class="badge text-bg-info">reply</span>
+                                <span t-if="record.taken_over.raw_value" class="badge text-bg-warning ms-1">taken over</span>
+                                <span t-if="record.flag_check.raw_value" class="badge text-bg-danger ms-1">check</span>
+                            </div>
+                        </footer>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_li_prospect_search" model="ir.ui.view">
+        <field name="name">li.prospect.search</field>
+        <field name="model">li.prospect</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="headline"/>
+                <field name="location"/>
+                <field name="persona_id"/>
+                <field name="profile_id"/>
+                <filter name="needs_reply" string="Waiting for a reply" domain="[('needs_reply', '=', True)]"/>
+                <filter name="flag_check" string="Needs a person to check" domain="[('flag_check', '=', True)]"/>
+                <filter name="taken_over" string="Taken over" domain="[('taken_over', '=', True)]"/>
+                <filter name="leads" string="Warm leads" domain="[('lead_id', '!=', False)]"/>
+                <separator/>
+                <filter name="active_stages" string="Active"
+                        domain="[('stage', 'not in', ('closed_no_response', 'closed_not_interested', 'closed_withdrawn', 'closed_declined', 'closed_referral', 'do_not_contact'))]"/>
+                <group expand="0">
+                    <filter name="by_stage" string="Stage" context="{'group_by': 'stage'}"/>
+                    <filter name="by_persona" string="Persona" context="{'group_by': 'persona_id'}"/>
+                    <filter name="by_profile" string="LinkedIn account" context="{'group_by': 'profile_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_li_prospect_form" model="ir.ui.view">
+        <field name="name">li.prospect.form</field>
+        <field name="model">li.prospect</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_take_over" type="object" string="Take over" class="btn-primary"
+                            invisible="taken_over or stage == 'do_not_contact'"/>
+                    <button name="action_return_to_agents" type="object" string="Return to agents"
+                            invisible="not taken_over" groups="nxb_linkedin_ai_prospecting.group_li_manager"/>
+                    <button name="action_allow_invite_again" type="object" string="Allow invite again"
+                            invisible="stage != 'closed_declined'" groups="nxb_linkedin_ai_prospecting.group_li_manager"/>
+                    <button name="action_requeue" type="object" string="Back to queue" invisible="stage != 'on_hold'"/>
+                    <button name="action_clear_flag" type="object" string="Checked" invisible="not flag_check"/>
+                    <button name="action_open_linkedin" type="object" string="Open on LinkedIn" icon="fa-linkedin"/>
+                    <button name="action_do_not_contact" type="object" string="Do not contact"
+                            invisible="stage == 'do_not_contact'"
+                            confirm="Never contact this person again, from any persona?"/>
+                    <field name="stage" widget="statusbar"
+                           statusbar_visible="queued,invited,connected,conversation,lead"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-danger" role="alert" invisible="not flag_check">
+                        <b>Check on LinkedIn:</b> <field name="flag_reason" readonly="1" class="d-inline"/>
+                    </div>
+                    <div class="alert alert-warning" role="alert" invisible="not taken_over">
+                        Taken over — the agents stopped for this person only:
+                        <field name="takeover_reason" readonly="1" class="d-inline"/>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                        <field name="headline" placeholder="Headline"/>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="linkedin_url" widget="url"/>
+                            <field name="company_name"/>
+                            <field name="location"/>
+                            <field name="persona_id"/>
+                            <field name="profile_id"/>
+                            <field name="lead_id"/>
+                        </group>
+                        <group>
+                            <field name="invited_at"/>
+                            <field name="accepted_at"/>
+                            <field name="already_connected" invisible="not already_connected"/>
+                            <field name="last_inbound_at"/>
+                            <field name="last_outbound_at"/>
+                            <field name="step_index"/>
+                            <field name="followups_sent"/>
+                            <field name="needs_reply"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Conversation" name="conversation">
+                            <field name="message_ids_li" readonly="1">
+                                <list decoration-info="direction == 'in'" decoration-muted="author == 'human_linkedin'">
+                                    <field name="date"/>
+                                    <field name="direction"/>
+                                    <field name="author"/>
+                                    <field name="body"/>
+                                    <field name="intent" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="AI summary" name="summary">
+                            <group>
+                                <field name="ai_summary"/>
+                                <field name="answers"/>
+                                <field name="referral_details" invisible="not referral_details"/>
+                                <field name="note_text"/>
+                            </group>
+                        </page>
+                        <page string="LinkedIn profile" name="profile">
+                            <field name="profile_read_at" readonly="1"/>
+                            <field name="profile_text" readonly="1"/>
+                        </page>
+                        <page string="Sending queue" name="queue">
+                            <field name="queue_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="kind"/>
+                                    <field name="state" widget="badge"/>
+                                    <field name="text"/>
+                                    <field name="scheduled_at"/>
+                                    <field name="sent_at"/>
+                                    <field name="error"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_li_prospect" model="ir.actions.act_window">
+        <field name="name">Prospects</field>
+        <field name="res_model">li.prospect</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_active_stages': 1}</field>
+    </record>
+</odoo>
