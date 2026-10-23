@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_li_service_list" model="ir.ui.view">
+        <field name="name">li.service.list</field>
+        <field name="model">li.service</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="tag_ids" widget="many2many_tags"/>
+                <field name="portfolio_public_url" widget="url"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_li_service_form" model="ir.ui.view">
+        <field name="name">li.service.form</field>
+        <field name="model">li.service</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name" placeholder="e.g. Odoo implementation"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="tag_ids" widget="many2many_tags"/>
+                            <field name="contact_phone"/>
+                            <field name="contact_email"/>
+                        </group>
+                        <group string="Portfolio">
+                            <field name="portfolio_file" filename="portfolio_filename"/>
+                            <field name="portfolio_filename" invisible="1"/>
+                            <field name="portfolio_link" widget="url"/>
+                            <field name="portfolio_public_url" widget="url" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="For the AI">
+                        <field name="description" placeholder="What you sell, for whom, and the outcome."/>
+                        <field name="value_points" placeholder="One per line: proof, numbers, differentiators."/>
+                    </group>
+                    <div class="text-muted">
+                        The portfolio file link opens without a login for anyone who has it (long random code). A new
+                        file gets a new link; removing the file ends it. PDF and images open in the browser.
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_li_service" model="ir.actions.act_window">
+        <field name="name">Services</field>
+        <field name="res_model">li.service</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

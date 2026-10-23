@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_li_dashboard" model="ir.actions.client">
+        <field name="name">LinkedIn Sales Dashboard</field>
+        <field name="tag">li_dashboard</field>
+    </record>
+</odoo>

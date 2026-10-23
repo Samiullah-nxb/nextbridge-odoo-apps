@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_li_ai_run_list" model="ir.ui.view">
+        <field name="name">li.ai.run.list</field>
+        <field name="model">li.ai.run</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="state == 'error'">
+                <field name="started_at"/>
+                <field name="name"/>
+                <field name="mode"/>
+                <field name="profile_ids" widget="many2many_tags"/>
+                <field name="items_given"/>
+                <field name="items_written"/>
+                <field name="items_refused"/>
+                <field name="actions_done" optional="hide"/>
+                <field name="state" widget="badge"/>
+                <field name="finished_at" optional="show"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_li_ai_run_form" model="ir.ui.view">
+        <field name="name">li.ai.run.form</field>
+        <field name="model">li.ai.run</field>
+        <field name="arch" type="xml">
+            <form create="false">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="mode"/>
+                            <field name="token_id"/>
+                            <field name="profile_ids" widget="many2many_tags"/>
+                        </group>
+                        <group>
+                            <field name="started_at"/>
+                            <field name="finished_at"/>
+                            <field name="items_given"/>
+                            <field name="items_written"/>
+                            <field name="items_refused"/>
+                            <field name="actions_done"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="summary"/>
+                        <field name="errors"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_li_ai_run" model="ir.actions.act_window">
+        <field name="name">AI runs</field>
+        <field name="res_model">li.ai.run</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="view_li_engine_action_list" model="ir.ui.view">
+        <field name="name">li.engine.action.list</field>
+        <field name="model">li.engine.action</field>
+        <field name="arch" type="xml">
+            <list create="false" decoration-danger="status == 'error'">
+                <field name="date"/>
+                <field name="profile_id"/>
+                <field name="source"/>
+                <field name="action"/>
+                <field name="target"/>
+                <field name="status" widget="badge"/>
+                <field name="pages" sum="Pages"/>
+                <field name="details"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_li_engine_action_search" model="ir.ui.view">
+        <field name="name">li.engine.action.search</field>
+        <field name="model">li.engine.action</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="action"/>
+                <field name="target"/>
+                <field name="profile_id"/>
+                <filter name="errors" string="Errors" domain="[('status', '=', 'error')]"/>
+                <filter name="today" string="Today"
+                        domain="[('date', '&gt;=', (context_today()).strftime('%Y-%m-%d 00:00:00'))]"/>
+                <group expand="0">
+                    <filter name="by_action" string="Action" context="{'group_by': 'action'}"/>
+                    <filter name="by_profile" string="Account" context="{'group_by': 'profile_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="action_li_engine_action" model="ir.actions.act_window">
+        <field name="name">Engine actions</field>
+        <field name="res_model">li.engine.action</field>
+        <field name="view_mode">list</field>
+    </record>
+</odoo>

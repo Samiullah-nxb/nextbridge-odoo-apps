@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_li_root" name="LinkedIn Sales" web_icon="nb_linkedin_ai_prospecting,static/description/icon.png"
+              groups="nb_linkedin_ai_prospecting.group_li_user" sequence="55"/>
+
+    <menuitem id="menu_li_dashboard" name="Dashboard" parent="menu_li_root" action="action_li_dashboard" sequence="1"/>
+
+    <menuitem id="menu_li_prospecting" name="Prospecting" parent="menu_li_root" sequence="10"/>
+    <menuitem id="menu_li_prospects" name="Prospects" parent="menu_li_prospecting" action="action_li_prospect" sequence="1"/>
+    <menuitem id="menu_li_queue" name="Sending queue" parent="menu_li_prospecting" action="action_li_queue" sequence="5"/>
+    <menuitem id="menu_li_posts" name="Posts" parent="menu_li_prospecting" action="action_li_post" sequence="10"/>
+
+    <menuitem id="menu_li_agents" name="Agents" parent="menu_li_root" sequence="20"/>
+    <menuitem id="menu_li_personas" name="Personas" parent="menu_li_agents" action="action_li_persona" sequence="1"/>
+    <menuitem id="menu_li_profiles" name="LinkedIn Profiles" parent="menu_li_agents" action="action_li_profile" sequence="5"/>
+
+    <menuitem id="menu_li_logs" name="Activity" parent="menu_li_root" sequence="30"/>
+    <menuitem id="menu_li_runs" name="AI runs" parent="menu_li_logs" action="action_li_ai_run" sequence="1"/>
+    <menuitem id="menu_li_engine_actions" name="Engine actions" parent="menu_li_logs" action="action_li_engine_action" sequence="5"/>
+
+    <menuitem id="menu_li_config" name="Configuration" parent="menu_li_root" sequence="90"
+              groups="nb_linkedin_ai_prospecting.group_li_manager"/>
+    <menuitem id="menu_li_settings" name="Settings" parent="menu_li_config" action="action_li_settings" sequence="1"/>
+    <menuitem id="menu_li_services" name="Services" parent="menu_li_config" action="action_li_service" sequence="5"/>
+    <menuitem id="menu_li_tokens" name="Connector URLs" parent="menu_li_config" action="action_li_token" sequence="10"/>
+</odoo>

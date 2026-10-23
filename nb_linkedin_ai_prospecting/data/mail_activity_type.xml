@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="mail_act_li_attention" model="mail.activity.type">
+        <field name="name">LinkedIn account needs you</field>
+        <field name="icon">fa-linkedin</field>
+        <field name="delay_count">0</field>
+        <field name="res_model">li.profile</field>
+    </record>
+</odoo>

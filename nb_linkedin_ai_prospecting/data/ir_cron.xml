@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="ir_cron_li_send" model="ir.cron">
+        <field name="name">LinkedIn Sales: send (one action per account, with delay gaps)</field>
+        <field name="model_id" ref="model_li_agent"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_send()</field>
+        <field name="interval_number">2</field>
+        <field name="interval_type">minutes</field>
+        <field name="user_id" ref="base.user_root"/>
+    </record>
+    <record id="ir_cron_li_read" model="ir.cron">
+        <field name="name">LinkedIn Sales: read inbox, acceptances, profiles, search; verify sent invites</field>
+        <field name="model_id" ref="model_li_agent"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_read()</field>
+        <field name="interval_number">5</field>
+        <field name="interval_type">minutes</field>
+        <field name="user_id" ref="base.user_root"/>
+    </record>
+    <record id="ir_cron_li_plan" model="ir.cron">
+        <field name="name">LinkedIn Sales: plan invites, withdraw old invites, close silent prospects</field>
+        <field name="model_id" ref="model_li_agent"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_plan()</field>
+        <field name="interval_number">15</field>
+        <field name="interval_type">minutes</field>
+        <field name="user_id" ref="base.user_root"/>
+    </record>
+    <record id="ir_cron_li_posts" model="ir.cron">
+        <field name="name">LinkedIn Sales: publish approved posts</field>
+        <field name="model_id" ref="model_li_agent"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_posts()</field>
+        <field name="interval_number">10</field>
+        <field name="interval_type">minutes</field>
+        <field name="user_id" ref="base.user_root"/>
+    </record>
+    <record id="ir_cron_li_watchdog" model="ir.cron">
+        <field name="name">LinkedIn Sales: engine watchdog</field>
+        <field name="model_id" ref="model_li_agent"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_watchdog()</field>
+        <field name="interval_number">5</field>
+        <field name="interval_type">minutes</field>
+        <field name="user_id" ref="base.user_root"/>
+    </record>
+    <record id="ir_cron_li_gc" model="ir.cron">
+        <field name="name">LinkedIn Sales: clean old engine logs</field>
+        <field name="model_id" ref="model_li_agent"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_gc()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="user_id" ref="base.user_root"/>
+    </record>
+</odoo>

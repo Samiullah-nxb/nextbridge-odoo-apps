@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_li_post_kanban" model="ir.ui.view">
+        <field name="name">li.post.kanban</field>
+        <field name="model">li.post</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" quick_create="false" records_draggable="false">
+                <templates>
+                    <t t-name="card">
+                        <field name="name" class="fw-bold"/>
+                        <field name="profile_id" class="small text-muted"/>
+                        <field name="text" class="small" widget="text"/>
+                        <footer class="small">
+                            <field name="scheduled_at"/>
+                            <div class="ms-auto">
+                                <i class="fa fa-thumbs-up me-1" title="Reactions"/><field name="reactions"/>
+                                <i class="fa fa-comment ms-2 me-1" title="Comments"/><field name="comments"/>
+                            </div>
+                        </footer>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+    <record id="view_li_post_list" model="ir.ui.view">
+        <field name="name">li.post.list</field>
+        <field name="model">li.post</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="profile_id"/>
+                <field name="state" widget="badge"/>
+                <field name="scheduled_at"/>
+                <field name="published_at"/>
+                <field name="reactions"/>
+                <field name="comments"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_li_post_form" model="ir.ui.view">
+        <field name="name">li.post.form</field>
+        <field name="model">li.post</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_approve" type="object" string="Approve &amp; schedule" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_back_to_draft" type="object" string="Back to draft"
+                            invisible="state not in ('scheduled', 'failed')"/>
+                    <button name="action_redraft" type="object" string="Ask AI to redraft"
+                            invisible="state not in ('draft', 'failed')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="idea,draft,scheduled,published"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name" placeholder="Post title (internal)"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="profile_id"/>
+                            <field name="service_id"/>
+                            <field name="scheduled_at"/>
+                        </group>
+                        <group>
+                            <field name="published_at"/>
+                            <field name="post_url" widget="url"/>
+                            <field name="reactions"/>
+                            <field name="comments"/>
+                            <field name="error" invisible="not error"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="idea" placeholder="What should this post say? the AI drafts from it."/>
+                        <field name="text" readonly="state in ('publishing', 'published')"/>
+                        <field name="comment_texts" invisible="not comment_texts"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="action_li_post" model="ir.actions.act_window">
+        <field name="name">Posts</field>
+        <field name="res_model">li.post</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add a post idea</p>
+            <p>Idea → the AI drafts → you approve → published at the chosen time.</p>
+        </field>
+    </record>
+</odoo>
