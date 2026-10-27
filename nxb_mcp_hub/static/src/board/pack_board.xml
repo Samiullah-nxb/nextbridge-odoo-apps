@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="nxb_mcp_hub.PackBoard">
+        <div class="o_nxb_mcp o_action h-100 overflow-auto">
+            <t t-set="b" t-value="state.board"/>
+            <div class="o_nxb_head">
+                <div>
+                    <h2>Tool packs</h2>
+                    <p class="o_nxb_muted">Choose what assistants may do. Every switched-on tool is described to the
+                        assistant in each request, so switching off packs you do not use also makes answers faster
+                        and cheaper.</p>
+                </div>
+                <div class="o_nxb_stats">
+                    <div class="o_nxb_stat"><div class="o_nxb_stat_v" t-esc="b.tools_on"/><div class="o_nxb_stat_l">tools on</div></div>
+                    <div class="o_nxb_stat"><div class="o_nxb_stat_v">≈<t t-esc="fmt(b.tokens_on)"/></div><div class="o_nxb_stat_l">tokens per request</div></div>
+                    <div class="o_nxb_stat"><div class="o_nxb_stat_v o_nxb_good">≈<t t-esc="fmt(b.tokens_saved)"/></div><div class="o_nxb_stat_l">tokens saved</div></div>
+                </div>
+            </div>
+            <div t-if="!b.can_edit" class="alert alert-info">Only administrators can change these switches.</div>
+            <t t-foreach="b.groups" t-as="g" t-key="g.key">
+                <h4 class="o_nxb_group" t-esc="g.title"/>
+                <div class="o_nxb_cards">
+                    <div t-foreach="g.cards" t-as="c" t-key="c.key" t-attf-class="o_nxb_card {{ c.on ? 'is-on' : '' }}">
+                        <div class="o_nxb_card_top">
+                            <div class="o_nxb_card_title">
+                                <span t-esc="c.title"/>
+                                <span t-if="c.risk == 'high'" class="badge text-bg-danger ms-2">sensitive</span>
+                                <span t-elif="c.risk == 'write'" class="badge text-bg-warning ms-2">changes data</span>
+                            </div>
+                            <div class="form-check form-switch m-0">
+                                <input class="form-check-input" type="checkbox" role="switch" t-att-checked="c.switch"
+                                       t-att-disabled="!b.can_edit or state.busy" t-on-change="() => this.toggle(c)"
+                                       t-att-aria-label="'Switch ' + c.title"/>
+                            </div>
+                        </div>
+                        <p class="o_nxb_card_sum" t-esc="c.summary"/>
+                        <div class="o_nxb_card_meta">
+                            <span><t t-esc="c.tools.length"/> tools · ≈<t t-esc="fmt(c.tokens)"/> tokens</span>
+                            <span t-if="c.app_missing" class="text-warning"><i class="fa fa-exclamation-triangle me-1"/>needs the <t t-esc="c.requires"/> app</span>
+                            <span t-if="c.parent_off" class="o_nxb_muted">works when <t t-esc="c.parent"/> is on</span>
+                        </div>
+                        <button class="btn btn-link btn-sm p-0" t-on-click="() => this.toggleOpen(c.key)">
+                            <t t-esc="state.open[c.key] ? 'Hide tools' : 'Show tools'"/>
+                        </button>
+                        <ul t-if="state.open[c.key]" class="o_nxb_tools">
+                            <li t-foreach="c.tools" t-as="t" t-key="t.name">
+                                <code t-esc="t.name"/> <span t-if="t.writes" class="badge text-bg-light">changes</span>
+                                <span t-if="t.admin_only" class="badge text-bg-light">admins</span>
+                                <div class="o_nxb_muted small" t-esc="t.description"/>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

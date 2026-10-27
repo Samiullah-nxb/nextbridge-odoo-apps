@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_nxb_mcp" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.nxb.mcp</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="AI Connector" string="AI Connector" name="nxb_mcp_hub" groups="nxb_mcp_hub.group_mcp_admin">
+                    <block title="Connector" name="nxb_mcp_connector">
+                        <setting string="Connector address" help="Give this address to your AI assistant, with a connector key or an Odoo sign-in.">
+                            <field name="nxb_mcp_endpoint" widget="CopyClipboardChar" readonly="1"/>
+                            <div class="mt-2">
+                                <button name="%(nxb_mcp_hub.action_nxb_mcp_key_wizard)d" type="action" string="New connector key" class="btn-primary" icon="fa-key"/>
+                            </div>
+                        </setting>
+                        <setting string="Several databases on this server?" help="To reach this database as /mcp/db/&lt;name&gt; when the server hosts several databases, add nxb_mcp_hub to server_wide_modules in the Odoo configuration file (server_wide_modules = base,web,nxb_mcp_hub). With one database per domain (dbfilter) nothing extra is needed."/>
+                    </block>
+                    <block title="Safety" name="nxb_mcp_safety">
+                        <setting help="No assistant may create, change or delete anything, whatever key or sign-in it uses.">
+                            <field name="nxb_mcp_strict_readonly"/>
+                        </setting>
+                        <setting help="When off, the delete tools are hidden from every assistant.">
+                            <field name="nxb_mcp_allow_delete"/>
+                        </setting>
+                        <setting string="Limits" help="Protects the server from very large answers and runaway assistants.">
+                            <div class="row"><label for="nxb_mcp_max_records" class="col-6"/><field name="nxb_mcp_max_records" class="col-3"/></div>
+                            <div class="row"><label for="nxb_mcp_rate_limit" class="col-6"/><field name="nxb_mcp_rate_limit" class="col-3"/></div>
+                        </setting>
+                    </block>
+                    <block title="Sign-in" name="nxb_mcp_oauth">
+                        <setting help="AI apps that cannot store a key let the user sign in with their Odoo login instead (OAuth 2.1 with PKCE).">
+                            <field name="nxb_mcp_oauth_enabled"/>
+                        </setting>
+                        <setting help="Most AI apps register themselves automatically the first time they connect." invisible="not nxb_mcp_oauth_enabled">
+                            <field name="nxb_mcp_oauth_dcr"/>
+                        </setting>
+                    </block>
+                    <block title="Activity log" name="nxb_mcp_log">
+                        <setting help="Store the arguments of every tool call (passwords and tokens are always masked).">
+                            <field name="nxb_mcp_log_arguments"/>
+                        </setting>
+                        <setting string="Retention">
+                            <div class="row"><label for="nxb_mcp_log_days" class="col-6"/><field name="nxb_mcp_log_days" class="col-3"/></div>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+    <record id="action_nxb_mcp_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module': 'nxb_mcp_hub', 'bin_size': False}</field>
+    </record>
+</odoo>

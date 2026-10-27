@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nxb_mcp_dashboard_kanban" model="ir.ui.view">
+        <field name="name">nxb.mcp.dashboard.kanban</field>
+        <field name="model">nxb.mcp.dashboard</field>
+        <field name="arch" type="xml">
+            <kanban action="action_open" type="object">
+                <field name="shared"/>
+                <field name="created_by_ai"/>
+                <templates>
+                    <t t-name="card">
+                        <field name="name" class="fw-bold fs-5"/>
+                        <field name="description" class="text-muted small"/>
+                        <footer class="small">
+                            <span><field name="widget_count"/> widgets</span>
+                            <span t-if="record.shared.raw_value" class="badge text-bg-light ms-2">shared</span>
+                            <span t-if="record.created_by_ai.raw_value" class="badge text-bg-light ms-1">built by AI</span>
+                            <field name="user_id" widget="many2one_avatar_user" class="ms-auto"/>
+                        </footer>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+    <record id="view_nxb_mcp_dashboard_list" model="ir.ui.view">
+        <field name="name">nxb.mcp.dashboard.list</field>
+        <field name="model">nxb.mcp.dashboard</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="widget_count"/>
+                <field name="shared"/>
+                <field name="user_id" widget="many2one_avatar_user"/>
+                <button name="action_open" type="object" string="Open" icon="fa-bar-chart"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_nxb_mcp_dashboard_form" model="ir.ui.view">
+        <field name="name">nxb.mcp.dashboard.form</field>
+        <field name="model">nxb.mcp.dashboard</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_open" type="object" string="Open dashboard" class="btn-primary" icon="fa-bar-chart"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name" placeholder="Dashboard title"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="description"/>
+                        </group>
+                        <group>
+                            <field name="user_id"/>
+                            <field name="shared"/>
+                            <field name="created_by_ai"/>
+                        </group>
+                    </group>
+                    <field name="widget_ids">
+                        <list editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="name"/>
+                            <field name="kind"/>
+                            <field name="model"/>
+                            <field name="measure" optional="show"/>
+                            <field name="aggregate"/>
+                            <field name="group_by" optional="show"/>
+                            <field name="interval" optional="hide"/>
+                            <field name="date_field" optional="hide"/>
+                            <field name="period"/>
+                            <field name="domain" optional="hide"/>
+                            <field name="list_fields" optional="hide"/>
+                            <field name="limit" optional="hide"/>
+                            <field name="order" optional="hide"/>
+                            <field name="width"/>
+                            <field name="prefix" optional="hide"/>
+                            <field name="suffix" optional="hide"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_nxb_mcp_dashboards" model="ir.actions.act_window">
+        <field name="name">Dashboards</field>
+        <field name="res_model">nxb.mcp.dashboard</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No dashboard yet</p>
+            <p>Ask your assistant: "Build a sales dashboard with this month's revenue, orders per salesperson and the
+               monthly trend." It appears here and opens inside Odoo.</p>
+        </field>
+    </record>
+    <record id="action_nxb_mcp_dashboard_view" model="ir.actions.client">
+        <field name="name">Dashboard</field>
+        <field name="tag">nxb_mcp_dashboard</field>
+    </record>
+    <menuitem id="menu_nxb_mcp_dashboards" name="Dashboards" parent="menu_nxb_mcp_features"
+              action="action_nxb_mcp_dashboards" sequence="1"/>
+
+    <record id="rule_dashboard_visible" model="ir.rule">
+        <field name="name">Dashboards: own or shared</field>
+        <field name="model_id" ref="model_nxb_mcp_dashboard"/>
+        <field name="domain_force">['|', ('user_id', '=', user.id), ('shared', '=', True)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_write" eval="False"/><field name="perm_create" eval="False"/><field name="perm_unlink" eval="False"/>
+    </record>
+    <record id="rule_dashboard_own_edit" model="ir.rule">
+        <field name="name">Dashboards: edit own</field>
+        <field name="model_id" ref="model_nxb_mcp_dashboard"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_read" eval="False"/>
+    </record>
+    <record id="rule_dashboard_admin" model="ir.rule">
+        <field name="name">Dashboards: all</field>
+        <field name="model_id" ref="model_nxb_mcp_dashboard"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_mcp_admin'))]"/>
+    </record>
+    <record id="rule_dashboard_widget_visible" model="ir.rule">
+        <field name="name">Dashboard widgets: own or shared</field>
+        <field name="model_id" ref="model_nxb_mcp_dashboard_widget"/>
+        <field name="domain_force">['|', ('dashboard_id.user_id', '=', user.id), ('dashboard_id.shared', '=', True)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_write" eval="False"/><field name="perm_create" eval="False"/><field name="perm_unlink" eval="False"/>
+    </record>
+    <record id="rule_dashboard_widget_own_edit" model="ir.rule">
+        <field name="name">Dashboard widgets: edit own</field>
+        <field name="model_id" ref="model_nxb_mcp_dashboard_widget"/>
+        <field name="domain_force">[('dashboard_id.user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_read" eval="False"/>
+    </record>
+    <record id="rule_dashboard_widget_admin" model="ir.rule">
+        <field name="name">Dashboard widgets: all</field>
+        <field name="model_id" ref="model_nxb_mcp_dashboard_widget"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_mcp_admin'))]"/>
+    </record>
+</odoo>

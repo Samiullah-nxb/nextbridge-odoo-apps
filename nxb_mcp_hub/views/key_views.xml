@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nxb_mcp_key_list" model="ir.ui.view">
+        <field name="name">nxb.mcp.key.list</field>
+        <field name="model">nxb.mcp.key</field>
+        <field name="arch" type="xml">
+            <list create="false" decoration-muted="not active">
+                <field name="name"/>
+                <field name="user_id" widget="many2one_avatar_user"/>
+                <field name="scope" widget="badge" decoration-info="scope == 'read'" decoration-warning="scope == 'write'"/>
+                <field name="connection_ids" widget="many2many_tags" optional="show"/>
+                <field name="hint"/>
+                <field name="last_used"/>
+                <field name="call_count"/>
+                <field name="expires_at" optional="hide"/>
+                <field name="active" widget="boolean_toggle"/>
+                <button name="action_revoke" type="object" string="Revoke" icon="fa-ban" invisible="not active"
+                        confirm="Revoke this key? Any assistant using it loses access immediately."/>
+            </list>
+        </field>
+    </record>
+    <record id="view_nxb_mcp_key_form" model="ir.ui.view">
+        <field name="name">nxb.mcp.key.form</field>
+        <field name="model">nxb.mcp.key</field>
+        <field name="arch" type="xml">
+            <form create="false">
+                <header>
+                    <button name="action_revoke" type="object" string="Revoke" invisible="not active"
+                            confirm="Revoke this key? Any assistant using it loses access immediately."/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="user_id" readonly="1"/>
+                            <field name="scope"/>
+                            <field name="connection_ids" widget="many2many_tags"/>
+                        </group>
+                        <group>
+                            <field name="hint"/>
+                            <field name="expires_at"/>
+                            <field name="last_used"/>
+                            <field name="call_count"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_nxb_mcp_key" model="ir.actions.act_window">
+        <field name="name">Connector keys</field>
+        <field name="res_model">nxb.mcp.key</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'active_test': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create a connector key</p>
+            <p>A key lets an AI assistant act as you. Use "New connector key", then paste the address and key into
+               your assistant.</p>
+        </field>
+    </record>
+
+    <record id="view_nxb_mcp_key_wizard_form" model="ir.ui.view">
+        <field name="name">nxb.mcp.key.wizard.form</field>
+        <field name="model">nxb.mcp.key.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="done" invisible="1"/>
+                <group invisible="done">
+                    <field name="name"/>
+                    <field name="user_id" groups="nxb_mcp_hub.group_mcp_admin"/>
+                    <field name="scope" widget="radio"/>
+                    <field name="connection_ids" widget="many2many_tags" placeholder="All databases"/>
+                    <field name="expires_at"/>
+                </group>
+                <div invisible="not done">
+                    <div class="alert alert-warning" role="alert">
+                        Copy the key now — for security it is shown only once.
+                    </div>
+                    <group>
+                        <field name="token" widget="CopyClipboardChar" string="Connector key"/>
+                        <field name="url_header" widget="CopyClipboardChar"/>
+                    </group>
+                    <h5 class="mt-3">How to connect</h5>
+                    <ul class="small">
+                        <li><b>Apps with header support</b> (desktop apps, IDEs, agents): use the connector URL and send
+                            the header <code>Authorization: Bearer &lt;key&gt;</code>.</li>
+                        <li><b>Web apps that only accept a URL</b>: use the URL that contains the key below, or sign in
+                            with your Odoo login instead (OAuth) using the plain connector URL.</li>
+                        <li><b>Desktop apps using a JSON configuration</b>: paste the configuration below.</li>
+                    </ul>
+                    <group>
+                        <field name="url_with_key" widget="CopyClipboardChar"/>
+                    </group>
+                    <field name="config_desktop" widget="CopyClipboardText" class="o_nxb_json"/>
+                </div>
+                <footer>
+                    <button name="action_generate" type="object" string="Create key" class="btn-primary" invisible="done"/>
+                    <button special="cancel" string="Cancel" invisible="done"/>
+                    <button name="action_close" type="object" string="Done" class="btn-primary" invisible="not done"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_nxb_mcp_key_wizard" model="ir.actions.act_window">
+        <field name="name">New connector key</field>
+        <field name="res_model">nxb.mcp.key.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

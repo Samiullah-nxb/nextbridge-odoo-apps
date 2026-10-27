@@ -1,0 +1,161 @@
+<section class="oe_container" style="padding: 32px 16px 8px;">
+  <div style="max-width: 1100px; margin: 0 auto; text-align: center;">
+    <h1 style="font-size: 34px; font-weight: 800; color: #0f3d56; margin-bottom: 10px;">Multi-Database MCP Server – AI Connector for Odoo</h1>
+    <p style="font-size: 19px; color: #405866; max-width: 820px; margin: 0 auto 18px;">
+      Give AI assistants a safe, audited way into Odoo. One connector address reaches this database,
+      other databases on the same server and databases on other Odoo servers.
+    </p>
+    <p style="margin: 0 0 6px;">
+      <span style="display:inline-block;background:#e6f6f4;color:#0f766e;border-radius:16px;padding:5px 14px;margin:3px;font-weight:600;">Odoo 18</span>
+      <span style="display:inline-block;background:#e8eefc;color:#1e3a8a;border-radius:16px;padding:5px 14px;margin:3px;font-weight:600;">Model Context Protocol (Streamable HTTP)</span>
+      <span style="display:inline-block;background:#fff4e0;color:#9a5b00;border-radius:16px;padding:5px 14px;margin:3px;font-weight:600;">109 tools in 11 switchable packs</span>
+      <span style="display:inline-block;background:#f1eefc;color:#4c2c92;border-radius:16px;padding:5px 14px;margin:3px;font-weight:600;">Connector keys + OAuth 2.1 sign-in</span>
+    </p>
+    <img src="screenshot_overview.png" alt="AI Connector overview" style="max-width:100%; margin-top: 18px; border: 1px solid #dfe5ea; border-radius: 10px; box-shadow: 0 6px 24px rgba(15,61,86,.12);"/>
+  </div>
+</section>
+
+<section class="oe_container" style="padding: 36px 16px;">
+  <div style="max-width: 1100px; margin: 0 auto;">
+    <h2 style="font-size: 26px; font-weight: 700; color: #0f3d56; text-align: center; margin-bottom: 6px;">One assistant, all your databases</h2>
+    <p style="text-align:center; color:#405866; font-size: 16px; max-width: 760px; margin: 0 auto 24px;">
+      Companies often run several Odoo databases: one per country, per branch or per brand. Register them once and
+      the assistant can work in any of them, or compare them in a single question.
+    </p>
+    <div class="row">
+      <div class="col-md-4" style="margin-bottom:16px;">
+        <div style="border:1px solid #dfe5ea;border-radius:10px;padding:18px;height:100%;">
+          <h4 style="color:#0f766e;font-weight:700;">This database</h4>
+          <p style="color:#405866;margin:0;">Every tool pack, using the signed-in user's own access rights.</p>
+        </div>
+      </div>
+      <div class="col-md-4" style="margin-bottom:16px;">
+        <div style="border:1px solid #dfe5ea;border-radius:10px;padding:18px;height:100%;">
+          <h4 style="color:#0f766e;font-weight:700;">Other databases on this server</h4>
+          <p style="color:#405866;margin:0;">Opened directly, authenticated with an Odoo API key of that database. All packs when the app is
+            installed there; data tools otherwise.</p>
+        </div>
+      </div>
+      <div class="col-md-4" style="margin-bottom:16px;">
+        <div style="border:1px solid #dfe5ea;border-radius:10px;padding:18px;height:100%;">
+          <h4 style="color:#0f766e;font-weight:700;">Databases on other servers</h4>
+          <p style="color:#405866;margin:0;">Data tools over Odoo's external API, or every pack when the remote server runs this app too
+            (calls are forwarded to its own connector).</p>
+        </div>
+      </div>
+    </div>
+    <p style="color:#405866;">The assistant sees a <code>database</code> choice on every tool, plus <b>hub_search_all</b> to run the same
+      search or count in every database at once ("How many open opportunities does each branch have?").</p>
+    <div class="row" style="margin-top: 10px;">
+      <div class="col-md-6"><img src="screenshot_databases.png" alt="Databases" style="max-width:100%;border:1px solid #dfe5ea;border-radius:8px;"/></div>
+      <div class="col-md-6"><img src="screenshot_database_form.png" alt="Database on another server" style="max-width:100%;border:1px solid #dfe5ea;border-radius:8px;"/></div>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container" style="padding: 36px 16px; background: #f6f9fb;">
+  <div style="max-width: 1100px; margin: 0 auto;">
+    <h2 style="font-size: 26px; font-weight: 700; color: #0f3d56; text-align: center; margin-bottom: 20px;">What the assistant can do</h2>
+    <table class="table" style="background:#fff;border:1px solid #dfe5ea;">
+      <thead><tr style="background:#0f3d56;color:#fff;"><th>Pack</th><th>Tools</th><th>Examples</th><th>Default</th></tr></thead>
+      <tbody>
+        <tr><td><b>Databases &amp; discovery</b></td><td>4</td><td>List connected databases, explain what is available, search all databases at once</td><td>On</td></tr>
+        <tr><td><b>Read data</b></td><td>9</td><td>Find models and fields, search, read, count, group and summarise any records the user may see</td><td>On</td></tr>
+        <tr><td><b>Create &amp; change data</b></td><td>5</td><td>Create, update and delete records (delete needs a confirmation), run model actions, post notes</td><td>On</td></tr>
+        <tr><td><b>Dashboards</b></td><td>9</td><td>Build KPI, bar, line and pie charts, tables and record lists that open inside Odoo</td><td>On</td></tr>
+        <tr><td><b>CRM &amp; prospecting</b></td><td>8</td><td>Pipeline summary, add leads with duplicate detection, follow-ups, win/lose; salespeople write "briefs" for the assistant</td><td>Off</td></tr>
+        <tr><td><b>Email campaigns</b></td><td>11</td><td>Mailing lists and contacts, draft campaigns from building blocks and products, schedule sending</td><td>Off</td></tr>
+        <tr><td><b>Access control</b></td><td>17</td><td>Hide menus, fields, buttons or the chatter for users and groups, block models, add record rules: all listed and reversible</td><td>Off</td></tr>
+        <tr><td><b>Website SEO</b></td><td>16</td><td>Audit pages, fix titles and descriptions, URLs with 301 redirects, headings, alt texts, robots.txt, sitemap</td><td>Off</td></tr>
+        <tr><td><b>Website builder</b></td><td>22</td><td>Create pages from Odoo blocks, edit texts, links and images, move sections, menus, colours and fonts, with undo</td><td>Off</td></tr>
+        <tr><td><b>Website builder – expert</b></td><td>5</td><td>HTML sections (sanitised), custom CSS, head/footer code, preview or import a public web page</td><td>Off</td></tr>
+        <tr><td><b>SQL &amp; schema</b></td><td>3</td><td>Administrators only: tables, columns and read-only SELECT queries with a time limit</td><td>Off</td></tr>
+      </tbody>
+    </table>
+    <p style="color:#405866;">Packs are switched on and off on one screen. Every tool switched on is described to the assistant in every
+      request, so switching off what you do not use also makes answers faster and cheaper; the screen shows the estimate.</p>
+    <img src="screenshot_packs.png" alt="Tool packs" style="max-width:100%;border:1px solid #dfe5ea;border-radius:8px;"/>
+  </div>
+</section>
+
+<section class="oe_container" style="padding: 36px 16px;">
+  <div style="max-width: 1100px; margin: 0 auto;">
+    <h2 style="font-size: 26px; font-weight: 700; color: #0f3d56; text-align: center; margin-bottom: 20px;">Dashboards built from a sentence</h2>
+    <p style="text-align:center;color:#405866;max-width:760px;margin:0 auto 20px;">"Make me a sales dashboard: revenue, open pipeline, revenue per salesperson and
+      orders per month." The assistant builds it, checks the figures and sends a link. Every viewer only sees figures for records they
+      are allowed to access.</p>
+    <img src="screenshot_dashboard.png" alt="Dashboard" style="max-width:100%;border:1px solid #dfe5ea;border-radius:8px;"/>
+  </div>
+</section>
+
+<section class="oe_container" style="padding: 36px 16px; background: #f6f9fb;">
+  <div style="max-width: 1100px; margin: 0 auto;">
+    <h2 style="font-size: 26px; font-weight: 700; color: #0f3d56; text-align: center; margin-bottom: 20px;">Built for safety</h2>
+    <div class="row">
+      <div class="col-md-6">
+        <ul style="color:#2c3e48;font-size:15px;line-height:1.7;">
+          <li><b>Odoo's own rights apply.</b> The assistant acts as a real user: access rights, record rules and multi-company stay in force.</li>
+          <li><b>Connector keys</b> are stored as hashes, can be read-only, limited to some databases, given an expiry date and revoked.</li>
+          <li><b>OAuth 2.1 sign-in</b> (PKCE, dynamic client registration, rotating refresh tokens) for apps that cannot store a key.</li>
+          <li><b>Read-only switch</b> for the whole company, a separate switch for deleting, and confirmation for anything irreversible.</li>
+        </ul>
+      </div>
+      <div class="col-md-6">
+        <ul style="color:#2c3e48;font-size:15px;line-height:1.7;">
+          <li><b>Activity log</b> of every call: who, which tool, which database, duration, result; secrets are masked.</li>
+          <li><b>Limits:</b> maximum records per answer and calls per minute per key.</li>
+          <li><b>Website changes</b> need an explicit permission per website and page, and every content change can be undone.</li>
+          <li><b>Restrictions never apply to administrators</b> and administrator rights can never be granted by the assistant.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6"><img src="screenshot_activity.png" alt="Activity log" style="max-width:100%;border:1px solid #dfe5ea;border-radius:8px;margin-bottom:12px;"/></div>
+      <div class="col-md-6"><img src="screenshot_access.png" alt="Access restrictions" style="max-width:100%;border:1px solid #dfe5ea;border-radius:8px;margin-bottom:12px;"/></div>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container" style="padding: 36px 16px;">
+  <div style="max-width: 1100px; margin: 0 auto;">
+    <h2 style="font-size: 26px; font-weight: 700; color: #0f3d56; text-align: center; margin-bottom: 20px;">Connect in three steps</h2>
+    <ol style="color:#2c3e48;font-size:16px;line-height:1.8;max-width:860px;margin:0 auto 20px;">
+      <li>Install the app and open <b>AI Connector → Connect → New connector key</b>.</li>
+      <li>Add the connector address to your AI app as a remote MCP server. Apps with header support send the key as
+        <code>Authorization: Bearer &lt;key&gt;</code>; desktop apps get a ready-made JSON configuration; apps with a sign-in flow open an Odoo consent page instead.</li>
+      <li>Ask in plain language: <i>"Compare this month's sales of all our companies"</i>, <i>"Create a dashboard of overdue invoices"</i>,
+        <i>"Hide the Invoicing app from the warehouse team"</i>.</li>
+    </ol>
+    <div class="row">
+      <div class="col-md-7"><img src="screenshot_key.png" alt="New connector key" style="max-width:100%;border:1px solid #dfe5ea;border-radius:8px;margin-bottom:12px;"/></div>
+      <div class="col-md-5"><img src="screenshot_signin.png" alt="Sign-in consent page" style="max-width:100%;border:1px solid #dfe5ea;border-radius:8px;margin-bottom:12px;"/></div>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container" style="padding: 36px 16px; background: #f6f9fb;">
+  <div style="max-width: 1100px; margin: 0 auto;">
+    <h2 style="font-size: 26px; font-weight: 700; color: #0f3d56; text-align: center; margin-bottom: 20px;">Questions</h2>
+    <p><b>Which AI apps work with it?</b><br/>Apps that support remote MCP servers over Streamable HTTP, either with a header (connector key)
+      or with OAuth sign-in. Desktop apps that only start local servers can use the generated <code>mcp-remote</code> configuration.</p>
+    <p><b>Do I need a special Odoo setup?</b><br/>No for one database per domain. On a server that hosts several databases without a
+      database filter, add the app to <code>server_wide_modules</code> so each database is reachable at <code>/mcp/db/&lt;name&gt;</code>;
+      the settings page explains it.</p>
+    <p><b>Does it change Odoo's core?</b><br/>No. It depends only on <code>base</code> and <code>web</code>; CRM, Email Marketing and
+      Website tools switch on when those apps are installed.</p>
+    <p><b>Does the AI provider see my data?</b><br/>Only the answers to the tools the assistant calls, within the user's rights and the
+      packs you allow. Keep sensitive packs off and use read-only keys where possible.</p>
+    <p><b>Is it tested?</b><br/>The app ships with an automated test suite (protocol, data tools, dashboards, CRM, email campaigns, access
+      control, website, HTTP endpoint and the full OAuth flow).</p>
+  </div>
+</section>
+
+<section class="oe_container" style="padding: 32px 16px;">
+  <div style="max-width: 900px; margin: 0 auto; text-align: center;">
+    <h2 style="font-size: 24px; font-weight: 700; color: #0f3d56;">Support</h2>
+    <p style="color:#405866;font-size:16px;">Developed and supported by <b>Nextbridge</b> ·
+      <a href="https://www.nextbridge.pk">www.nextbridge.pk</a> ·
+      <a href="mailto:samiullah.3277@nxb.com.pk">samiullah.3277@nxb.com.pk</a></p>
+    <p style="color:#8597a2;font-size:13px;">Product names mentioned are trademarks of their respective owners; this app is not affiliated with them.</p>
+  </div>
+</section>

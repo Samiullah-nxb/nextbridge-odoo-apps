@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nxb_mcp_brief_list" model="ir.ui.view">
+        <field name="name">nxb.mcp.brief.list</field>
+        <field name="model">nxb.mcp.brief</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="kind"/>
+                <field name="user_id" widget="many2one_avatar_user"/>
+                <field name="target_count"/>
+                <field name="deadline" optional="show"/>
+                <field name="state" widget="badge" decoration-info="state == 'active'" decoration-success="state == 'done'"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_nxb_mcp_brief_form" model="ir.ui.view">
+        <field name="name">nxb.mcp.brief.form</field>
+        <field name="model">nxb.mcp.brief</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_ready" type="object" string="Ready for the assistant" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_done" type="object" string="Mark done" invisible="state != 'active'"/>
+                    <button name="action_draft" type="object" string="Back to draft" invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name" placeholder="e.g. Furniture retailers in Germany"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="kind" widget="radio"/>
+                            <field name="user_id"/>
+                            <field name="target_count"/>
+                            <field name="deadline"/>
+                        </group>
+                        <group>
+                            <field name="tags" placeholder="AI prospecting, DE retail"/>
+                            <field name="tone"/>
+                            <field name="call_to_action" invisible="kind != 'campaign'"/>
+                            <field name="link" invisible="kind != 'campaign'"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="goal" placeholder="What should the assistant achieve?"/>
+                        <field name="audience" placeholder="Industries, countries, company size, job roles..."/>
+                        <field name="offer" placeholder="What you sell or announce, key benefits..."/>
+                        <field name="products" invisible="kind != 'campaign'" placeholder="One product per line"/>
+                        <field name="exclude"/>
+                        <field name="notes"/>
+                    </group>
+                    <div class="alert alert-info mt-3" role="alert" invisible="not prompt">
+                        <b>Ask your assistant:</b>
+                        <field name="prompt" widget="CopyClipboardText" readonly="1"/>
+                    </div>
+                    <group string="What the assistant did" invisible="not result_note">
+                        <field name="result_note" nolabel="1" colspan="2"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_nxb_mcp_brief" model="ir.actions.act_window">
+        <field name="name">Briefs</field>
+        <field name="res_model">nxb.mcp.brief</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Write a brief for your assistant</p>
+            <p>Describe who to prospect or what to promote. The assistant reads the brief, adds leads to the CRM or
+               prepares a draft email campaign, and reports back here.</p>
+        </field>
+    </record>
+    <menuitem id="menu_nxb_mcp_briefs" name="Briefs" parent="menu_nxb_mcp_features" action="action_nxb_mcp_brief" sequence="5"/>
+</odoo>

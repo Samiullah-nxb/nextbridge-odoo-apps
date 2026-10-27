@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="nxb_mcp_hub.DashboardView">
+        <div class="o_nxb_mcp o_nxb_dash o_action h-100 overflow-auto" t-ref="root">
+            <t t-if="state.list">
+                <h2>Dashboards</h2>
+                <p class="o_nxb_muted">Ask your assistant to build one, for example: "Create a sales dashboard with this
+                    month's revenue, orders per salesperson and the revenue trend."</p>
+                <div class="o_nxb_cards">
+                    <div t-foreach="state.list" t-as="d" t-key="d.id" class="o_nxb_card o_nxb_click is-on" t-on-click="() => this.openDashboard(d.id)">
+                        <div class="o_nxb_card_title" t-esc="d.name"/>
+                        <p class="o_nxb_card_sum" t-esc="d.description or ''"/>
+                        <div class="o_nxb_card_meta"><t t-esc="d.widget_count"/> widgets</div>
+                    </div>
+                </div>
+            </t>
+            <div t-elif="state.error" class="alert alert-danger m-3" t-esc="state.error"/>
+            <t t-elif="state.data">
+                <t t-set="d" t-value="state.data"/>
+                <div class="o_nxb_head">
+                    <div>
+                        <h2 t-esc="d.name"/>
+                        <p class="o_nxb_muted" t-if="d.description" t-esc="d.description"/>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-light" t-on-click="refresh"><i class="fa fa-refresh me-1"/>Refresh</button>
+                        <button class="btn btn-light" t-on-click="editDashboard"><i class="fa fa-pencil me-1"/>Edit</button>
+                    </div>
+                </div>
+                <div class="o_nxb_dgrid">
+                    <div t-foreach="d.widgets" t-as="w" t-key="w.id" t-attf-class="o_nxb_widget o_nxb_w{{ w.width }} o_nxb_k_{{ w.kind }}">
+                        <div class="o_nxb_widget_head">
+                            <span class="o_nxb_widget_title" t-esc="w.title"/>
+                            <span class="o_nxb_widget_period" t-if="w.period != 'All time'" t-esc="w.period"/>
+                        </div>
+                        <div t-if="w.error" class="text-danger small"><i class="fa fa-exclamation-triangle me-1"/><t t-esc="w.error"/></div>
+                        <div t-elif="w.kind == 'kpi'" class="o_nxb_kpi" t-esc="fmt(w.value, w)"/>
+                        <div t-elif="['bar', 'line', 'pie'].includes(w.kind)" class="o_nxb_chart">
+                            <canvas t-att-data-widget="w.id" role="img" t-att-aria-label="w.title"/>
+                            <div t-if="!w.values.length" class="o_nxb_muted small">No data for this period.</div>
+                        </div>
+                        <table t-elif="w.kind == 'table'" class="table table-sm mb-0">
+                            <thead><tr><th/><th class="text-end" t-esc="w.measure_label"/></tr></thead>
+                            <tbody>
+                                <tr t-foreach="w.labels" t-as="l" t-key="l_index">
+                                    <td t-esc="l"/><td class="text-end o_nxb_num" t-esc="fmt(w.values[l_index], w)"/>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table t-elif="w.kind == 'list'" class="table table-sm table-hover mb-0">
+                            <thead><tr><th t-foreach="w.columns" t-as="c" t-key="c.name" t-esc="c.label"/></tr></thead>
+                            <tbody>
+                                <tr t-foreach="w.rows" t-as="r" t-key="r_index" class="o_nxb_click" t-on-click="() => this.openRecord(w.model, w.ids[r_index])">
+                                    <td t-foreach="r" t-as="cell" t-key="cell_index" t-attf-class="{{ typeof cell == 'number' ? 'text-end o_nxb_num' : '' }}" t-esc="typeof cell == 'number' ? fmt(cell, w) : cell"/>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,31 @@
+.o_nxb_mcp {
+    --nxb-card: var(--o-view-background-color, #fff);
+    --nxb-border: var(--bs-border-color, #e3e4ea);
+    --nxb-muted: var(--bs-secondary-color, #6b7280);
+    --nxb-accent: #4c56d6;
+    --nxb-good: #12805c;
+    padding: 20px 28px 40px;
+    background: var(--bs-body-bg, #f6f7fb);
+
+    h2 { font-size: 1.45rem; font-weight: 700; margin: 0 0 4px; }
+    .o_nxb_muted { color: var(--nxb-muted); }
+    .o_nxb_good { color: var(--nxb-good); }
+    .o_nxb_head { display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;
+        p { max-width: 720px; margin: 0; } }
+    .o_nxb_stats { display: flex; gap: 10px; }
+    .o_nxb_stat { background: var(--nxb-card); border: 1px solid var(--nxb-border); border-radius: 10px; padding: 10px 16px; min-width: 120px; }
+    .o_nxb_stat_v { font-size: 1.35rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .o_nxb_stat_l { font-size: .78rem; color: var(--nxb-muted); }
+    .o_nxb_group { font-size: 1rem; font-weight: 700; margin: 22px 0 10px; text-transform: uppercase; letter-spacing: .04em; color: var(--nxb-muted); }
+    .o_nxb_cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
+    .o_nxb_card { background: var(--nxb-card); border: 1px solid var(--nxb-border); border-radius: 12px; padding: 14px 16px;
+        border-left: 4px solid var(--nxb-border);
+        &.is-on { border-left-color: var(--nxb-accent); } }
+    .o_nxb_card_top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .o_nxb_card_title { font-weight: 700; font-size: 1rem; }
+    .o_nxb_card_sum { margin: 6px 0 8px; font-size: .9rem; }
+    .o_nxb_card_meta { display: flex; flex-wrap: wrap; gap: 12px; font-size: .8rem; color: var(--nxb-muted); margin-bottom: 4px; }
+    .o_nxb_tools { list-style: none; padding: 6px 0 0; margin: 0; font-size: .85rem;
+        li { padding: 6px 0; border-top: 1px dashed var(--nxb-border); } }
+    .form-switch .form-check-input { width: 2.6em; height: 1.35em; cursor: pointer; }
+}

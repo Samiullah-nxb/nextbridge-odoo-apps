@@ -1,0 +1,20 @@
+.o_nxb_dash {
+    --nxb-grid: rgba(127, 127, 127, .16);
+    .o_nxb_dgrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+    @media (max-width: 992px) { .o_nxb_dgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 576px) { .o_nxb_dgrid { grid-template-columns: minmax(0, 1fr); } }
+    .o_nxb_widget { background: var(--nxb-card); border: 1px solid var(--nxb-border); border-radius: 12px; padding: 14px 16px; min-width: 0;
+        .table { --bs-table-bg: transparent; font-size: .86rem; } }
+    .o_nxb_w1 { grid-column: span 1; }
+    .o_nxb_w2 { grid-column: span 2; }
+    .o_nxb_w3 { grid-column: span 3; }
+    .o_nxb_w4 { grid-column: 1 / -1; }
+    @media (max-width: 992px) { .o_nxb_w3, .o_nxb_w4 { grid-column: 1 / -1; } }
+    @media (max-width: 576px) { .o_nxb_w1, .o_nxb_w2, .o_nxb_w3, .o_nxb_w4 { grid-column: 1 / -1; } }
+    .o_nxb_widget_head { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+    .o_nxb_widget_title { font-weight: 600; font-size: .9rem; }
+    .o_nxb_widget_period { font-size: .75rem; color: var(--nxb-muted); white-space: nowrap; }
+    .o_nxb_kpi { font-size: 2rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.2; }
+    .o_nxb_chart { position: relative; height: 240px; }
+    .o_nxb_num { font-variant-numeric: tabular-nums; }
+}

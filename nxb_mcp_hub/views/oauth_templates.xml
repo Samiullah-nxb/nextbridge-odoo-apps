@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="oauth_page" name="AI Connector sign-in page">
+        <html>
+            <head>
+                <meta charset="utf-8"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <title>Connect an AI assistant to Odoo</title>
+                <style>
+                    body { margin: 0; font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif; background: #f3f4f8; color: #1f2937; }
+                    .card { max-width: 460px; margin: 8vh auto; background: #fff; border-radius: 14px; padding: 32px;
+                            box-shadow: 0 10px 40px rgba(15, 23, 42, .12); }
+                    h1 { font-size: 22px; margin: 0 0 6px; }
+                    .muted { color: #6b7280; font-size: 14px; }
+                    .app { font-weight: 700; }
+                    ul { padding-left: 18px; line-height: 1.7; font-size: 14.5px; }
+                    label { display: block; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 8px; margin: 8px 0; cursor: pointer; }
+                    .btns { display: flex; gap: 10px; margin-top: 18px; }
+                    button { flex: 1; padding: 11px; border-radius: 8px; border: 0; font-size: 15px; font-weight: 600; cursor: pointer; }
+                    .allow { background: #4c56d6; color: #fff; }
+                    .deny { background: #eef0f4; color: #374151; }
+                    .err { color: #b42318; }
+                </style>
+            </head>
+            <body><div class="card"><t t-out="0"/></div></body>
+        </html>
+    </template>
+
+    <template id="oauth_consent" name="AI Connector consent">
+        <t t-call="nxb_mcp_hub.oauth_page">
+            <h1>Connect <span class="app" t-esc="client.name"/> to Odoo?</h1>
+            <p class="muted">Signed in as <b t-esc="user.name"/> · database <b t-esc="dbname"/></p>
+            <p>The assistant will act as you and see only what you can see. It can:</p>
+            <ul>
+                <li>read the records you have access to,</li>
+                <li>create and change records if you allow it below,</li>
+                <li>use the tool packs your administrator switched on.</li>
+            </ul>
+            <form method="post">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <t t-foreach="['client_id', 'redirect_uri', 'response_type', 'state', 'code_challenge', 'code_challenge_method', 'scope', 'resource']" t-as="k">
+                    <input type="hidden" t-att-name="k" t-att-value="params.get(k) or ''"/>
+                </t>
+                <label><input type="radio" name="scope_choice" value="write" t-att-checked="not readonly_default"/> Read and change data</label>
+                <label><input type="radio" name="scope_choice" value="read" t-att-checked="readonly_default"/> Read only</label>
+                <div class="btns">
+                    <button class="deny" type="submit" name="decision" value="deny">Cancel</button>
+                    <button class="allow" type="submit" name="decision" value="allow">Allow</button>
+                </div>
+            </form>
+        </t>
+    </template>
+
+    <template id="oauth_error" name="AI Connector sign-in error">
+        <t t-call="nxb_mcp_hub.oauth_page">
+            <h1>Cannot connect</h1>
+            <p class="err" t-esc="message"/>
+            <p class="muted">Ask your Odoo administrator to check AI Connector → Settings.</p>
+        </t>
+    </template>
+</odoo>

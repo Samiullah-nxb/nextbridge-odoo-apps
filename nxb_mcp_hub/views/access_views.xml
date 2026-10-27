@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nxb_mcp_access_rule_list" model="ir.ui.view">
+        <field name="name">nxb.mcp.access.rule.list</field>
+        <field name="model">nxb.mcp.access.rule</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="not active">
+                <field name="name"/>
+                <field name="kind"/>
+                <field name="model" optional="show"/>
+                <field name="user_ids" widget="many2many_tags" optional="show"/>
+                <field name="group_ids" widget="many2many_tags" optional="show"/>
+                <field name="created_by_ai" optional="show"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_nxb_mcp_access_rule_form" model="ir.ui.view">
+        <field name="name">nxb.mcp.access.rule.form</field>
+        <field name="model">nxb.mcp.access.rule</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <widget name="web_ribbon" title="Off" bg_color="text-bg-secondary" invisible="active"/>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="kind" readonly="kind == 'record_rule' and ir_rule_id"/>
+                            <field name="model_id" invisible="kind in ('menu_hide', 'menu_only')"
+                                   required="kind in ('field', 'element', 'chatter', 'model_block', 'record_rule')"/>
+                            <field name="active"/>
+                            <field name="created_by_ai"/>
+                        </group>
+                        <group string="Applies to">
+                            <field name="user_ids" widget="many2many_tags" invisible="kind == 'record_rule'"/>
+                            <field name="group_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                    <group invisible="kind not in ('menu_hide', 'menu_only')">
+                        <field name="menu_ids" widget="many2many_tags"/>
+                    </group>
+                    <group invisible="kind != 'field'">
+                        <field name="field_ids" widget="many2many_tags" domain="[('model_id', '=', model_id)]"/>
+                        <field name="field_mode" widget="radio"/>
+                    </group>
+                    <group invisible="kind != 'element'">
+                        <field name="selectors" placeholder="button[name=action_confirm]&#10;page[name=other_information]"/>
+                    </group>
+                    <group invisible="kind != 'model_block'">
+                        <field name="block_read"/><field name="block_write"/>
+                        <field name="block_create"/><field name="block_unlink"/>
+                    </group>
+                    <group invisible="kind != 'record_rule'">
+                        <field name="ir_rule_id" readonly="1"/>
+                        <field name="domain"/>
+                    </group>
+                    <field name="note" placeholder="Why this restriction exists..."/>
+                    <div class="text-muted small mt-2">Restrictions never apply to administrators. Users see the change
+                        after reloading Odoo.</div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_nxb_mcp_access_rule" model="ir.actions.act_window">
+        <field name="name">Access restrictions</field>
+        <field name="res_model">nxb.mcp.access.rule</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'active_test': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No restriction yet</p>
+            <p>Ask your assistant, for example: "Hide the Invoicing app from the warehouse team" or "Salespeople
+               must not see the cost field on products". Every restriction is listed here and can be switched off.</p>
+        </field>
+    </record>
+    <menuitem id="menu_nxb_mcp_access" name="Access restrictions" parent="menu_nxb_mcp_features"
+              action="action_nxb_mcp_access_rule" sequence="10" groups="nxb_mcp_hub.group_mcp_admin"/>
+</odoo>

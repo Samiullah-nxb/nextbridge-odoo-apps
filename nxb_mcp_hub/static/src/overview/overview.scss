@@ -1,0 +1,35 @@
+.o_nxb_mcp {
+    h4 { font-size: 1.02rem; font-weight: 700; margin: 0 0 10px; }
+    h5 { font-size: .9rem; font-weight: 700; }
+    .o_nxb_grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    @media (max-width: 1100px) { .o_nxb_grid { grid-template-columns: 1fr; } }
+    .o_nxb_panel { background: var(--nxb-card); border: 1px solid var(--nxb-border); border-radius: 12px; padding: 16px 18px; min-width: 0;
+        .table { --bs-table-bg: transparent; } }
+    .o_nxb_wide { grid-column: 1 / -1; }
+    .o_nxb_steps { margin: 0; padding-left: 20px; li { margin-bottom: 12px; } }
+    .o_nxb_copy { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; padding: 4px 6px 4px 10px;
+        border: 1px solid var(--nxb-border); border-radius: 8px; code { font-size: .95rem; } }
+    .o_nxb_click { cursor: pointer; }
+    .o_nxb_bars { display: flex; align-items: flex-end; gap: 8px; height: 120px; }
+    .o_nxb_bar_col { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; }
+    .o_nxb_bar_stack { flex: 1; width: 100%; display: flex; flex-direction: column; justify-content: flex-end; gap: 2px; }
+    .o_nxb_bar_ok { background: var(--nxb-accent); border-radius: 4px 4px 0 0; min-height: 0; }
+    .o_nxb_bar_bad { background: #d5483d; border-radius: 4px 4px 0 0; min-height: 0; }
+    .o_nxb_bar_l { font-size: .72rem; color: var(--nxb-muted); margin-top: 4px; }
+    .o_nxb_legend { display: flex; gap: 14px; font-size: .78rem; color: var(--nxb-muted); margin-top: 6px; }
+    .o_nxb_dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; }
+    .o_nxb_dot_ok { background: var(--nxb-accent); }
+    .o_nxb_dot_bad { background: #d5483d; }
+    .o_nxb_recent { display: flex; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--nxb-border); font-size: .88rem; }
+}
+
+// key wizard: keep the JSON configuration readable
+.o_nxb_json {
+    width: 100%;
+    span, .o_field_CopyClipboardText, div:not(.o_clipboard_button) {
+        white-space: pre-wrap;
+        font-family: SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 12px;
+        text-align: left;
+    }
+}

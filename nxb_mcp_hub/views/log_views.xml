@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nxb_mcp_log_list" model="ir.ui.view">
+        <field name="name">nxb.mcp.log.list</field>
+        <field name="model">nxb.mcp.log</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false" decoration-danger="status == 'error'" decoration-warning="status == 'refused'">
+                <field name="create_date" string="When"/>
+                <field name="user_id" widget="many2one_avatar_user"/>
+                <field name="tool"/>
+                <field name="database_code"/>
+                <field name="status" widget="badge" decoration-success="status == 'ok'"
+                       decoration-danger="status == 'error'" decoration-warning="status == 'refused'"/>
+                <field name="duration_ms" optional="show"/>
+                <field name="key_id" optional="hide"/>
+                <field name="error" optional="show"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_nxb_mcp_log_form" model="ir.ui.view">
+        <field name="name">nxb.mcp.log.form</field>
+        <field name="model">nxb.mcp.log</field>
+        <field name="arch" type="xml">
+            <form create="false" edit="false">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="tool"/>
+                            <field name="status"/>
+                            <field name="create_date" string="When"/>
+                            <field name="duration_ms"/>
+                        </group>
+                        <group>
+                            <field name="user_id"/>
+                            <field name="key_id"/>
+                            <field name="oauth_token_id"/>
+                            <field name="connection_id"/>
+                            <field name="session_ref"/>
+                        </group>
+                    </group>
+                    <group string="Arguments"><field name="arguments" nolabel="1" colspan="2"/></group>
+                    <group string="Error" invisible="not error"><field name="error" nolabel="1" colspan="2"/></group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_nxb_mcp_log_search" model="ir.ui.view">
+        <field name="name">nxb.mcp.log.search</field>
+        <field name="model">nxb.mcp.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="tool"/>
+                <field name="user_id"/>
+                <field name="database_code"/>
+                <field name="arguments"/>
+                <filter name="errors" string="Errors and refusals" domain="[('status', '!=', 'ok')]"/>
+                <filter name="today" string="Today" domain="[('create_date', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <group expand="0">
+                    <filter name="by_tool" string="Tool" context="{'group_by': 'tool'}"/>
+                    <filter name="by_user" string="User" context="{'group_by': 'user_id'}"/>
+                    <filter name="by_db" string="Database" context="{'group_by': 'database_code'}"/>
+                    <filter name="by_day" string="Day" context="{'group_by': 'create_date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="view_nxb_mcp_log_graph" model="ir.ui.view">
+        <field name="name">nxb.mcp.log.graph</field>
+        <field name="model">nxb.mcp.log</field>
+        <field name="arch" type="xml">
+            <graph string="AI activity" type="bar" stacked="1">
+                <field name="create_date" interval="day"/>
+                <field name="status"/>
+            </graph>
+        </field>
+    </record>
+    <record id="action_nxb_mcp_log" model="ir.actions.act_window">
+        <field name="name">AI activity</field>
+        <field name="res_model">nxb.mcp.log</field>
+        <field name="view_mode">list,graph,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_empty_folder">No AI activity yet</p>
+            <p>Every tool call made by an assistant is recorded here: who, which database, which tool and the result.</p>
+        </field>
+    </record>
+
+    <record id="view_nxb_mcp_session_list" model="ir.ui.view">
+        <field name="name">nxb.mcp.session.list</field>
+        <field name="model">nxb.mcp.session</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false">
+                <field name="last_seen"/>
+                <field name="user_id" widget="many2one_avatar_user"/>
+                <field name="client_name"/>
+                <field name="client_version"/>
+                <field name="protocol_version"/>
+                <field name="key_id"/>
+                <field name="closed"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_nxb_mcp_session" model="ir.actions.act_window">
+        <field name="name">Connected apps</field>
+        <field name="res_model">nxb.mcp.session</field>
+        <field name="view_mode">list</field>
+    </record>
+</odoo>

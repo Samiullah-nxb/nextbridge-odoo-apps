@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nxb_mcp_oauth_client_list" model="ir.ui.view">
+        <field name="name">nxb.mcp.oauth.client.list</field>
+        <field name="model">nxb.mcp.oauth.client</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="not active">
+                <field name="name"/>
+                <field name="client_id"/>
+                <field name="token_count" string="Active sign-ins"/>
+                <field name="create_date" string="Registered"/>
+                <field name="active" widget="boolean_toggle"/>
+                <button name="action_revoke_tokens" type="object" string="Sign everyone out" icon="fa-sign-out"
+                        confirm="Revoke every sign-in of this app?"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_nxb_mcp_oauth_client_form" model="ir.ui.view">
+        <field name="name">nxb.mcp.oauth.client.form</field>
+        <field name="model">nxb.mcp.oauth.client</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="client_id"/>
+                        <field name="redirect_uris"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_nxb_mcp_oauth_client" model="ir.actions.act_window">
+        <field name="name">Signed-in apps</field>
+        <field name="res_model">nxb.mcp.oauth.client</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'active_test': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_empty_folder">No app has signed in yet</p>
+            <p>AI apps that connect with an Odoo login (OAuth) appear here. You can block an app or sign everyone out.</p>
+        </field>
+    </record>
+
+    <record id="view_nxb_mcp_oauth_token_list" model="ir.ui.view">
+        <field name="name">nxb.mcp.oauth.token.list</field>
+        <field name="model">nxb.mcp.oauth.token</field>
+        <field name="arch" type="xml">
+            <list create="false" decoration-muted="revoked">
+                <field name="client_id"/>
+                <field name="user_id" widget="many2one_avatar_user"/>
+                <field name="scope"/>
+                <field name="create_date" string="Signed in"/>
+                <field name="last_used"/>
+                <field name="expires_at"/>
+                <field name="revoked"/>
+                <button name="action_revoke" type="object" string="Sign out" icon="fa-sign-out" invisible="revoked"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_nxb_mcp_oauth_token" model="ir.actions.act_window">
+        <field name="name">Sign-ins</field>
+        <field name="res_model">nxb.mcp.oauth.token</field>
+        <field name="view_mode">list</field>
+        <field name="domain">[('revoked', '=', False)]</field>
+    </record>
+</odoo>

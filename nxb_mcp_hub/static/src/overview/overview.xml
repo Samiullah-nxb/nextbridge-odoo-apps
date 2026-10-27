@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="nxb_mcp_hub.Overview">
+        <div class="o_nxb_mcp o_action h-100 overflow-auto">
+            <t t-set="d" t-value="state.d"/>
+            <div class="o_nxb_head">
+                <div>
+                    <h2>AI Connector</h2>
+                    <p class="o_nxb_muted">Connect AI assistants (any app that supports MCP) to this Odoo and to your
+                        other databases.</p>
+                </div>
+                <div class="o_nxb_stats">
+                    <div class="o_nxb_stat"><div class="o_nxb_stat_v" t-esc="d.calls_24h"/><div class="o_nxb_stat_l">AI calls (24 h)</div></div>
+                    <div class="o_nxb_stat"><div t-attf-class="o_nxb_stat_v {{ d.errors_24h ? 'text-danger' : '' }}" t-esc="d.errors_24h"/><div class="o_nxb_stat_l">errors (24 h)</div></div>
+                    <div class="o_nxb_stat"><div class="o_nxb_stat_v" t-esc="d.databases.length"/><div class="o_nxb_stat_l">databases</div></div>
+                    <div class="o_nxb_stat"><div class="o_nxb_stat_v" t-esc="d.tools_on"/><div class="o_nxb_stat_l">tools on</div></div>
+                </div>
+            </div>
+
+            <div class="o_nxb_grid">
+                <div class="o_nxb_panel o_nxb_wide">
+                    <h4>Connect in three steps</h4>
+                    <ol class="o_nxb_steps">
+                        <li>
+                            <b>Create a connector key</b> — it decides which user the assistant acts as.
+                            <button class="btn btn-primary btn-sm ms-2" t-on-click="() => this.open('nxb_mcp_hub.action_nxb_mcp_key_wizard')"><i class="fa fa-key me-1"/>New connector key</button>
+                        </li>
+                        <li>
+                            <b>Add the connector to your AI app</b> as a custom/remote MCP server with this address:
+                            <div class="o_nxb_copy">
+                                <code t-esc="d.endpoint"/>
+                                <button class="btn btn-light btn-sm" t-on-click="() => this.copy(d.endpoint)" aria-label="Copy address"><i class="fa fa-copy"/></button>
+                            </div>
+                            <div class="o_nxb_muted small">Apps that support a sign-in can also connect without a key: they open an Odoo login page.</div>
+                            <div t-if="d.server_wide and d.endpoint_db !== d.endpoint" class="o_nxb_muted small mt-1">Multi-database server address:
+                                <code t-esc="d.endpoint_db"/></div>
+                        </li>
+                        <li><b>Ask in plain language</b>, for example <i>"Which customers have unpaid invoices over 5,000?"</i>
+                            or <i>"Compare this month's sales across all our databases."</i></li>
+                    </ol>
+                </div>
+
+                <div class="o_nxb_panel">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4>Databases</h4>
+                        <button t-if="d.is_admin" class="btn btn-link btn-sm" t-on-click="() => this.open('nxb_mcp_hub.action_nxb_mcp_connection')">Manage</button>
+                    </div>
+                    <table class="table table-sm mb-0">
+                        <tbody>
+                            <tr t-foreach="d.databases" t-as="c" t-key="c.id" class="o_nxb_click" t-on-click="() => d.is_admin and this.openConnection(c.id)">
+                                <td><b t-esc="c.name"/><div class="o_nxb_muted small"><code t-esc="c.code"/> · <t t-esc="c.kind"/></div></td>
+                                <td class="text-end">
+                                    <span t-if="c.state == 'ok'" class="text-success"><i class="fa fa-check-circle me-1"/>Working</span>
+                                    <span t-elif="c.state == 'error'" class="text-danger"><i class="fa fa-exclamation-circle me-1"/>Error</span>
+                                    <span t-else="" class="o_nxb_muted"><i class="fa fa-circle-o me-1"/>Not tested</span>
+                                    <div class="o_nxb_muted small" t-esc="c.full ? 'all tool packs' : 'basic tools'"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="o_nxb_panel">
+                    <h4>Last 7 days</h4>
+                    <div class="o_nxb_bars" role="img" aria-label="AI calls per day">
+                        <div t-foreach="d.per_day" t-as="p" t-key="p_index" class="o_nxb_bar_col" t-att-title="p.day + ': ' + p.ok + ' ok, ' + p.bad + ' failed'">
+                            <div class="o_nxb_bar_stack">
+                                <div class="o_nxb_bar_bad" t-attf-style="height: {{ p.bad / this.maxDay * 100 }}%"/>
+                                <div class="o_nxb_bar_ok" t-attf-style="height: {{ p.ok / this.maxDay * 100 }}%"/>
+                            </div>
+                            <div class="o_nxb_bar_l" t-esc="p.day"/>
+                        </div>
+                    </div>
+                    <div class="o_nxb_legend"><span><i class="o_nxb_dot o_nxb_dot_ok"/>OK</span><span><i class="o_nxb_dot o_nxb_dot_bad"/>Failed or refused</span></div>
+                    <h5 class="mt-3">Most used tools</h5>
+                    <div t-if="!d.top_tools.length" class="o_nxb_muted small">No calls yet.</div>
+                    <div t-foreach="d.top_tools" t-as="t" t-key="t.tool" class="d-flex justify-content-between small py-1 border-bottom">
+                        <code t-esc="t.tool"/><b t-esc="t.count"/>
+                    </div>
+                </div>
+
+                <div class="o_nxb_panel">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4>Recent activity</h4>
+                        <button class="btn btn-link btn-sm" t-on-click="() => this.open('nxb_mcp_hub.action_nxb_mcp_log')">All activity</button>
+                    </div>
+                    <div t-if="!d.recent.length" class="o_nxb_muted small">Nothing yet — connect an assistant to get started.</div>
+                    <div t-foreach="d.recent" t-as="r" t-key="r.id" class="o_nxb_recent o_nxb_click" t-on-click="() => this.openLog(r.id)">
+                        <i t-attf-class="fa {{ r.status == 'ok' ? 'fa-check text-success' : 'fa-times text-danger' }} me-2"/>
+                        <code t-esc="r.tool"/>
+                        <span class="o_nxb_muted small ms-auto"><t t-esc="r.user"/> · <t t-esc="r.db"/></span>
+                    </div>
+                    <h5 class="mt-3">Switched on</h5>
+                    <div class="d-flex flex-wrap gap-1">
+                        <span t-foreach="d.packs_on" t-as="p" t-key="p" class="badge text-bg-light" t-esc="p"/>
+                    </div>
+                    <button t-if="d.is_admin" class="btn btn-link btn-sm px-0" t-on-click="() => this.open('nxb_mcp_hub.action_nxb_mcp_board')">Change tool packs</button>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

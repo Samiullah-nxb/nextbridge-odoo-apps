@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nxb_mcp_site_permission_list" model="ir.ui.view">
+        <field name="name">nxb.mcp.site.permission.list</field>
+        <field name="model">nxb.mcp.site.permission</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="not active">
+                <field name="website_key"/>
+                <field name="scope"/>
+                <field name="allow_seo"/>
+                <field name="allow_edit"/>
+                <field name="allow_create"/>
+                <field name="allow_delete"/>
+                <field name="allow_sitewide"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_nxb_mcp_site_permission_form" model="ir.ui.view">
+        <field name="name">nxb.mcp.site.permission.form</field>
+        <field name="model">nxb.mcp.site.permission</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="alert alert-info" role="alert">
+                        Nothing on a website can be changed by an assistant until it is listed here. Choose exactly
+                        what is allowed.
+                    </div>
+                    <group>
+                        <group string="Website">
+                            <field name="website_key"/>
+                            <field name="active"/>
+                            <field name="scope" widget="radio"/>
+                        </group>
+                        <group string="The assistant may">
+                            <field name="allow_seo"/>
+                            <field name="allow_edit"/>
+                            <field name="allow_create"/>
+                            <field name="allow_delete"/>
+                            <field name="allow_sitewide"/>
+                        </group>
+                    </group>
+                    <group invisible="scope != 'listed'">
+                        <field name="page_urls" placeholder="/&#10;/about-us&#10;/contactus"/>
+                    </group>
+                    <field name="note" placeholder="Notes..."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_nxb_mcp_site_permission" model="ir.actions.act_window">
+        <field name="name">Website permissions</field>
+        <field name="res_model">nxb.mcp.site.permission</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'active_test': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Allow the assistant to work on a website</p>
+            <p>Requires the Website app. Add a website, choose which pages may be changed and what is allowed: SEO,
+               page content, creating or deleting pages, theme and menus.</p>
+        </field>
+    </record>
+    <record id="view_nxb_mcp_site_snapshot_list" model="ir.ui.view">
+        <field name="name">nxb.mcp.site.snapshot.list</field>
+        <field name="model">nxb.mcp.site.snapshot</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false">
+                <field name="create_date" string="When"/>
+                <field name="page_url"/>
+                <field name="label"/>
+                <field name="user_id" widget="many2one_avatar_user"/>
+                <field name="restored"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_nxb_mcp_site_snapshot" model="ir.actions.act_window">
+        <field name="name">Website change history</field>
+        <field name="res_model">nxb.mcp.site.snapshot</field>
+        <field name="view_mode">list</field>
+    </record>
+    <menuitem id="menu_nxb_mcp_site_permission" name="Website permissions" parent="menu_nxb_mcp_features"
+              action="action_nxb_mcp_site_permission" sequence="15" groups="nxb_mcp_hub.group_mcp_admin"/>
+    <menuitem id="menu_nxb_mcp_site_snapshot" name="Website change history" parent="menu_nxb_mcp_activity"
+              action="action_nxb_mcp_site_snapshot" sequence="10" groups="nxb_mcp_hub.group_mcp_admin"/>
+</odoo>

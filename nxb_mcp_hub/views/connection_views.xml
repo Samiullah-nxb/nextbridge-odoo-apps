@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nxb_mcp_connection_list" model="ir.ui.view">
+        <field name="name">nxb.mcp.connection.list</field>
+        <field name="model">nxb.mcp.connection</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="not active" decoration-danger="state == 'error'">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="kind"/>
+                <field name="db_name" optional="show"/>
+                <field name="url" optional="show"/>
+                <field name="app_installed" optional="show"/>
+                <field name="state" widget="badge" decoration-success="state == 'ok'" decoration-danger="state == 'error'"/>
+                <field name="last_check" optional="hide"/>
+                <field name="active" column_invisible="True"/>
+                <button name="action_test" type="object" string="Test" icon="fa-plug"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nxb_mcp_connection_form" model="ir.ui.view">
+        <field name="name">nxb.mcp.connection.form</field>
+        <field name="model">nxb.mcp.connection</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_test" type="object" string="Test connection" class="btn-primary" icon="fa-plug"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_logs" type="object" class="oe_stat_button" icon="fa-history">
+                            <field name="call_count" widget="statinfo" string="AI calls"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="alert alert-danger" role="alert" invisible="state != 'error'">
+                        <field name="state_message" readonly="1"/>
+                    </div>
+                    <div class="alert alert-success" role="alert" invisible="state != 'ok'">
+                        <field name="state_message" readonly="1"/>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Spain company"/></h1>
+                    </div>
+                    <group>
+                        <group string="Database">
+                            <field name="kind" readonly="kind == 'this'" widget="radio"/>
+                            <field name="code"/>
+                            <field name="db_name" invisible="kind == 'this'" required="kind != 'this'"/>
+                            <field name="url" invisible="kind != 'remote'" required="kind == 'remote'"
+                                   placeholder="https://erp.example.com"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group string="Act as" invisible="kind == 'this'">
+                            <field name="login" required="kind != 'this'"/>
+                            <field name="api_key" password="True" required="kind != 'this'"/>
+                            <div colspan="2" class="text-muted small">
+                                Create the API key in that database: user menu → My Preferences → Account Security →
+                                New API Key. The assistant gets exactly that user's access rights there.
+                            </div>
+                        </group>
+                    </group>
+                    <group string="Full features on the other server" invisible="kind != 'remote'">
+                        <field name="mcp_url" placeholder="https://erp.example.com/mcp"/>
+                        <field name="mcp_key" password="True"/>
+                        <div colspan="2" class="text-muted small">
+                            Optional. If this app is also installed on that server, enter its connector address and a
+                            connector key created there: every tool pack then works on that database too. Without it,
+                            only the basic record tools are available.
+                        </div>
+                    </group>
+                    <notebook>
+                        <page string="Access" name="access">
+                            <field name="user_ids" widget="many2many_tags"/>
+                            <div class="text-muted small">Leave empty to allow every user who has a connector key.</div>
+                        </page>
+                        <page string="Note for the assistant" name="note">
+                            <field name="note" placeholder="e.g. Live database of the Spanish company; amounts in EUR."/>
+                        </page>
+                        <page string="Status" name="status">
+                            <group>
+                                <field name="last_check"/>
+                                <field name="app_installed"/>
+                                <field name="remote_version" invisible="kind != 'remote'"/>
+                                <field name="federated" invisible="kind != 'remote'"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_nxb_mcp_connection" model="ir.actions.act_window">
+        <field name="name">Databases</field>
+        <field name="res_model">nxb.mcp.connection</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'active_test': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Connect more databases</p>
+            <p>Add databases of this server or of other Odoo servers. Your assistant reaches all of them through one
+               connector and picks the right one with the database code.</p>
+        </field>
+    </record>
+</odoo>
