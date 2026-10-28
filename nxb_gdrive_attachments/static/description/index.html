@@ -1,0 +1,93 @@
+<section class="oe_container" style="padding: 32px 16px 8px;">
+  <div style="max-width: 1100px; margin: 0 auto; text-align: center;">
+    <h1 style="font-size: 34px; font-weight: 800; color: #1e3a8a; margin-bottom: 10px;">Google Drive Attachment Storage</h1>
+    <p style="font-size: 19px; color: #3f4f63; max-width: 820px; margin: 0 auto 18px;">
+      Every file attached to an Odoo document is sent to Google Drive automatically, in tidy folders.
+      Keep a copy in Odoo, or move the files out of Odoo to free its storage &#8211; people keep working exactly as before.
+    </p>
+    <p>
+      <span style="display:inline-block;background:#e0f2fe;color:#0e7490;border-radius:16px;padding:5px 14px;margin:3px;font-weight:600;">Odoo 18</span>
+      <span style="display:inline-block;background:#e0e7ff;color:#4338ca;border-radius:16px;padding:5px 14px;margin:3px;font-weight:600;">Folders per document type or per record</span>
+      <span style="display:inline-block;background:#fef3c7;color:#92400e;border-radius:16px;padding:5px 14px;margin:3px;font-weight:600;">Update, rename &amp; delete sync</span>
+      <span style="display:inline-block;background:#dcfce7;color:#166534;border-radius:16px;padding:5px 14px;margin:3px;font-weight:600;">Shared Drives &amp; service accounts</span>
+    </p>
+    <img src="screenshot_files.png" alt="Files on Google Drive" style="max-width:100%; margin-top: 18px; border: 1px solid #dfe5ea; border-radius: 10px; box-shadow: 0 6px 24px rgba(30,58,138,.12);"/>
+  </div>
+</section>
+
+<section class="oe_container" style="padding: 36px 16px;">
+  <div style="max-width: 1100px; margin: 0 auto;">
+    <h2 style="font-size: 26px; font-weight: 700; color: #1e3a8a; text-align: center; margin-bottom: 20px;">What it does</h2>
+    <div class="row">
+      <div class="col-md-6">
+        <ul style="color:#2c3e48;font-size:15px;line-height:1.8;">
+          <li><b>Automatic upload</b> of every new attachment: chatter files, e-mail attachments, generated PDFs, imported documents.</li>
+          <li><b>Three folder structures:</b> one folder, one folder per document type (Sales Order, Invoice...), or one folder per record (Sales Order / S00016).</li>
+          <li><b>Stays in step:</b> replacing a file updates it on Drive, renaming renames it, attaching it to another record moves it, deleting it moves it to the Drive trash (or deletes it, or keeps it &#8211; your choice).</li>
+          <li><b>Drive link</b> on every attachment, and an option to make files viewable by anyone with the link.</li>
+        </ul>
+      </div>
+      <div class="col-md-6">
+        <ul style="color:#2c3e48;font-size:15px;line-height:1.8;">
+          <li><b>Copy or Move:</b> keep files in Odoo with a Drive copy, or move them out of Odoo. Moved files still open, download, preview and go out by e-mail as usual: Odoo reads them from Drive (with a local cache and an integrity check).</li>
+          <li><b>Existing attachments</b> are sent in one click, and every file can be <b>brought back</b> into Odoo at any time.</li>
+          <li><b>Choose what goes</b>: all documents or selected document types, minimum size, images in fields and public files on or off.</li>
+          <li><b>Background sync</b> with automatic retries, an activity log and a list of every file and folder.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="row" style="margin-top:12px;">
+      <div class="col-md-6"><img src="screenshot_attachment.png" alt="Attachment with its Drive link" style="max-width:100%;border:1px solid #dfe5ea;border-radius:8px;margin-bottom:12px;"/></div>
+      <div class="col-md-6"><img src="screenshot_folders.png" alt="Drive folders" style="max-width:100%;border:1px solid #dfe5ea;border-radius:8px;margin-bottom:12px;"/></div>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container" style="padding: 36px 16px; background: #f5f8fc;">
+  <div style="max-width: 1100px; margin: 0 auto;">
+    <h2 style="font-size: 26px; font-weight: 700; color: #1e3a8a; text-align: center; margin-bottom: 20px;">Simple, safe setup</h2>
+    <ol style="color:#2c3e48;font-size:16px;line-height:1.8;max-width:900px;margin:0 auto 20px;">
+      <li>In Google Cloud Console, enable the Google Drive API and create an OAuth client of type <i>Web application</i>. Add the redirect URI shown in Odoo.</li>
+      <li>In <b>Settings &#8594; Google Drive</b>, switch the storage on, enter the Client ID and secret, Save, then click <b>Connect Google account</b> and allow access.</li>
+      <li>Choose Copy or Move, the folder structure and which files go. Click <b>Test connection</b>. Done: new attachments go to Drive within seconds.</li>
+    </ol>
+    <p style="color:#3f4f63;text-align:center;max-width:860px;margin:0 auto 18px;">Google Workspace? Use a <b>service account</b> with a Shared Drive instead of a personal account. By default the app only asks Google for access to the files it creates.</p>
+    <div class="row">
+      <div class="col-md-6"><img src="screenshot_settings.png" alt="Connection settings" style="max-width:100%;border:1px solid #dfe5ea;border-radius:8px;margin-bottom:12px;"/></div>
+      <div class="col-md-6"><img src="screenshot_storage.png" alt="Storage settings" style="max-width:100%;border:1px solid #dfe5ea;border-radius:8px;margin-bottom:12px;"/></div>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container" style="padding: 36px 16px;">
+  <div style="max-width: 1100px; margin: 0 auto;">
+    <h2 style="font-size: 26px; font-weight: 700; color: #1e3a8a; text-align: center; margin-bottom: 20px;">Built to be trusted with your files</h2>
+    <ul style="color:#2c3e48;font-size:15px;line-height:1.8;max-width:900px;margin:0 auto;">
+      <li>Uploads and deletions run in the background, after the user's change is saved: a cancelled operation never leaves Drive out of step and nobody waits for Google.</li>
+      <li>A file is only released from Odoo once Drive holds exactly the same content (checksums), and files read back from Drive are checked again.</li>
+      <li>The app refuses to be uninstalled while files exist only on Drive, so no document can become unreadable.</li>
+      <li>Multi-company: each company has its own Google connection, folders and rules.</li>
+    </ul>
+    <img src="screenshot_activity.png" alt="Activity log" style="max-width:100%;border:1px solid #dfe5ea;border-radius:8px;margin-top:18px;"/>
+  </div>
+</section>
+
+<section class="oe_container" style="padding: 36px 16px; background: #f5f8fc;">
+  <div style="max-width: 1100px; margin: 0 auto;">
+    <h2 style="font-size: 26px; font-weight: 700; color: #1e3a8a; text-align: center; margin-bottom: 20px;">Questions</h2>
+    <p><b>Which files are sent?</b><br/>Files attached to records (chatter, e-mails, reports saved as attachments, imports). Odoo's technical files (views, assets) never are; product images and other images stored in fields only when you switch that on.</p>
+    <p><b>Do users need a Google account?</b><br/>No. Users keep opening files in Odoo. The Drive link opens the file on Drive for people who have access to it, or for everyone when "Anyone with the link" is on.</p>
+    <p><b>What if Google is unreachable?</b><br/>Uploads are retried automatically. In Move mode, recently read files come from the local cache.</p>
+    <p><b>Dependencies?</b><br/>None besides Odoo itself: no Google library to install.</p>
+  </div>
+</section>
+
+<section class="oe_container" style="padding: 32px 16px;">
+  <div style="max-width: 900px; margin: 0 auto; text-align: center;">
+    <h2 style="font-size: 24px; font-weight: 700; color: #1e3a8a;">Support</h2>
+    <p style="color:#3f4f63;font-size:16px;">Developed and supported by <b>Nextbridge</b> &#183;
+      <a href="https://www.nextbridge.pk">www.nextbridge.pk</a> &#183;
+      <a href="mailto:samiullah.3277@nxb.com.pk">samiullah.3277@nxb.com.pk</a></p>
+    <p style="color:#8597a2;font-size:13px;">Google Drive is a trademark of Google LLC. This app is not affiliated with or endorsed by Google.</p>
+  </div>
+</section>

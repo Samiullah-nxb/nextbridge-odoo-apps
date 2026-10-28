@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- attachments -->
+    <record id="view_attachment_form_gdrive" model="ir.ui.view">
+        <field name="name">ir.attachment.form.nxb.gdrive</field>
+        <field name="model">ir.attachment</field>
+        <field name="inherit_id" ref="base.view_attachment_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <button name="action_gdrive_open" type="object" string="Open in Google Drive" icon="fa-external-link" invisible="not gdrive_url"/>
+                    <button name="action_gdrive_sync" type="object" string="Send to Drive now" icon="fa-cloud-upload" invisible="gdrive_state == 'synced' or type != 'binary'" groups="base.group_system"/>
+                    <field name="gdrive_state" widget="statusbar" statusbar_visible="pending,synced" invisible="not gdrive_state"/>
+                </header>
+            </xpath>
+            <xpath expr="//sheet/group" position="inside">
+                <group string="Google Drive" invisible="not gdrive_state">
+                    <field name="gdrive_url" widget="url" invisible="not gdrive_url"/>
+                    <field name="gdrive_moved"/>
+                    <field name="gdrive_synced_at"/>
+                    <field name="gdrive_file_id" groups="base.group_no_one"/>
+                    <field name="gdrive_error" invisible="not gdrive_error" class="text-danger"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_attachment_list_gdrive" model="ir.ui.view">
+        <field name="name">ir.attachment.list.nxb.gdrive</field>
+        <field name="model">ir.attachment</field>
+        <field name="priority">30</field>
+        <field name="arch" type="xml">
+            <list string="Files on Google Drive" create="0">
+                <field name="name"/>
+                <field name="res_model" string="Document type"/>
+                <field name="res_name" string="Document"/>
+                <field name="file_size" widget="integer" string="Size (bytes)" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+                <field name="gdrive_state" widget="badge" decoration-success="gdrive_state == 'synced'" decoration-danger="gdrive_state == 'error'" decoration-info="gdrive_state in ('pending', 'changed', 'renamed', 'move')"/>
+                <field name="gdrive_moved" optional="show"/>
+                <field name="gdrive_synced_at" optional="show"/>
+                <field name="gdrive_url" widget="url" text="Open" optional="show"/>
+                <field name="gdrive_error" optional="hide"/>
+                <button name="action_gdrive_sync" type="object" string="Retry" icon="fa-refresh" invisible="gdrive_state != 'error'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_attachment_search_gdrive" model="ir.ui.view">
+        <field name="name">ir.attachment.search.nxb.gdrive</field>
+        <field name="model">ir.attachment</field>
+        <field name="inherit_id" ref="base.view_attachment_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='binary_filter']" position="after">
+                <separator/>
+                <filter name="gdrive_synced" string="On Google Drive" domain="[('gdrive_state', '=', 'synced')]"/>
+                <filter name="gdrive_moved" string="Only on Google Drive" domain="[('gdrive_moved', '=', True)]"/>
+                <filter name="gdrive_waiting" string="Waiting for Drive" domain="[('gdrive_state', 'in', ('pending', 'changed', 'renamed', 'move'))]"/>
+                <filter name="gdrive_error" string="Drive errors" domain="[('gdrive_state', '=', 'error')]"/>
+            </xpath>
+            <xpath expr="//filter[@name='owner']" position="after">
+                <filter name="group_gdrive_state" string="Google Drive status" context="{'group_by': 'gdrive_state'}"/>
+                <filter name="group_res_model" string="Document type" context="{'group_by': 'res_model'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_gdrive_files" model="ir.actions.act_window">
+        <field name="name">Files on Google Drive</field>
+        <field name="res_model">ir.attachment</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_attachment_list_gdrive"/>
+        <field name="domain">[('gdrive_state', '!=', False)]</field>
+        <field name="context">{'search_default_group_gdrive_state': 0}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No file sent to Google Drive yet</p>
+            <p>Connect Google Drive in the settings. New attachments are then sent automatically; existing ones can be sent with one click.</p>
+        </field>
+    </record>
+
+    <!-- folders -->
+    <record id="view_gdrive_folder_list" model="ir.ui.view">
+        <field name="name">nxb.gdrive.folder.list</field>
+        <field name="model">nxb.gdrive.folder</field>
+        <field name="arch" type="xml">
+            <list string="Google Drive folders" create="0" edit="0">
+                <field name="name"/>
+                <field name="res_model"/>
+                <field name="res_id" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="file_count"/>
+                <field name="folder_id" optional="hide"/>
+                <button name="action_open" type="object" string="Open" icon="fa-external-link"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_gdrive_folder_search" model="ir.ui.view">
+        <field name="name">nxb.gdrive.folder.search</field>
+        <field name="model">nxb.gdrive.folder</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="res_model"/>
+                <filter name="type_folders" string="Document type folders" domain="[('res_id', '=', 0)]"/>
+                <filter name="record_folders" string="Record folders" domain="[('res_id', '!=', 0)]"/>
+                <filter name="group_model" string="Document type" context="{'group_by': 'res_model'}"/>
+            </search>
+        </field>
+    </record>
+    <record id="action_gdrive_folders" model="ir.actions.act_window">
+        <field name="name">Drive folders</field>
+        <field name="res_model">nxb.gdrive.folder</field>
+        <field name="view_mode">list</field>
+        <field name="help" type="html"><p>Folders are created on Google Drive automatically when the first file of a document type or record is sent. Removing a line here only makes Odoo look the folder up again.</p></field>
+    </record>
+
+    <!-- deletions -->
+    <record id="view_gdrive_trash_list" model="ir.ui.view">
+        <field name="name">nxb.gdrive.trash.list</field>
+        <field name="model">nxb.gdrive.trash</field>
+        <field name="arch" type="xml">
+            <list string="Waiting deletions" create="0" edit="0">
+                <field name="name"/>
+                <field name="mode"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="attempts"/>
+                <field name="next_try"/>
+                <field name="error"/>
+                <button name="action_retry" type="object" string="Retry" icon="fa-refresh"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_gdrive_trash" model="ir.actions.act_window">
+        <field name="name">Waiting deletions</field>
+        <field name="res_model">nxb.gdrive.trash</field>
+        <field name="view_mode">list</field>
+        <field name="help" type="html"><p>Nothing to delete on Google Drive.</p></field>
+    </record>
+
+    <!-- activity -->
+    <record id="view_gdrive_log_list" model="ir.ui.view">
+        <field name="name">nxb.gdrive.log.list</field>
+        <field name="model">nxb.gdrive.log</field>
+        <field name="arch" type="xml">
+            <list string="Google Drive activity" create="0" edit="0" decoration-danger="status == 'error'">
+                <field name="create_date"/>
+                <field name="name"/>
+                <field name="res_model" optional="show"/>
+                <field name="operation"/>
+                <field name="status" widget="badge" decoration-success="status == 'ok'" decoration-danger="status == 'error'"/>
+                <field name="duration_ms" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+                <field name="message"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_gdrive_log_search" model="ir.ui.view">
+        <field name="name">nxb.gdrive.log.search</field>
+        <field name="model">nxb.gdrive.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="res_model"/>
+                <filter name="errors" string="Errors" domain="[('status', '=', 'error')]"/>
+                <filter name="today" string="Today" domain="[('create_date', '&gt;=', (context_today()).strftime('%Y-%m-%d'))]"/>
+                <filter name="group_operation" string="Operation" context="{'group_by': 'operation'}"/>
+            </search>
+        </field>
+    </record>
+    <record id="action_gdrive_log" model="ir.actions.act_window">
+        <field name="name">Google Drive activity</field>
+        <field name="res_model">nxb.gdrive.log</field>
+        <field name="view_mode">list</field>
+        <field name="help" type="html"><p>Every upload, update, rename and deletion done on Google Drive is listed here.</p></field>
+    </record>
+</odoo>

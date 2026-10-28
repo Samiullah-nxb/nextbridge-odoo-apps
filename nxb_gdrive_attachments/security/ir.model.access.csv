@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_nxb_gdrive_folder_admin,nxb.gdrive.folder admin,model_nxb_gdrive_folder,base.group_system,1,1,1,1
+access_nxb_gdrive_trash_admin,nxb.gdrive.trash admin,model_nxb_gdrive_trash,base.group_system,1,1,1,1
+access_nxb_gdrive_log_admin,nxb.gdrive.log admin,model_nxb_gdrive_log,base.group_system,1,0,0,1

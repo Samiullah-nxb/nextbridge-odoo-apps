@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- menus (Settings app) -->
+    <menuitem id="menu_gdrive_root" name="Google Drive" parent="base.menu_administration" sequence="45" groups="base.group_system"/>
+    <menuitem id="menu_gdrive_settings" name="Settings" parent="menu_gdrive_root" action="action_gdrive_settings" sequence="1"/>
+    <menuitem id="menu_gdrive_files" name="Files" parent="menu_gdrive_root" action="action_gdrive_files" sequence="10"/>
+    <menuitem id="menu_gdrive_folders" name="Folders" parent="menu_gdrive_root" action="action_gdrive_folders" sequence="20"/>
+    <menuitem id="menu_gdrive_trash" name="Waiting deletions" parent="menu_gdrive_root" action="action_gdrive_trash" sequence="30"/>
+    <menuitem id="menu_gdrive_log" name="Activity" parent="menu_gdrive_root" action="action_gdrive_log" sequence="40"/>
+</odoo>

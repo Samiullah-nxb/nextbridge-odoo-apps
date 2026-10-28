@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_gdrive" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.nxb.gdrive</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Google Drive" string="Google Drive" name="nxb_gdrive_attachments" groups="base.group_system">
+                    <block title="Google Drive storage" name="gdrive_main">
+                        <setting string="Store attachments on Google Drive" help="Send the files attached to your documents to Google Drive, for this company.">
+                            <field name="gdrive_enabled"/>
+                            <div class="mt8" invisible="not gdrive_enabled">
+                                <span class="badge text-bg-success" invisible="not gdrive_connected">Connected</span>
+                                <span class="badge text-bg-warning" invisible="gdrive_connected">Not connected yet</span>
+                                <span class="ms-2" invisible="not gdrive_account"><field name="gdrive_account" class="d-inline"/></span>
+                            </div>
+                        </setting>
+                        <setting string="Status" help="Files of this company handled by the app." invisible="not gdrive_enabled">
+                            <div class="row mt8">
+                                <div class="col-6"><field name="gdrive_count_synced" class="fw-bold d-inline"/> on Drive</div>
+                                <div class="col-6"><field name="gdrive_count_moved" class="fw-bold d-inline"/> only on Drive (<field name="gdrive_moved_mb" class="d-inline"/> MB)</div>
+                                <div class="col-6"><field name="gdrive_count_waiting" class="fw-bold d-inline"/> waiting</div>
+                                <div class="col-6 text-danger"><field name="gdrive_count_error" class="fw-bold d-inline"/> errors</div>
+                            </div>
+                            <div class="mt8">
+                                <button name="action_gdrive_sync_now" type="object" string="Sync now" icon="fa-refresh" class="btn-link"/>
+                                <button name="%(nxb_gdrive_attachments.action_gdrive_files)d" type="action" string="Files" icon="oi-arrow-right" class="btn-link"/>
+                                <button name="%(nxb_gdrive_attachments.action_gdrive_log)d" type="action" string="Activity" icon="oi-arrow-right" class="btn-link"/>
+                            </div>
+                            <div class="text-muted small" invisible="not gdrive_restore">Files are being brought back into Odoo...</div>
+                        </setting>
+                    </block>
+                    <block title="Connection" name="gdrive_connection" invisible="not gdrive_enabled">
+                        <setting string="Connect with" help="A Google account, or a Workspace service account.">
+                            <field name="gdrive_auth" widget="radio"/>
+                        </setting>
+                        <setting string="Google Cloud project" invisible="gdrive_auth != 'oauth'"
+                                 help="Create an OAuth client of type 'Web application' in Google Cloud Console (APIs &amp; Services), enable the Google Drive API and add this redirect URI. Enter the Client ID and secret, Save, then click Connect.">
+                            <div class="content-group">
+                                <div class="row mt8"><label for="gdrive_client_id" class="col-lg-4 o_light_label"/><field name="gdrive_client_id" class="col-lg-8"/></div>
+                                <div class="row"><label for="gdrive_client_secret" class="col-lg-4 o_light_label"/><field name="gdrive_client_secret" password="True" class="col-lg-8"/></div>
+                                <div class="row"><label for="gdrive_redirect_uri" class="col-lg-4 o_light_label"/><field name="gdrive_redirect_uri" widget="CopyClipboardChar" class="col-lg-8"/></div>
+                                <div class="row"><label for="gdrive_scope" class="col-lg-4 o_light_label"/><field name="gdrive_scope" class="col-lg-8"/></div>
+                                <div class="mt8">
+                                    <button name="action_gdrive_connect" type="object" string="Connect Google account" icon="fa-google" class="btn-primary" invisible="gdrive_connected"/>
+                                    <button name="action_gdrive_connect" type="object" string="Reconnect" class="btn-secondary" invisible="not gdrive_connected"/>
+                                    <button name="action_gdrive_disconnect" type="object" string="Disconnect" class="btn-link" invisible="not gdrive_connected" confirm="Disconnect Google Drive for this company?"/>
+                                </div>
+                            </div>
+                        </setting>
+                        <setting string="Service account" invisible="gdrive_auth != 'service'"
+                                 help="Upload the JSON key of a service account that can access the Shared Drive below, or impersonate a user (domain-wide delegation).">
+                            <div class="content-group">
+                                <div class="row mt8"><label for="gdrive_service_key" class="col-lg-4 o_light_label"/><field name="gdrive_service_key" filename="gdrive_service_key_name" class="col-lg-8"/><field name="gdrive_service_key_name" invisible="1"/></div>
+                                <div class="row"><label for="gdrive_service_subject" class="col-lg-4 o_light_label"/><field name="gdrive_service_subject" class="col-lg-8" placeholder="user@yourcompany.com"/></div>
+                            </div>
+                        </setting>
+                        <setting string="Test" help="Check the access and prepare the main folder.">
+                            <button name="action_gdrive_test" type="object" string="Test connection" icon="fa-plug" class="btn-secondary"/>
+                        </setting>
+                    </block>
+                    <block title="Storage" name="gdrive_storage" invisible="not gdrive_enabled">
+                        <setting string="Storage mode" help="Copy keeps every file in Odoo too. Move frees Odoo storage; Odoo reads the files from Drive when needed.">
+                            <field name="gdrive_storage" widget="radio"/>
+                        </setting>
+                        <setting string="Folder structure" help="How the files are organised under the main folder.">
+                            <field name="gdrive_folder_mode" widget="radio"/>
+                        </setting>
+                        <setting string="Location" help="Leave the main folder empty and Odoo creates 'Odoo - company name'. A Shared Drive ID puts it in that Shared Drive.">
+                            <div class="content-group">
+                                <div class="row mt8"><label for="gdrive_shared_drive_id" class="col-lg-4 o_light_label"/><field name="gdrive_shared_drive_id" class="col-lg-8"/></div>
+                                <div class="row"><label for="gdrive_root_folder_id" class="col-lg-4 o_light_label"/><field name="gdrive_root_folder_id" class="col-lg-8"/></div>
+                                <button name="action_gdrive_open_folder" type="object" string="Open the folder on Drive" icon="oi-arrow-right" class="btn-link" invisible="not gdrive_root_folder_id"/>
+                            </div>
+                        </setting>
+                        <setting string="When a file is deleted in Odoo" help="What happens to its Drive copy.">
+                            <field name="gdrive_delete" widget="radio"/>
+                        </setting>
+                        <setting string="Share links" help="Make each uploaded file readable by anyone who has its link (useful to send links to customers).">
+                            <field name="gdrive_share_link"/>
+                        </setting>
+                        <setting string="Local cache" help="Size of the cache for files read back from Drive (Move mode).">
+                            <field name="gdrive_cache_mb"/> MB
+                        </setting>
+                    </block>
+                    <block title="Which files" name="gdrive_scope" invisible="not gdrive_enabled">
+                        <setting string="Document types" help="All business documents, or only some (e.g. Sales Orders, Invoices).">
+                            <field name="gdrive_model_scope" widget="radio"/>
+                            <field name="gdrive_model_ids" widget="many2many_tags" invisible="gdrive_model_scope != 'selected'" options="{'no_create': True}" placeholder="Choose document types..."/>
+                        </setting>
+                        <setting string="Minimum size" help="Smaller files stay in Odoo only. 0 = every file.">
+                            <field name="gdrive_min_size"/> KB
+                        </setting>
+                        <setting string="Images in fields" help="Product images, avatars, signatures... Odoo shows them very often, so they stay local by default.">
+                            <field name="gdrive_include_fields"/>
+                        </setting>
+                        <setting string="Public files" help="Website images and other public files.">
+                            <field name="gdrive_include_public"/>
+                        </setting>
+                        <setting string="Existing attachments" help="New attachments go to Drive automatically. Send the ones that already exist too, or bring every moved file back into Odoo.">
+                            <button name="action_gdrive_queue_existing" type="object" string="Send existing attachments" icon="fa-cloud-upload" class="btn-secondary" confirm="Queue all existing attachments that match these settings?"/>
+                            <button name="action_gdrive_bring_back" type="object" string="Bring all files back to Odoo" icon="fa-cloud-download" class="btn-link" confirm="Copy every file that is only on Drive back into Odoo and switch to Copy mode?"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_gdrive_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module': 'nxb_gdrive_attachments', 'bin_size': False}</field>
+    </record>
+</odoo>
