@@ -55,7 +55,7 @@
                 <field name="arguments"/>
                 <filter name="errors" string="Errors and refusals" domain="[('status', '!=', 'ok')]"/>
                 <filter name="today" string="Today" domain="[('create_date', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
-                <group expand="0">
+                <group>
                     <filter name="by_tool" string="Tool" context="{'group_by': 'tool'}"/>
                     <filter name="by_user" string="User" context="{'group_by': 'user_id'}"/>
                     <filter name="by_db" string="Database" context="{'group_by': 'database_code'}"/>

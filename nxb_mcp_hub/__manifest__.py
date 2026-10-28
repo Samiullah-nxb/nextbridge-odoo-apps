@@ -12,7 +12,7 @@ server and on other Odoo servers. Switchable tool packs: data, dashboards, CRM, 
 website SEO, website builder and read-only SQL. API keys with scopes, OAuth 2.1 sign-in, read-only mode,
 rate limits and a complete activity log.
 """,
-    "version": "18.0.1.0.0",
+    "version": "19.0.1.0.0",
     "category": "Productivity",
     "author": "Nextbridge",
     "maintainer": "Nextbridge",

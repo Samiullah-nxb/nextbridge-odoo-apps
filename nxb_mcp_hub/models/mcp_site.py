@@ -33,7 +33,7 @@ class McpSitePermission(models.Model):
                                          "expert mode) custom CSS and head/footer code.")
     note = fields.Text()
 
-    _sql_constraints = [("website_uniq", "unique(website_key)", "This website already has permissions.")]
+    _website_uniq = models.Constraint("unique(website_key)", "This website already has permissions.")
 
     def _website(self):
         self.ensure_one()

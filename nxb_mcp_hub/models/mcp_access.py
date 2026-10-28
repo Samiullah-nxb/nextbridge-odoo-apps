@@ -54,7 +54,7 @@ class McpAccessRule(models.Model):
         for rec in self:
             if rec.kind != "record_rule" and not (rec.user_ids or rec.group_ids):
                 raise ValidationError(_("Choose the users or groups this restriction applies to."))
-            if admin_group in rec.group_ids or rec.group_ids.filtered(lambda g: admin_group in g.trans_implied_ids):
+            if admin_group in rec.group_ids or rec.group_ids.filtered(lambda g: admin_group in g.all_implied_ids):
                 raise ValidationError(_("Restrictions cannot target the Administrator group."))
             if rec.kind in ("menu_hide", "menu_only") and not rec.menu_ids:
                 raise ValidationError(_("Choose at least one menu."))
@@ -97,7 +97,7 @@ class McpAccessRule(models.Model):
         user = self.env["res.users"].sudo().browse(uid)
         if not user.exists() or user._is_superuser() or user.has_group("base.group_system"):
             return ()
-        groups = set(user.groups_id.ids)
+        groups = set(user.group_ids.ids)
         out = []
         for r in self.sudo().search([("active", "=", True), ("kind", "!=", "record_rule")]):
             if uid in r.user_ids.ids or groups & set(r.group_ids.ids):

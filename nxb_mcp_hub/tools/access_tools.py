@@ -86,7 +86,7 @@ def access_users_find(ctx, text=None, limit=20, include_portal=False):
         dom += ["|", ("name", "ilike", text), ("login", "ilike", text)]
     users = env["res.users"].search(dom, limit=ctx.cap_limit(limit, 20))
     return [{"id": u.id, "name": u.name, "login": u.login, "active": u.active, "admin": u.has_group("base.group_system"),
-             "groups": u.groups_id.filtered(lambda g: g.category_id).mapped("full_name")} for u in users]
+             "groups": u.group_ids.filtered(lambda g: g.privilege_id).mapped("full_name")} for u in users]
 
 
 @tool("access_groups_list", "access", "List groups",
@@ -94,10 +94,10 @@ def access_users_find(ctx, text=None, limit=20, include_portal=False):
       properties={"text": s_str("Group or application name contains.")})
 def access_groups_list(ctx, text=None):
     env = _env(ctx)
-    dom = [("full_name", "ilike", text)] if text else [("category_id", "!=", False)]
+    dom = [("full_name", "ilike", text)] if text else [("privilege_id", "!=", False)]
     groups = env["res.groups"].search(dom, limit=300)
     data = {g.full_name: g for g in groups}
-    return [{"name": n, "xml_id": g.get_external_id().get(g.id) or "", "users": len(g.users)}
+    return [{"name": n, "xml_id": g.get_external_id().get(g.id) or "", "users": len(g.user_ids)}
             for n, g in sorted(data.items())]
 
 
@@ -110,8 +110,8 @@ def access_user_summary(ctx, user, model=None):
     env = _env(ctx)
     u = _users(env, [user], allow_admin=True)
     out = {"user": u.name, "login": u.login, "administrator": u.has_group("base.group_system"),
-           "groups": u.groups_id.filtered(lambda g: g.category_id).mapped("full_name")}
-    rules = env["nxb.mcp.access.rule"].search(["|", ("user_ids", "in", u.ids), ("group_ids", "in", u.groups_id.ids)])
+           "groups": u.group_ids.filtered(lambda g: g.privilege_id).mapped("full_name")}
+    rules = env["nxb.mcp.access.rule"].search(["|", ("user_ids", "in", u.ids), ("group_ids", "in", u.group_ids.ids)])
     out["restrictions_from_this_app"] = [r._describe() for r in rules]
     if model:
         _model(env, model)
@@ -119,7 +119,7 @@ def access_user_summary(ctx, user, model=None):
         out["model_access"] = {op: Access.check(model, op, raise_exception=False)
                                for op in ("read", "write", "create", "unlink")}
         irules = env["ir.rule"].search([("model_id.model", "=", model), "|", ("groups", "=", False),
-                                        ("groups", "in", u.groups_id.ids)])
+                                        ("groups", "in", u.group_ids.ids)])
         out["record_rules"] = [{"name": r.name, "domain": r.domain_force, "global": r["global"]} for r in irules]
     return out
 
@@ -139,9 +139,9 @@ def access_user_create(ctx, name, login, email=None, groups=None):
         raise ToolError("Administrator rights must be granted by a person in Odoo, not by the assistant.")
     user = env["res.users"].with_context(no_reset_password=True).create({
         "name": name, "login": login, "email": email or (login if "@" in login else False),
-        "groups_id": [(4, env.ref("base.group_user").id)] + [(4, x.id) for x in g]})
+        "group_ids": [(4, env.ref("base.group_user").id)] + [(4, x.id) for x in g]})
     return {"created": {"id": user.id, "name": user.name, "login": user.login,
-                        "groups": user.groups_id.filtered(lambda x: x.category_id).mapped("full_name")}}
+                        "groups": user.group_ids.filtered(lambda x: x.privilege_id).mapped("full_name")}}
 
 
 @tool("access_user_groups", "access", "Change a user's groups",
@@ -156,8 +156,8 @@ def access_user_groups(ctx, user, add=None, remove=None):
         raise ToolError("Administrator rights must be granted by a person in Odoo, not by the assistant.")
     if not a and not r:
         raise ToolError("Nothing to add or remove.")
-    u.write({"groups_id": [(4, x.id) for x in a] + [(3, x.id) for x in r]})
-    return {"user": u.login, "groups": u.groups_id.filtered(lambda x: x.category_id).mapped("full_name")}
+    u.write({"group_ids": [(4, x.id) for x in a] + [(3, x.id) for x in r]})
+    return {"user": u.login, "groups": u.group_ids.filtered(lambda x: x.privilege_id).mapped("full_name")}
 
 
 # ---------------------------------------------------------------------------- menus
@@ -344,12 +344,12 @@ def access_record_rule_add(ctx, model, domain, groups, operations=None, name=Non
     dom = repr(domain).replace("'user.id'", "user.id").replace("'company_ids'", "company_ids")\
         .replace("\"user.id\"", "user.id")
     ops = set(operations or ["read", "write", "create", "unlink"])
-    from odoo.osv import expression
+    from odoo.fields import Domain
     from odoo.tools.safe_eval import safe_eval
     try:
         evaluated = safe_eval(dom, env["ir.rule"]._eval_context())
         with env.cr.savepoint():
-            env[model].search_count(expression.normalize_domain(evaluated))
+            env[model].search_count(Domain(evaluated))
     except Exception as e:  # noqa: BLE001
         raise ToolError("The domain is not valid for %s: %s" % (model, e))
     rule = env["ir.rule"].create({"name": "[AI] " + (name or "Rule on %s" % model), "model_id": m.id,
@@ -373,7 +373,7 @@ def access_rules_list(ctx, model=None, user=None, include_inactive=False):
         dom.append(("model", "=", model))
     if user:
         u = _users(env, [user], allow_admin=True)
-        dom += ["|", ("user_ids", "in", u.ids), ("group_ids", "in", u.groups_id.ids)]
+        dom += ["|", ("user_ids", "in", u.ids), ("group_ids", "in", u.group_ids.ids)]
     rules = env["nxb.mcp.access.rule"].with_context(active_test=not include_inactive).search(dom)
     return [r._describe() for r in rules]
 

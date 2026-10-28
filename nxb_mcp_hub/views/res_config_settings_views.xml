@@ -14,7 +14,7 @@
                                 <button name="%(nxb_mcp_hub.action_nxb_mcp_key_wizard)d" type="action" string="New connector key" class="btn-primary" icon="fa-key"/>
                             </div>
                         </setting>
-                        <setting string="Several databases on this server?" help="To reach this database as /mcp/db/&lt;name&gt; when the server hosts several databases, add nxb_mcp_hub to server_wide_modules in the Odoo configuration file (server_wide_modules = base,web,nxb_mcp_hub). With one database per domain (dbfilter) nothing extra is needed."/>
+                        <setting string="Several databases on this server?" help="To reach this database as /mcp/db/DATABASE-NAME when the server hosts several databases, add nxb_mcp_hub to server_wide_modules in the Odoo configuration file (server_wide_modules = base,rpc,web,nxb_mcp_hub). With one database per domain (dbfilter) nothing extra is needed."/>
                     </block>
                     <block title="Safety" name="nxb_mcp_safety">
                         <setting help="No assistant may create, change or delete anything, whatever key or sign-in it uses.">
@@ -52,7 +52,6 @@
         <field name="name">Settings</field>
         <field name="res_model">res.config.settings</field>
         <field name="view_mode">form</field>
-        <field name="target">inline</field>
         <field name="context">{'module': 'nxb_mcp_hub', 'bin_size': False}</field>
     </record>
 </odoo>

@@ -21,7 +21,7 @@ class TestAccess(McpCase):
     def test_users_and_groups(self):
         users = self.call("access_users_find", text="mcp_test")
         self.assertEqual(users[0]["login"], "mcp_test_user")
-        groups = self.call("access_groups_list", text="Settings")
+        groups = self.call("access_groups_list", text="Administrator")
         self.assertTrue(groups)
         created = self.call("access_user_create", name="New Person", login="new.person@example.com",
                             groups=["base.group_partner_manager"])["created"]
@@ -92,7 +92,7 @@ class TestAccess(McpCase):
                                                elements=["button:first"], users=["mcp_test_user"]))
 
     def test_model_block(self):
-        self.user.groups_id = [(4, self.env.ref("base.group_partner_manager").id)]
+        self.user.group_ids = [(4, self.env.ref("base.group_partner_manager").id)]
         self.env["res.partner"].with_user(self.user).create({"name": "allowed before"})
         self.call("access_model_block", model="res.partner", operations=["create", "unlink"],
                   users=["mcp_test_user"])
@@ -105,7 +105,7 @@ class TestAccess(McpCase):
 
     def test_record_rule(self):
         grp = self.env["res.groups"].create({"name": "MCP restricted readers"})
-        self.user.groups_id = [(4, grp.id)]
+        self.user.group_ids = [(4, grp.id)]
         mine = self.env["res.partner"].create({"name": "Mine", "user_id": self.user.id})
         other = self.env["res.partner"].create({"name": "Other", "user_id": self.admin.id})
         res = self.call("access_record_rule_add", model="res.partner",

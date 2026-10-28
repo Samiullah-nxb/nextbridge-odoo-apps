@@ -52,8 +52,21 @@ class LocalOrm(object):
         return to_json(self.model(model).browse(ids).exists().read(fields or None))
 
     def read_group(self, model, domain, fields, groupby, limit=None, orderby=False, lazy=False):
-        return to_json(self.model(model).read_group(domain, fields, groupby, limit=limit, orderby=orderby,
-                                                    lazy=lazy))
+        """Grouped totals in the classic read_group shape ({group fields, measure: value, __count})."""
+        aggs = ["__count"] + [f if ":" in f else "%s:sum" % f for f in fields]
+        rows = self.model(model).formatted_read_group(domain, list(groupby or []), aggs, limit=limit,
+                                                      order=orderby or None)
+        out = []
+        for row in rows:
+            item = {}
+            for key, value in row.items():
+                if key == "__extra_domain":
+                    continue
+                if key in aggs and key != "__count":
+                    key = key.split(":")[0]
+                item[key] = value
+            out.append(item)
+        return to_json(out)
 
     def create(self, model, vals_list):
         return self.model(model).create(vals_list).ids
@@ -72,12 +85,13 @@ class LocalOrm(object):
         return {"deleted": done, "not_found": missing}
 
     def call(self, model, method, ids, args, kwargs):
-        from odoo.models import check_method_name
-        check_method_name(method)
+        from odoo.service.model import get_public_method
         target = self.model(model).browse(ids) if ids else self.model(model)
-        func = getattr(target, method, None)
-        if not callable(func):
+        try:
+            get_public_method(target, method)
+        except AttributeError:
             raise ToolError("Method %r does not exist on %s." % (method, model))
+        func = getattr(target, method)
         return to_json(_serialisable(func(*(args or []), **(kwargs or {}))))
 
     def companies(self):

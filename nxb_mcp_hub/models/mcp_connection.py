@@ -49,7 +49,7 @@ class McpConnection(models.Model):
     app_installed = fields.Boolean("App installed there", readonly=True)
     call_count = fields.Integer(compute="_compute_call_count")
 
-    _sql_constraints = [("code_uniq", "unique(code)", "The code must be unique.")]
+    _code_uniq = models.Constraint("unique(code)", "The code must be unique.")
 
     @api.depends("mcp_url")
     def _compute_federated(self):

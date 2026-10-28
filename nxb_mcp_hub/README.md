@@ -1,6 +1,6 @@
 # Multi-Database MCP Server – AI Connector for Odoo
 
-Odoo 18 app by **Nextbridge** (https://www.nextbridge.pk) · License OPL-1 · Support: samiullah.3277@nxb.com.pk
+Odoo 19 app by **Nextbridge** (https://www.nextbridge.pk) · License OPL-1 · Support: samiullah.3277@nxb.com.pk
 
 An MCP (Model Context Protocol) server that lives inside Odoo. AI assistants connect to one address and can work
 in this database, in other databases on the same server and in databases on other Odoo servers.

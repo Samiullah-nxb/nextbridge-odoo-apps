@@ -1,6 +1,6 @@
 # Multi-Database MCP Server – AI Connector for Odoo
 
-**User guide · Version 18.0.1.0.0 · Prepared by Nextbridge**
+**User guide · Version 19.0.1.0.0 · Prepared by Nextbridge**
 
 Website: https://www.nextbridge.pk · Support: samiullah.3277@nxb.com.pk · License: OPL-1
 
@@ -28,7 +28,7 @@ The assistant always acts as a real Odoo user, so Odoo's access rights, record r
 2. Update the apps list and install **Multi-Database MCP Server – AI Connector for Odoo**.
 3. A new **AI Connector** app appears in the main menu (administrators and members of the *AI Connector / User* group).
 
-Requirements: Odoo 18, no extra Python packages. The app depends only on `base` and `web`. The CRM, Email campaigns
+Requirements: Odoo 19, no extra Python packages. The app depends only on `base` and `web`. The CRM, Email campaigns
 and Website tools become available when the CRM, Email Marketing and Website apps are installed.
 
 ### 2.1 Servers hosting several databases
@@ -39,8 +39,11 @@ If one server hosts several databases on the same domain, load the app server-wi
 at `/mcp/db/<database name>`. In the Odoo configuration file:
 
 ```
-server_wide_modules = base,web,nxb_mcp_hub
+server_wide_modules = base,rpc,web,nxb_mcp_hub
 ```
+
+Keep `rpc` in the list: since Odoo 19 it provides Odoo's external API (XML-RPC/JSON-RPC), which other
+programs, and other hubs connecting to this database, rely on.
 
 and restart Odoo. The app shows the correct address automatically on the Overview page, in Settings and in the key
 wizard. Databases hidden by the server's `dbfilter` are never reachable through the connector.

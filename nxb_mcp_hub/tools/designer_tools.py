@@ -628,7 +628,7 @@ def site_menu_change(ctx, action, website_id=None, menu_id=None, label=None, url
 def site_theme(ctx, website_id=None, palette=None, colors=None, body_font=None, heading_font=None, button_font=None):
     w = sc.website(ctx, website_id)
     sc.permission(ctx, w, "allow_sitewide")
-    Assets = ctx.env["web_editor.assets"].sudo().with_context(website_id=w.id)
+    Assets = ctx.env["website.assets"].sudo().with_context(website_id=w.id)
     changed = {}
     if palette:
         if not re.match(r"^default-\d{1,2}$", palette):
@@ -704,7 +704,7 @@ def site_section_html(ctx, page, html, website_id=None, replace_section=None, af
 
 
 def _custom_css(env, w):
-    Assets = env["web_editor.assets"].sudo().with_context(website_id=w.id)
+    Assets = env["website.assets"].sudo().with_context(website_id=w.id)
     url = "/website/static/src/scss/user_custom_rules.scss"
     custom = Assets._make_custom_asset_url(url, "web.assets_frontend")
     att = Assets._get_custom_attachment(custom)

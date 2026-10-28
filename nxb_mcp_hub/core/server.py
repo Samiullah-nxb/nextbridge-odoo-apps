@@ -17,7 +17,7 @@ from .registry import PACKS, PARAM_PREFIX, TOOLS
 _logger = logging.getLogger(__name__)
 
 SERVER_NAME = "nextbridge-odoo-mcp-hub"
-SERVER_VERSION = "18.0.1.0.0"
+SERVER_VERSION = "19.0.1.0.0"
 PROTOCOL_VERSIONS = ("2025-06-18", "2025-03-26", "2024-11-05")
 MAX_RESULT_CHARS = 120000
 

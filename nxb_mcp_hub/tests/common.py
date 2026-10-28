@@ -29,7 +29,7 @@ class McpCase(TransactionCase):
             {"name": "test", "user_id": cls.admin.id, "scope": "write"})
         cls.user = cls.env["res.users"].create({
             "name": "MCP Test User", "login": "mcp_test_user", "email": "mcp_test_user@example.com",
-            "groups_id": [(6, 0, [cls.env.ref("base.group_user").id])]})
+            "group_ids": [(6, 0, [cls.env.ref("base.group_user").id])]})
 
     def server(self, user=None, readonly=False, key=None):
         principal = Principal(user or self.admin, readonly=readonly, key=key or self.key)

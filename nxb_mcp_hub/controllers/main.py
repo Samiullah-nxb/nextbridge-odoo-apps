@@ -4,7 +4,7 @@
 
 The endpoint opens its own cursor on the hub database, so it works both on a normal
 single-database server and on a multi-database server where the module is loaded
-server-wide (``server_wide_modules = base,web,nxb_mcp_hub``) and the database is named in
+server-wide (``server_wide_modules = base,rpc,web,nxb_mcp_hub``) and the database is named in
 the URL: ``/mcp/db/<name>``.
 """
 import json
