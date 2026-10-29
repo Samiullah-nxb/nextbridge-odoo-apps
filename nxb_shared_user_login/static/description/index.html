@@ -1,0 +1,94 @@
+<section class="oe_container" style="padding: 32px 16px 8px;">
+  <div style="max-width: 1100px; margin: 0 auto; text-align: center;">
+    <h1 style="font-size: 34px; font-weight: 800; color: #3730a3; margin-bottom: 10px;">Shared User Login with Employee PIN</h1>
+    <p style="font-size: 19px; color: #3f4f63; max-width: 840px; margin: 0 auto 18px;">
+      On a shared screen &#8211; shop floor, warehouse, front desk, workshop &#8211; several employees use the same Odoo user.
+      Each one signs in with a personal PIN, and Odoo shows who wrote every message, note and e-mail.
+    </p>
+    <p>
+      <span style="display:inline-block;background:#eef2ff;color:#4338ca;border-radius:16px;padding:5px 14px;margin:3px;font-weight:600;">Odoo 18</span>
+      <span style="display:inline-block;background:#ecfdf5;color:#047857;border-radius:16px;padding:5px 14px;margin:3px;font-weight:600;">Works on every app, including custom ones</span>
+      <span style="display:inline-block;background:#fef3c7;color:#92400e;border-radius:16px;padding:5px 14px;margin:3px;font-weight:600;">PIN lockout &amp; idle lock</span>
+      <span style="display:inline-block;background:#f1f5f9;color:#334155;border-radius:16px;padding:5px 14px;margin:3px;font-weight:600;">Sign-in history</span>
+    </p>
+    <img src="screenshot_pin.png" alt="Who is working? screen" style="max-width:100%; margin-top: 18px; border: 1px solid #dfe5ea; border-radius: 10px; box-shadow: 0 6px 24px rgba(55,48,163,.12);"/>
+  </div>
+</section>
+
+<section class="oe_container" style="padding: 36px 16px;">
+  <div style="max-width: 1100px; margin: 0 auto;">
+    <h2 style="font-size: 26px; font-weight: 700; color: #3730a3; text-align: center; margin-bottom: 20px;">How it works</h2>
+    <ol style="color:#2c3e48;font-size:16px;line-height:1.8;max-width:900px;margin:0 auto 20px;">
+      <li>The shared user logs in as usual (login and password).</li>
+      <li>A <b>"Who is working?"</b> screen appears: the employee taps their name and types their PIN (keyboard or on-screen keypad).</li>
+      <li>Odoo opens with the <b>employee's name and photo</b> in the top bar. Everything they post is signed with their name.</li>
+      <li><b>Switch employee</b> from the user menu hands the screen to a colleague in two seconds.</li>
+    </ol>
+    <div class="row">
+      <div class="col-md-6"><img src="screenshot_chatter.png" alt="Chatter signed by the employee" style="max-width:100%;border:1px solid #dfe5ea;border-radius:8px;margin-bottom:12px;"/></div>
+      <div class="col-md-6"><img src="screenshot_discuss.png" alt="Discuss message signed by the employee" style="max-width:100%;border:1px solid #dfe5ea;border-radius:8px;margin-bottom:12px;"/></div>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container" style="padding: 36px 16px; background: #f5f7fb;">
+  <div style="max-width: 1100px; margin: 0 auto;">
+    <h2 style="font-size: 26px; font-weight: 700; color: #3730a3; text-align: center; margin-bottom: 20px;">Features</h2>
+    <div class="row">
+      <div class="col-md-6">
+        <ul style="color:#2c3e48;font-size:15px;line-height:1.8;">
+          <li><b>Employee as author</b> of chatter messages, logged notes, field-change tracking, Discuss messages and outgoing e-mails &#8211; on every model, including apps installed later and custom modules.</li>
+          <li><b>Customers see the employee's name</b> (and work e-mail when set) on e-mails; replies still reach the shared account.</li>
+          <li><b>Nothing is reachable before the PIN:</b> pages, data calls and downloads all wait until an employee has signed in.</li>
+          <li><b>Switch employee</b> and <b>Change my PIN</b> in the user menu.</li>
+        </ul>
+      </div>
+      <div class="col-md-6">
+        <ul style="color:#2c3e48;font-size:15px;line-height:1.8;">
+          <li><b>Idle lock:</b> ask for the PIN again after a chosen number of idle minutes.</li>
+          <li><b>PIN lockout:</b> after a number of wrong PINs the employee is locked for a while (both configurable); HR can unlock.</li>
+          <li><b>Sign-in history:</b> every sign-in, switch, idle lock, wrong PIN and PIN change with date and IP address.</li>
+          <li><b>Safe by default:</b> administrator and portal accounts cannot be shared, and the external API (XML-RPC/JSON-RPC) is refused for shared accounts unless you allow it.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="row" style="margin-top:12px;">
+      <div class="col-md-6"><img src="screenshot_menu.png" alt="Switch employee" style="max-width:100%;border:1px solid #dfe5ea;border-radius:8px;margin-bottom:12px;"/></div>
+      <div class="col-md-6"><img src="screenshot_history.png" alt="Sign-in history" style="max-width:100%;border:1px solid #dfe5ea;border-radius:8px;margin-bottom:12px;"/></div>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container" style="padding: 36px 16px;">
+  <div style="max-width: 1100px; margin: 0 auto;">
+    <h2 style="font-size: 26px; font-weight: 700; color: #3730a3; text-align: center; margin-bottom: 20px;">Set up in three steps</h2>
+    <ol style="color:#2c3e48;font-size:16px;line-height:1.8;max-width:900px;margin:0 auto 20px;">
+      <li><b>Settings &#8594; General Settings &#8594; Users:</b> switch on <i>Shared user accounts</i> (and choose the idle lock and PIN lockout).</li>
+      <li>Give each employee a <b>PIN</b> (employee form &#8594; Settings tab &#8594; PIN Code &#8211; the same PIN Odoo uses for attendance).</li>
+      <li>Open the user to share &#8594; <b>Shared account</b> tab &#8594; tick it and add the employees.</li>
+    </ol>
+    <div class="row">
+      <div class="col-md-6"><img src="screenshot_settings.png" alt="Settings" style="max-width:100%;border:1px solid #dfe5ea;border-radius:8px;margin-bottom:12px;"/></div>
+      <div class="col-md-6"><img src="screenshot_user.png" alt="Shared account tab" style="max-width:100%;border:1px solid #dfe5ea;border-radius:8px;margin-bottom:12px;"/></div>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container" style="padding: 36px 16px; background: #f5f7fb;">
+  <div style="max-width: 1100px; margin: 0 auto;">
+    <h2 style="font-size: 26px; font-weight: 700; color: #3730a3; text-align: center; margin-bottom: 20px;">Questions</h2>
+    <p><b>What does it depend on?</b><br/>Discuss (mail) and Employees (hr) only.</p>
+    <p><b>Do record "Created by" fields change?</b><br/>No: Odoo still records the shared user there. The employee's name is on the messages, notes, tracking and e-mails of each record, and in the sign-in history.</p>
+    <p><b>Does a shared account replace Odoo user licences?</b><br/>This app is about knowing who did what on a shared screen. Odoo Enterprise subscriptions are priced per person using the system: check your subscription terms before sharing an account between several people.</p>
+    <p><b>Is it tested?</b><br/>The app ships with an automated test suite (PIN screen, lockout, idle lock, switching, attribution on chatter, Discuss and e-mail, external API protection).</p>
+  </div>
+</section>
+
+<section class="oe_container" style="padding: 32px 16px;">
+  <div style="max-width: 900px; margin: 0 auto; text-align: center;">
+    <h2 style="font-size: 24px; font-weight: 700; color: #3730a3;">Support</h2>
+    <p style="color:#3f4f63;font-size:16px;">Developed and supported by <b>Nextbridge</b> &#183;
+      <a href="https://www.nextbridge.pk">www.nextbridge.pk</a> &#183;
+      <a href="mailto:samiullah.3277@nxb.com.pk">samiullah.3277@nxb.com.pk</a></p>
+  </div>
+</section>

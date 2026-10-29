@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_nxb_shared_log_admin,nxb.shared.login.log admin,model_nxb_shared_login_log,base.group_system,1,0,0,1
+access_nxb_shared_log_hr,nxb.shared.login.log hr,model_nxb_shared_login_log,hr.group_hr_manager,1,0,0,0

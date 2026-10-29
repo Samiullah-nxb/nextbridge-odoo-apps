@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_employee_form_nxb_shared" model="ir.ui.view">
+        <field name="name">hr.employee.form.nxb.shared</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='pin']" position="after">
+                <field name="nxb_shared_user_ids" widget="many2many_tags" readonly="1" invisible="not nxb_shared_user_ids"/>
+                <label for="nxb_pin_locked_until" invisible="not nxb_pin_locked_until"/>
+                <div class="o_row" invisible="not nxb_pin_locked_until">
+                    <field name="nxb_pin_locked_until" readonly="1"/>
+                    <button name="action_nxb_unlock_pin" type="object" string="Unlock" class="btn-link" icon="fa-unlock"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

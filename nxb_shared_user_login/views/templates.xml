@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="page_layout" name="Shared login page">
+        <t t-out="doctype"/>
+        <html>
+            <head>
+                <meta charset="utf-8"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <title t-esc="title"/>
+                <style>
+                    * { box-sizing: border-box; }
+                    body { margin: 0; font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f2f4f8; color: #1f2937; }
+                    .wrap { max-width: 760px; margin: 0 auto; padding: 32px 16px 48px; }
+                    .card { background: #fff; border-radius: 14px; box-shadow: 0 8px 30px rgba(15, 23, 42, .08); padding: 28px; }
+                    h1 { font-size: 22px; margin: 0 0 4px; }
+                    .muted { color: #6b7280; font-size: 14px; margin: 0 0 20px; }
+                    .people { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; margin-bottom: 22px; }
+                    .person input { position: absolute; opacity: 0; pointer-events: none; }
+                    .person label { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 8px; border: 2px solid #e5e7eb; border-radius: 12px; cursor: pointer; text-align: center; font-size: 14px; font-weight: 600; min-height: 128px; }
+                    .person img { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; background: #eef2ff; }
+                    .person input:checked + label { border-color: #4f46e5; background: #eef2ff; }
+                    .person input:focus-visible + label { outline: 3px solid #a5b4fc; }
+                    .pin { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+                    .pin input { font-size: 24px; letter-spacing: 8px; padding: 10px 14px; width: 220px; border: 2px solid #d1d5db; border-radius: 10px; text-align: center; }
+                    .pin input:focus { border-color: #4f46e5; outline: none; }
+                    .keys { display: grid; grid-template-columns: repeat(3, 64px); gap: 8px; margin: 16px 0; }
+                    .keys button { height: 52px; font-size: 20px; border: 1px solid #d1d5db; border-radius: 10px; background: #fff; cursor: pointer; }
+                    .keys button:active { background: #eef2ff; }
+                    .btn { background: #4f46e5; color: #fff; border: 0; border-radius: 10px; padding: 12px 22px; font-size: 16px; font-weight: 600; cursor: pointer; }
+                    .btn:hover { background: #4338ca; }
+                    .error { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; border-radius: 10px; padding: 10px 14px; margin-bottom: 16px; }
+                    .ok { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; border-radius: 10px; padding: 10px 14px; margin-bottom: 16px; }
+                    .foot { display: flex; justify-content: space-between; margin-top: 18px; font-size: 14px; }
+                    .foot a { color: #4f46e5; text-decoration: none; }
+                    .field { display: block; margin-bottom: 14px; }
+                    .field span { display: block; font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+                    .field input { font-size: 18px; padding: 8px 12px; width: 220px; border: 2px solid #d1d5db; border-radius: 10px; letter-spacing: 4px; }
+                    .empty { padding: 18px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; }
+                </style>
+            </head>
+            <body>
+                <div class="wrap">
+                    <p class="muted" style="text-align:center"><t t-esc="company.name"/></p>
+                    <div class="card"><t t-out="0"/></div>
+                </div>
+            </body>
+        </html>
+    </template>
+
+    <template id="select_page" name="Shared login: who are you?">
+        <t t-call="nxb_shared_user_login.page_layout">
+            <t t-set="title">Who is working?</t>
+            <h1>Who is working?</h1>
+            <p class="muted">Shared account <b t-esc="user.name"/>. Choose your name and enter your PIN.</p>
+            <div class="error" t-if="error" role="alert"><t t-esc="error"/></div>
+            <div class="empty" t-if="not employees">
+                No employee can use this account yet. An administrator can add employees in Settings &gt; Users &gt;
+                <t t-esc="user.name"/> &gt; Shared account.
+            </div>
+            <form t-if="employees" method="post" action="/shared_login" autocomplete="off" id="nxb_form">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <input type="hidden" name="redirect" t-att-value="redirect"/>
+                <div class="people" role="radiogroup" aria-label="Employees">
+                    <t t-foreach="employees" t-as="emp">
+                        <div class="person">
+                            <input type="radio" name="employee_id" t-att-id="'emp_%s' % emp.id" t-att-value="emp.id"
+                                   t-att-checked="'checked' if emp.id == selected_id else None" required="required"/>
+                            <label t-att-for="'emp_%s' % emp.id">
+                                <img t-att-src="'/shared_login/avatar/%s' % emp.id" alt=""/>
+                                <span t-esc="emp.name"/>
+                            </label>
+                        </div>
+                    </t>
+                </div>
+                <div class="pin">
+                    <input type="password" name="pin" id="nxb_pin" inputmode="numeric" pattern="[0-9]*"
+                           autocomplete="off" placeholder="PIN" aria-label="PIN" maxlength="12" required="required"/>
+                    <button type="submit" class="btn">Sign in</button>
+                </div>
+                <div class="keys" aria-hidden="true">
+                    <t t-foreach="['1','2','3','4','5','6','7','8','9','C','0','&#8592;']" t-as="k">
+                        <button type="button" t-att-data-key="k" tabindex="-1"><t t-esc="k"/></button>
+                    </t>
+                </div>
+            </form>
+            <div class="foot">
+                <span/>
+                <a href="/web/session/logout">Not this account? Log out</a>
+            </div>
+            <script>
+                (function () {
+                    var pin = document.getElementById("nxb_pin");
+                    if (!pin) { return; }
+                    document.querySelectorAll(".keys button").forEach(function (b) {
+                        b.addEventListener("click", function () {
+                            var k = b.getAttribute("data-key");
+                            if (k === "C") { pin.value = ""; }
+                            else if (k.length !== 1 || isNaN(parseInt(k, 10))) { pin.value = pin.value.slice(0, -1); }
+                            else if (pin.value.length &lt; 12) { pin.value += k; }
+                            pin.focus();
+                        });
+                    });
+                    document.querySelectorAll(".person input").forEach(function (r) {
+                        r.addEventListener("change", function () { pin.value = ""; pin.focus(); });
+                    });
+                    if (document.querySelector(".person input:checked")) { pin.focus(); }
+                })();
+            </script>
+        </t>
+    </template>
+
+    <template id="pin_page" name="Shared login: change PIN">
+        <t t-call="nxb_shared_user_login.page_layout">
+            <t t-set="title">Change my PIN</t>
+            <h1>Change my PIN</h1>
+            <p class="muted"><t t-esc="employee.name"/></p>
+            <div class="ok" t-if="done">Your PIN has been changed.</div>
+            <div class="error" t-if="error" role="alert"><t t-esc="error"/></div>
+            <form method="post" action="/shared_login/pin" autocomplete="off" t-if="not done">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <label class="field"><span>Current PIN</span><input type="password" name="current" inputmode="numeric" required="required" maxlength="12"/></label>
+                <label class="field"><span>New PIN (4 to 12 digits)</span><input type="password" name="new" inputmode="numeric" pattern="[0-9]{4,12}" required="required" maxlength="12"/></label>
+                <label class="field"><span>New PIN again</span><input type="password" name="confirm" inputmode="numeric" pattern="[0-9]{4,12}" required="required" maxlength="12"/></label>
+                <button type="submit" class="btn">Change PIN</button>
+            </form>
+            <div class="foot"><a href="/odoo">Back to Odoo</a><span/></div>
+        </t>
+    </template>
+</odoo>

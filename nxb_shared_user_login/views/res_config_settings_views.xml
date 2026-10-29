@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_nxb_shared" model="ir.ui.view">
+        <field name="name">res.config.settings.form.nxb.shared</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='users_setting_container']" position="inside">
+                <setting id="nxb_shared_login" string="Shared user accounts"
+                         help="Several employees use one user (shop floor, warehouse, front desk). Each one signs in with a PIN and is shown as the author of messages and e-mails.">
+                    <field name="nxb_shared_enabled"/>
+                    <div class="content-group mt16" invisible="not nxb_shared_enabled">
+                        <div class="row"><label for="nxb_shared_idle_minutes" class="col-lg-7 o_light_label"/><field name="nxb_shared_idle_minutes" class="col-lg-3"/></div>
+                        <div class="row"><label for="nxb_shared_max_attempts" class="col-lg-7 o_light_label"/><field name="nxb_shared_max_attempts" class="col-lg-3"/></div>
+                        <div class="row"><label for="nxb_shared_lock_minutes" class="col-lg-7 o_light_label"/><field name="nxb_shared_lock_minutes" class="col-lg-3"/></div>
+                        <div class="mt8"><field name="nxb_shared_allow_api" class="w-auto"/> <label for="nxb_shared_allow_api" class="o_light_label"/></div>
+                        <div class="mt8">
+                            <button name="%(base.action_res_users)d" type="action" string="Choose the shared users" icon="oi-arrow-right" class="btn-link" context="{'search_default_nxb_shared': 0}"/>
+                            <button name="%(nxb_shared_user_login.action_nxb_shared_log)d" type="action" string="Sign-in history" icon="oi-arrow-right" class="btn-link"/>
+                        </div>
+                    </div>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+</odoo>

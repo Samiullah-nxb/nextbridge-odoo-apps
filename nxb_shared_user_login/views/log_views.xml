@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nxb_shared_log_list" model="ir.ui.view">
+        <field name="name">nxb.shared.login.log.list</field>
+        <field name="model">nxb.shared.login.log</field>
+        <field name="arch" type="xml">
+            <list string="Shared account sign-ins" create="0" edit="0" decoration-danger="event in ('wrong_pin', 'locked')" decoration-muted="event == 'timeout'">
+                <field name="create_date"/>
+                <field name="user_id"/>
+                <field name="employee_id"/>
+                <field name="event" widget="badge" decoration-success="event in ('sign_in', 'switch')" decoration-danger="event in ('wrong_pin', 'locked')"/>
+                <field name="ip" optional="show"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_nxb_shared_log_search" model="ir.ui.view">
+        <field name="name">nxb.shared.login.log.search</field>
+        <field name="model">nxb.shared.login.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="user_id"/>
+                <filter name="signins" string="Sign-ins" domain="[('event', 'in', ('sign_in', 'switch'))]"/>
+                <filter name="failures" string="Wrong PINs and locks" domain="[('event', 'in', ('wrong_pin', 'locked'))]"/>
+                <separator/>
+                <filter name="today" string="Today" domain="[('create_date', '&gt;=', (context_today()).strftime('%Y-%m-%d'))]"/>
+                <filter name="group_employee" string="Employee" context="{'group_by': 'employee_id'}"/>
+                <filter name="group_user" string="Shared account" context="{'group_by': 'user_id'}"/>
+                <filter name="group_day" string="Day" context="{'group_by': 'create_date:day'}"/>
+            </search>
+        </field>
+    </record>
+    <record id="action_nxb_shared_log" model="ir.actions.act_window">
+        <field name="name">Shared account sign-ins</field>
+        <field name="res_model">nxb.shared.login.log</field>
+        <field name="view_mode">list</field>
+        <field name="help" type="html"><p>Every sign-in, employee switch, lock after inactivity and wrong PIN on a shared account is listed here.</p></field>
+    </record>
+    <menuitem id="menu_nxb_shared_log" name="Shared account sign-ins" parent="base.menu_users" action="action_nxb_shared_log" sequence="40" groups="base.group_system"/>
+</odoo>

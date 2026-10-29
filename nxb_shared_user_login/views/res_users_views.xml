@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_users_form_nxb_shared" model="ir.ui.view">
+        <field name="name">res.users.form.nxb.shared</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='access_rights']" position="after">
+                <page string="Shared account" name="nxb_shared" invisible="not nxb_feature_on or share" groups="base.group_system">
+                    <field name="nxb_feature_on" invisible="1"/>
+                    <group>
+                        <field name="nxb_shared"/>
+                    </group>
+                    <div class="text-muted mb-3" invisible="nxb_shared">
+                        Several employees can use this login: after the usual login, each one picks their name and
+                        types their PIN, and their name is shown on messages, notes and e-mails.
+                    </div>
+                    <div invisible="not nxb_shared">
+                        <field name="nxb_employee_ids" widget="many2many" options="{'no_create': True}">
+                            <list>
+                                <field name="name"/>
+                                <field name="job_title"/>
+                                <field name="work_email"/>
+                                <field name="department_id"/>
+                            </list>
+                        </field>
+                        <div class="text-muted">Each employee needs a PIN (employee form &gt; Settings tab &gt; PIN Code).</div>
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_users_search_nxb_shared" model="ir.ui.view">
+        <field name="name">res.users.search.nxb.shared</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='filter_no_share']" position="after">
+                <filter name="nxb_shared" string="Shared accounts" domain="[('nxb_shared', '=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
