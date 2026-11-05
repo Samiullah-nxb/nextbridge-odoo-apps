@@ -1,0 +1,92 @@
+// Sign portal "/my/signature/…" — detail page layout (CLM).
+// Uses Bootstrap theme tokens so it follows the active Odoo / website colors.
+
+.o_clm_sign_kicker {
+    letter-spacing: 0.06em;
+}
+
+.o_clm_sign_title {
+    font-weight: 600;
+    line-height: 1.25;
+    word-break: break-word;
+}
+
+.o_clm_sign_portal {
+    margin-bottom: 2rem;
+}
+
+.o_clm_sign_panel {
+    background: var(--o-view-background-color, var(--bs-body-bg, #fff));
+    border: 1px solid var(--bs-border-color, rgba(0, 0, 0, 0.1));
+    border-radius: 0.5rem;
+    padding: 1.25rem 1.35rem;
+}
+
+.o_clm_sign_panel_head {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    color: var(--bs-secondary-color, #6c757d);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.o_clm_sign_meta_row {
+    display: grid;
+    grid-template-columns: minmax(7rem, 34%) 1fr;
+    gap: 0.5rem 1rem;
+    padding: 0.7rem 0;
+    border-top: 1px solid var(--bs-border-color-translucent, rgba(0, 0, 0, 0.06));
+
+    &:first-child {
+        border-top: 0;
+        padding-top: 0;
+    }
+
+    &:last-child {
+        padding-bottom: 0;
+    }
+
+    dt {
+        margin: 0;
+        color: var(--bs-secondary-color, #6c757d);
+        font-weight: 500;
+    }
+
+    dd {
+        margin: 0;
+        font-weight: 600;
+    }
+}
+
+.o_clm_sign_signer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    padding: 0.75rem 0;
+    border-top: 1px solid var(--bs-border-color-translucent, rgba(0, 0, 0, 0.06));
+
+    &:first-child {
+        border-top: 0;
+        padding-top: 0;
+    }
+
+    &:last-child {
+        padding-bottom: 0;
+    }
+}
+
+.o_clm_sign_actions .o_clm_sign_cta {
+    font-weight: 600;
+}
+
+@media (max-width: 575.98px) {
+    .o_clm_sign_meta_row {
+        grid-template-columns: 1fr;
+        gap: 0.15rem;
+    }
+}

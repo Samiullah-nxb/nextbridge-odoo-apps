@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ─── Negotiation rounds ─────────────────────────────────────────── -->
+    <record id="view_clm_negotiation_round_list" model="ir.ui.view">
+        <field name="name">clm.negotiation.round.list</field>
+        <field name="model">clm.negotiation.round</field>
+        <field name="arch" type="xml">
+            <list string="Negotiation Rounds" class="o_clm_list"
+                  decoration-muted="status == 'cancelled'">
+                <field name="contract_id"/>
+                <field name="round_number" string="Round"/>
+                <field name="recipient_id"/>
+                <field name="sent_at"/>
+                <field name="response_deadline"/>
+                <field name="received_at" optional="show"/>
+                <field name="outbound_version_id" optional="hide"/>
+                <field name="inbound_version_id" optional="hide"/>
+                <field name="status" widget="badge"
+                       decoration-warning="status == 'in_progress'"
+                       decoration-success="status == 'completed'"
+                       decoration-danger="status == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_clm_negotiation_round_form" model="ir.ui.view">
+        <field name="name">clm.negotiation.round.form</field>
+        <field name="model">clm.negotiation.round</field>
+        <field name="arch" type="xml">
+            <form string="Negotiation Round" class="o_clm_form">
+                <sheet>
+                    <div class="oe_title o_clm_page_header" name="clm_page_header">
+                        <div class="o_clm_kicker">
+                            Negotiation · <field name="contract_id" readonly="1" class="oe_inline"
+                                                 options="{'no_open': True}"/>
+                        </div>
+                        <h1 class="o_clm_title">Round <field name="round_number" readonly="1" class="oe_inline"/></h1>
+                        <div class="o_clm_subtitle">
+                            <span invisible="not recipient_id">
+                                <i class="fa fa-building-o" role="img" aria-label="Sent to"/>
+                                <field name="recipient_id" readonly="1" options="{'no_open': True}"/>
+                            </span>
+                            <span invisible="not sent_at">
+                                <i class="fa fa-paper-plane-o" role="img" aria-label="Sent"/>
+                                <field name="sent_at" readonly="1"/>
+                            </span>
+                        </div>
+                    </div>
+                    <group>
+                        <group string="Exchange">
+                            <field name="contract_id"/>
+                            <field name="round_number"/>
+                            <field name="status"/>
+                            <field name="recipient_id"/>
+                        </group>
+                        <group string="Versions &amp; Timing">
+                            <field name="outbound_version_id"/>
+                            <field name="inbound_version_id"/>
+                            <field name="response_deadline"/>
+                            <field name="sent_at"/>
+                            <field name="received_at"/>
+                        </group>
+                    </group>
+                    <separator string="Notes"/>
+                    <field name="notes" nolabel="1" class="o_clm_longtext"
+                           placeholder="What was sent, what came back, and what is still open."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_clm_negotiation_round_search" model="ir.ui.view">
+        <field name="name">clm.negotiation.round.search</field>
+        <field name="model">clm.negotiation.round</field>
+        <field name="arch" type="xml">
+            <search string="Negotiation Rounds">
+                <field name="contract_id"/>
+                <field name="recipient_id"/>
+                <filter string="Awaiting Counterparty" name="in_progress" domain="[('status', '=', 'in_progress')]"/>
+                <filter string="Completed" name="completed" domain="[('status', '=', 'completed')]"/>
+                <group>
+                    <filter string="Contract" name="group_by_contract" context="{'group_by': 'contract_id'}"/>
+                    <filter string="Status" name="group_by_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ─── Version comparisons ────────────────────────────────────────── -->
+    <record id="view_clm_document_comparison_list" model="ir.ui.view">
+        <field name="name">clm.document.comparison.list</field>
+        <field name="model">clm.document.comparison</field>
+        <field name="arch" type="xml">
+            <list string="Version Comparisons" class="o_clm_list">
+                <field name="title"/>
+                <field name="contract_id"/>
+                <field name="base_version_id" string="Original"/>
+                <field name="target_version_id" string="Revised"/>
+                <field name="stats_label" string="Changes" optional="show"/>
+                <field name="status" widget="badge"
+                       decoration-info="status == 'pending'"
+                       decoration-warning="status == 'in_progress'"
+                       decoration-success="status == 'done'"
+                       decoration-danger="status == 'failed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_clm_document_comparison_form" model="ir.ui.view">
+        <field name="name">clm.document.comparison.form</field>
+        <field name="model">clm.document.comparison</field>
+        <field name="arch" type="xml">
+            <form string="Version Comparison" class="o_clm_form o_clm_comparison_form">
+                <header>
+                    <button name="action_generate_redline" type="object" string="Compare Documents"
+                            class="btn-primary" icon="fa-columns"
+                            invisible="status == 'done' or not base_version_id or not target_version_id"/>
+                    <button name="action_generate_redline" type="object" string="Regenerate"
+                            icon="fa-refresh" invisible="status != 'done'"/>
+                    <field name="status" widget="statusbar"
+                           statusbar_visible="pending,in_progress,done"/>
+                </header>
+                <sheet>
+                    <field name="has_differences" invisible="1"/>
+                    <field name="change_count" invisible="1"/>
+                    <div class="oe_title o_clm_page_header" name="clm_page_header">
+                        <div class="o_clm_kicker">
+                            Version Comparison · <field name="contract_id" readonly="1" class="oe_inline"
+                                                        options="{'no_open': True}"/>
+                        </div>
+                        <h1 class="o_clm_title">
+                            <field name="title" readonly="1" class="oe_inline"/>
+                        </h1>
+                        <div class="o_clm_subtitle" invisible="not stats_label">
+                            <span>
+                                <i class="fa fa-exchange" role="img" aria-label="Changes"/>
+                                <field name="stats_label" readonly="1"/>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning" role="alert" invisible="status != 'pending' or not base_version_id or not target_version_id">
+                        Versions changed — the comparison is out of date. Use
+                        <strong>Compare Documents</strong> to refresh it.
+                    </div>
+                    <div class="alert alert-danger" role="alert" invisible="status != 'failed'">
+                        <strong>The comparison could not be generated.</strong>
+                        <field name="error_message" readonly="1" nolabel="1" class="o_clm_longtext"/>
+                    </div>
+                    <div class="alert alert-warning" role="alert"
+                         invisible="status != 'done' or not error_message">
+                        <strong>PDF preview note:</strong>
+                        <field name="error_message" readonly="1" nolabel="1" class="o_clm_longtext"/>
+                    </div>
+                    <div class="alert alert-info" role="alert"
+                         invisible="status != 'done' or has_differences">
+                        No wording changes between these versions.
+                    </div>
+
+                    <div class="o_clm_facts" invisible="not base_version_id and not target_version_id">
+                        <div class="o_clm_fact">
+                            <span class="o_clm_fact_label">Original</span>
+                            <span class="o_clm_fact_value">
+                                <field name="base_caption" readonly="1" nolabel="1"/>
+                            </span>
+                        </div>
+                        <div class="o_clm_fact">
+                            <span class="o_clm_fact_label">Revised</span>
+                            <span class="o_clm_fact_value">
+                                <field name="target_caption" readonly="1" nolabel="1"/>
+                            </span>
+                        </div>
+                        <div class="o_clm_fact" invisible="status != 'done' or not has_differences">
+                            <span class="o_clm_fact_label">Additions</span>
+                            <span class="o_clm_fact_value text-success" invisible="addition_count == 0">
+                                +<field name="addition_count" readonly="1" class="oe_inline"/>
+                            </span>
+                            <span class="o_clm_fact_value o_clm_fact_zero" invisible="addition_count != 0">+0</span>
+                        </div>
+                        <div class="o_clm_fact" invisible="status != 'done' or not has_differences">
+                            <span class="o_clm_fact_label">Deletions</span>
+                            <span class="o_clm_fact_value text-danger" invisible="deletion_count == 0">
+                                −<field name="deletion_count" readonly="1" class="oe_inline"/>
+                            </span>
+                            <span class="o_clm_fact_value o_clm_fact_zero" invisible="deletion_count != 0">−0</span>
+                        </div>
+                    </div>
+
+                    <group>
+                        <group string="Compared Versions">
+                            <field name="contract_id"/>
+                            <field name="base_version_id" string="Original"
+                                   context="{'clm_hide_contract_in_name': True}"
+                                   options="{'no_create': True}"/>
+                            <field name="target_version_id" string="Revised"
+                                   context="{'clm_hide_contract_in_name': True}"
+                                   options="{'no_create': True}"
+                                   domain="[('contract_id', '=', contract_id), ('id', '!=', base_version_id)]"/>
+                        </group>
+                    </group>
+
+                    <field name="diff_view" invisible="1"/>
+                    <field name="base_pdf_attachment_id" invisible="1"/>
+                    <field name="target_pdf_attachment_id" invisible="1"/>
+
+                    <div class="o_clm_empty"
+                         invisible="status != 'pending' or (base_version_id and target_version_id)">
+                        <i class="fa fa-columns" role="img" aria-label="No comparison"/>
+                        <div class="o_clm_empty_title">No comparison yet</div>
+                        <div class="o_clm_empty_text">
+                            Pick the Original and Revised versions, then use
+                            <strong>Compare Documents</strong> for a side-by-side
+                            view with red removals and green additions.
+                        </div>
+                    </div>
+                    <div class="o_clm_empty" invisible="status != 'in_progress'">
+                        <i class="fa fa-spinner fa-spin" role="img" aria-label="Comparing"/>
+                        <div class="o_clm_empty_title">Comparing documents…</div>
+                        <div class="o_clm_empty_text">
+                            Building the side-by-side comparison with highlights.
+                        </div>
+                    </div>
+
+                    <!-- Keep generated HTML for Export PDF; not shown in the UI. -->
+                    <field name="html_changes" invisible="1"/>
+                    <field name="html_redline" invisible="1"/>
+
+                    <div class="o_clm_section o_clm_pdf_compare_section"
+                         invisible="status != 'done' or (not base_pdf_attachment_id and not target_pdf_attachment_id)">
+                        <div class="o_clm_pdf_compare_header">
+                            <div class="o_clm_pdf_compare_banner" role="status"
+                                 invisible="not has_differences">
+                                <i class="fa fa-info-circle o_clm_pdf_compare_banner_icon"
+                                   title="Legend"
+                                   aria-hidden="true"/>
+                                <div class="o_clm_pdf_compare_banner_body">
+                                    <strong class="o_clm_pdf_compare_banner_title">
+                                        Changes are highlighted inside the PDFs
+                                    </strong>
+                                    <div class="o_clm_pdf_compare_banner_legend">
+                                        <span class="o_clm_pdf_compare_swatch o_clm_pdf_compare_swatch_del"
+                                              aria-hidden="true"/>
+                                        <span>red = removed (Original)</span>
+                                        <span class="o_clm_pdf_compare_banner_sep" aria-hidden="true">·</span>
+                                        <span class="o_clm_pdf_compare_swatch o_clm_pdf_compare_swatch_add"
+                                              aria-hidden="true"/>
+                                        <span>green = added (Revised)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="#"
+                               role="button"
+                               class="btn btn-secondary btn-sm o_clm_compare_fullscreen_btn"
+                               title="View the side-by-side comparison full screen"
+                               aria-pressed="false">
+                                <i class="fa fa-expand me-1" aria-hidden="true"/>
+                                <span class="o_clm_compare_fullscreen_label">Fullscreen</span>
+                            </a>
+                        </div>
+                        <div class="o_clm_pdf_compare_row" data-clm-pdf-compare="1">
+                            <div class="o_clm_pdf_compare_col o_clm_pdf_compare_col_left"
+                                 data-clm-pdf-pane="left">
+                                <field name="base_pdf_preview_html" nolabel="1" widget="html"/>
+                            </div>
+                            <!-- Draftable-style minimap: fixed track + viewport thumb + change ticks. -->
+                            <div class="o_clm_pdf_compare_gutter_wrap" aria-hidden="true">
+                                <div class="o_clm_pdf_compare_gutter" data-clm-pdf-gutter="1">
+                                    <div class="o_clm_pdf_gutter_viewport"
+                                         data-clm-pdf-gutter-viewport="1"
+                                         title="Drag to scroll both documents"/>
+                                    <div class="o_clm_pdf_gutter_rail">
+                                        <field name="pdf_gutter_html" nolabel="1" widget="html"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_clm_pdf_compare_col o_clm_pdf_compare_col_right"
+                                 data-clm-pdf-pane="right">
+                                <field name="target_pdf_preview_html" nolabel="1" widget="html"/>
+                            </div>
+                        </div>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_clm_negotiation_round" model="ir.actions.act_window">
+        <field name="name">Negotiation Rounds</field>
+        <field name="res_model">clm.negotiation.round</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_clm_negotiation_round_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No negotiation activity yet</p>
+            <p>A round is recorded each time a version goes out to the
+               counterparty and each time their mark-up comes back.</p>
+        </field>
+    </record>
+
+    <record id="action_clm_document_comparison" model="ir.actions.act_window">
+        <field name="name">Version Comparisons</field>
+        <field name="res_model">clm.document.comparison</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No comparisons yet</p>
+            <p>Compare any two versions of a contract to see exactly what the
+               counterparty changed, as a redline.</p>
+        </field>
+    </record>
+
+    <record id="view_clm_contract_version_form_negotiation" model="ir.ui.view">
+        <field name="name">clm.contract.version.form.negotiation</field>
+        <field name="model">clm.contract.version</field>
+        <field name="inherit_id" ref="clm.view_clm_contract_version_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_open_send_negotiation_wizard" type="object"
+                        string="Send to Counterparty" icon="fa-paper-plane-o"
+                        invisible="version_type not in ('internal_draft', 'negotiated_draft', 'legal_draft')"/>
+                <button name="action_compare_with_parent" type="object" string="Compare with previous"
+                        icon="fa-columns" invisible="not parent_version_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_clm_contract_form_compare" model="ir.ui.view">
+        <field name="name">clm.contract.form.compare</field>
+        <field name="model">clm.contract</field>
+        <field name="inherit_id" ref="clm.view_clm_contract_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_compare_versions" type="object" string="Compare Versions"
+                        icon="fa-columns" invisible="version_count &lt; 2"
+                        groups="clm.group_clm_user,clm.group_clm_legal"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,305 @@
+// Contract preview — a page-like rendering of the same document the PDF prints.
+// Colours are fixed on purpose: this is a picture of a paper document, so it
+// stays black on white in the dark theme too.
+
+.o_clm_preview {
+    .o_clm_preview_page {
+        max-width: 820px;
+        margin: 0 auto 16px;
+        padding: 40px 48px;
+        background: #fff;
+        color: #111;
+        border: 1px solid #dee2e6;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+        font-family: "Liberation Serif", "Times New Roman", Times, serif;
+        font-size: 11pt;
+        line-height: 1.5;
+        text-align: justify;
+
+        h1, h2, h3, h4, h5 {
+            color: #111;
+            text-align: left;
+            font-family: inherit;
+        }
+        h1 {
+            font-size: 20pt;
+            font-weight: 700;
+            text-align: center;
+            margin: 0 0 8px;
+        }
+        h2 {
+            font-size: 13pt;
+            font-weight: 700;
+            margin: 22px 0 10px;
+            padding-bottom: 6px;
+            border-bottom: 1.5px dotted #111;
+        }
+        h3 {
+            font-size: 11.5pt;
+            font-weight: 700;
+            margin: 15px 0 5px;
+        }
+        h4, h5 {
+            font-size: 11pt;
+            font-weight: 700;
+            margin: 11px 0 4px;
+        }
+
+        .o_clm_cover {
+            text-align: center;
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1.5px dotted #111;
+        }
+        .o_clm_subtitle {
+            color: #6c757d;
+            font-size: 10pt;
+            margin-bottom: 8px;
+        }
+        .o_clm_meta_row {
+            display: flex;
+            gap: 16px;
+            padding: 6px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .o_clm_meta_label {
+            flex: 0 0 32%;
+            font-size: 8.5pt;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: #868e96;
+        }
+        .o_clm_meta_value {
+            flex: 1 1 auto;
+            color: #212529;
+        }
+        .o_clm_meta_sub {
+            display: block;
+            font-size: 9pt;
+            color: #6c757d;
+        }
+        .o_clm_meta_block {
+            margin-bottom: 12px;
+        }
+        .o_clm_body p {
+            margin: 0 0 7px;
+        }
+        .o_clm_sign_grid {
+            width: 100%;
+            margin-top: 18px;
+            border: none !important;
+            border-collapse: collapse;
+
+            td, th {
+                width: 50%;
+                padding: 0 24px 10px 0;
+                vertical-align: top;
+                border: none !important;
+                background: transparent !important;
+            }
+        }
+        .o_clm_sign_cols {
+            width: 100%;
+            margin-top: 18px;
+            overflow: hidden;
+            border: none !important;
+        }
+        .o_clm_sign_col {
+            float: left;
+            width: 48%;
+            padding: 0 2% 10px 0;
+            border: none !important;
+            box-sizing: border-box;
+        }
+        .o_clm_sign_rule {
+            height: 30px;
+            margin: 14px 0 8px;
+            border: none !important;
+            border-bottom: 1px solid #111 !important;
+        }
+        .o_clm_note {
+            font-size: 9pt;
+            font-style: italic;
+            color: #6c757d;
+        }
+        .o_clm_sign_artifact img {
+            max-width: 100%;
+            max-height: 220px;
+        }
+    }
+}
+
+.o_clm_placeholder_table code {
+    white-space: nowrap;
+}
+
+// Final-PDF preview: native browser PDF viewer (iframe) — Preview = Download.
+.o_clm_preview.o_clm_preview_pdf {
+    background: #e8eaed;
+    padding: 12px;
+    max-height: none;
+
+    .o_clm_preview_banner,
+    .o_clm_preview_warnings {
+        max-width: none;
+        margin: 0 0 12px;
+    }
+
+    .o_clm_pdf_preview {
+        max-width: none;
+        width: 100%;
+        margin: 0;
+    }
+
+    .o_clm_pdf_toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+        margin: 0 0 8px;
+    }
+
+    .o_clm_pdf_fullscreen_btn {
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .o_clm_pdf_open_tab {
+        color: #0b5ed7 !important;
+        font-weight: 600;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+
+        &:hover,
+        &:focus {
+            color: #084298 !important;
+        }
+    }
+
+    .o_clm_pdf_viewer_frame {
+        width: 100%;
+        // CSS min() — quote so Sass does not resolve incompatible vh/px units.
+        height: #{'min(78vh, 920px)'};
+        min-height: 480px;
+        background: #525659;
+        border: 1px solid #c5c8ce;
+        border-radius: 2px;
+        overflow: hidden;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+    }
+
+    .o_clm_pdf_viewer_frame:fullscreen,
+    .o_clm_pdf_viewer_frame:-webkit-full-screen {
+        width: 100vw;
+        height: 100vh;
+        border: 0;
+        border-radius: 0;
+        background: #323639;
+    }
+
+    .o_clm_pdf_iframe {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border: 0;
+        background: #525659;
+    }
+
+    // Searchable / testable PDF text — not shown visually.
+    .o_clm_pdf_text_layer {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: pre-wrap;
+        border: 0;
+    }
+}
+
+// Extra-large preview dialog: give the PDF viewer room to breathe.
+.o_dialog .o_clm_preview_dialog {
+    .modal-body,
+    .o_form_view {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .o_clm_preview_pdf {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .o_clm_pdf_viewer_frame {
+        height: #{'min(80vh, 960px)'};
+    }
+}
+
+// Legacy DOCX HTML preview (kept for non-contract DOCX tools).
+// Spacing comes from inline styles generated from DOCX w:spacing (pPr) —
+// do not force a uniform margin that collapses Base blank paragraphs.
+.o_clm_preview .o_clm_docx_preview_body {
+    text-align: left;
+    color: #303841;
+    font-family: Calibri, Carlito, 'Liberation Sans', Arial, sans-serif;
+    font-size: 9.5pt;
+    line-height: 1.15;
+
+    .o_clm_docx_header {
+        // Match DOCX/PDF gap under the grey rule before body text.
+        margin: 0 0 22pt;
+        padding-bottom: 0;
+        // Border comes from the DOCX header paragraph (inline CSS), not a
+        // second Preview-only rule — keeps one grey line like Word/PDF.
+        border-bottom: none !important;
+    }
+    .o_clm_docx_header_line {
+        text-align: right;
+        margin-bottom: 0;
+        // Inline style from DOCX supplies border-bottom + padding-bottom
+        // (space above the grey rule). Floor so Preview never looks cramped.
+        padding-bottom: 12pt;
+    }
+    p, div.o_clm_docx_hdr {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+    // Title / headings — sizes come from inline DOCX CSS; keep brand ink fallback.
+    p[style*="font-size:18pt"],
+    p[style*="font-size:18.0pt"] {
+        color: #162233;
+    }
+    p[style*="font-weight:700"] {
+        color: #162233;
+    }
+    // Preserve DOCX table fills (accent bar, label cells) in HTML Preview.
+    table.o_clm_docx_table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 0 0 12pt;
+    }
+    .o_clm_docx_accent_rule {
+        display: block !important;
+        width: 100% !important;
+        min-height: 6pt;
+        height: 6pt;
+        margin: 8pt 0 12pt;
+        padding: 0;
+        border: none !important;
+        background-color: #415A77 !important;
+        line-height: 0;
+        font-size: 0;
+    }
+    img.o_clm_docx_img {
+        max-width: 100%;
+        max-height: 180px;
+        height: auto;
+        width: auto;
+        object-fit: contain;
+        display: inline-block;
+        vertical-align: middle;
+    }
+}

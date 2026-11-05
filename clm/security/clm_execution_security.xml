@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Risk Assessment Rules -->
+        <record id="rule_clm_risk_assessment_user" model="ir.rule">
+            <field name="name">Risk Assessment: User Access</field>
+            <field name="model_id" ref="model_clm_risk_assessment"/>
+            <field name="groups" eval="[(4, ref('clm.group_clm_user'))]"/>
+            <field name="domain_force">[
+                '&amp;',
+                ('contract_id.company_id', 'in', company_ids),
+                '|', '|', '|',
+                ('contract_id.user_id', '=', user.id),
+                ('contract_id.legal_owner_id', '=', user.id),
+                '&amp;', ('contract_id.department_id', '!=', False), ('contract_id.department_id', '=', user.employee_id.department_id.id),
+                ('contract_id.confidentiality_level', '!=', 'restricted')
+            ]</field>
+        </record>
+
+        <record id="rule_clm_risk_assessment_legal" model="ir.rule">
+            <field name="name">Risk Assessment: Legal Access</field>
+            <field name="model_id" ref="model_clm_risk_assessment"/>
+            <field name="groups" eval="[(4, ref('clm.group_clm_legal'))]"/>
+            <field name="domain_force">[('contract_id.company_id', 'in', company_ids)]</field>
+        </record>
+
+        <!-- Risk Assessment Item Rules -->
+        <record id="rule_clm_risk_assessment_item_user" model="ir.rule">
+            <field name="name">Risk Assessment Item: User Access</field>
+            <field name="model_id" ref="model_clm_risk_assessment_item"/>
+            <field name="groups" eval="[(4, ref('clm.group_clm_user'))]"/>
+            <field name="domain_force">[
+                '&amp;',
+                ('assessment_id.contract_id.company_id', 'in', company_ids),
+                '|', '|', '|',
+                ('assessment_id.contract_id.user_id', '=', user.id),
+                ('assessment_id.contract_id.legal_owner_id', '=', user.id),
+                '&amp;', ('assessment_id.contract_id.department_id', '!=', False), ('assessment_id.contract_id.department_id', '=', user.employee_id.department_id.id),
+                ('assessment_id.contract_id.confidentiality_level', '!=', 'restricted')
+            ]</field>
+        </record>
+
+        <record id="rule_clm_risk_assessment_item_legal" model="ir.rule">
+            <field name="name">Risk Assessment Item: Legal Access</field>
+            <field name="model_id" ref="model_clm_risk_assessment_item"/>
+            <field name="groups" eval="[(4, ref('clm.group_clm_legal'))]"/>
+            <field name="domain_force">[('assessment_id.contract_id.company_id', 'in', company_ids)]</field>
+        </record>
+
+        <!-- Obligation Rules -->
+        <record id="rule_clm_obligation_user" model="ir.rule">
+            <field name="name">Obligation: User Access</field>
+            <field name="model_id" ref="model_clm_obligation"/>
+            <field name="groups" eval="[(4, ref('clm.group_clm_user'))]"/>
+            <field name="domain_force">[
+                '&amp;',
+                ('contract_id.company_id', 'in', company_ids),
+                '|', '|', '|',
+                ('contract_id.user_id', '=', user.id),
+                ('contract_id.legal_owner_id', '=', user.id),
+                '&amp;', ('contract_id.department_id', '!=', False), ('contract_id.department_id', '=', user.employee_id.department_id.id),
+                ('contract_id.confidentiality_level', '!=', 'restricted')
+            ]</field>
+        </record>
+
+        <record id="rule_clm_obligation_legal" model="ir.rule">
+            <field name="name">Obligation: Legal Access</field>
+            <field name="model_id" ref="model_clm_obligation"/>
+            <field name="groups" eval="[(4, ref('clm.group_clm_legal'))]"/>
+            <field name="domain_force">[('contract_id.company_id', 'in', company_ids)]</field>
+        </record>
+    </data>
+</odoo>

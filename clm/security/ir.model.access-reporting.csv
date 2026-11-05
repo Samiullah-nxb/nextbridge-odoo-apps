@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_clm_excel_export_wizard_user,clm.excel.export.wizard.user,model_clm_excel_export_wizard,clm.group_clm_user,1,1,1,1
+access_clm_excel_export_wizard_manager,clm.excel.export.wizard.manager,model_clm_excel_export_wizard,clm.group_clm_manager,1,1,1,1
+access_clm_excel_export_wizard_admin,clm.excel.export.wizard.admin,model_clm_excel_export_wizard,clm.group_clm_legal_admin,1,1,1,1

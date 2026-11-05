@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_clm_manual_signature_wizard_form" model="ir.ui.view">
+        <field name="name">clm.manual.signature.wizard.form</field>
+        <field name="model">clm.manual.signature.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Manual Execution" class="o_clm_form o_clm_dialog">
+                <group>
+                    <field name="contract_id" invisible="1"/>
+                    <field name="source_version_id" options="{'no_create': True}"/>
+                    <field name="execution_date"/>
+                    <field name="signatory"/>
+                    <field name="reason"/>
+                </group>
+                <group string="Upload Document">
+                    <field name="signed_document" filename="signed_document_name"
+                            string="Signed Document (PDF or Word)"/>
+                    <field name="signed_document_name" invisible="1"/>
+                </group>
+                <group>
+                    <field name="confirm_execution"/>
+                </group>
+                <footer>
+                    <button name="action_confirm_manual_signature" type="object" string="Confirm Execution" class="btn-primary" invisible="not confirm_execution"/>
+                    <button special="cancel" string="Cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_clm_manual_signature_wizard" model="ir.actions.act_window">
+        <field name="name">Mark as Manually Signed</field>
+        <field name="res_model">clm.manual.signature.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

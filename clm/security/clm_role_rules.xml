@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Role record rules — re-applied on module upgrade (noupdate=0). -->
+    <data>
+        <!-- Multi-company (global) -->
+        <record id="rule_clm_contract_multi_company" model="ir.rule">
+            <field name="name">NextContract Contract: Multi-Company</field>
+            <field name="model_id" ref="model_clm_contract"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <!-- h. Read-Only: non-restricted contracts in company -->
+        <record id="rule_clm_contract_read_only" model="ir.rule">
+            <field name="name">NextContract Contract: Read-Only (non-restricted)</field>
+            <field name="model_id" ref="model_clm_contract"/>
+            <field name="groups" eval="[(4, ref('group_clm_read_only'))]"/>
+            <field name="domain_force">[('confidentiality_level', '!=', 'restricted')]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- c. Business Requester: own / department / non-restricted -->
+        <record id="rule_clm_contract_user" model="ir.rule">
+            <field name="name">NextContract Contract: Business Requester</field>
+            <field name="model_id" ref="model_clm_contract"/>
+            <field name="groups" eval="[(4, ref('group_clm_user'))]"/>
+            <field name="domain_force">[
+                '|', '|', '|',
+                ('user_id', '=', user.id),
+                ('legal_owner_id', '=', user.id),
+                '&amp;', ('department_id', '!=', False), ('department_id', '=', user.employee_id.department_id.id),
+                ('confidentiality_level', '!=', 'restricted')
+            ]</field>
+        </record>
+
+        <!-- d. Procurement User -->
+        <record id="rule_clm_contract_procurement" model="ir.rule">
+            <field name="name">NextContract Contract: Procurement User</field>
+            <field name="model_id" ref="model_clm_contract"/>
+            <field name="groups" eval="[(4, ref('group_clm_procurement'))]"/>
+            <field name="domain_force">[
+                '|', '|', '|', '|',
+                ('procurement_owner_id', '=', user.id),
+                ('user_id', '=', user.id),
+                ('state', '=', 'awaiting_procurement'),
+                '&amp;', ('department_id', '!=', False), ('department_id', '=', user.employee_id.department_id.id),
+                ('confidentiality_level', '!=', 'restricted')
+            ]</field>
+        </record>
+
+        <!-- e. Finance User -->
+        <record id="rule_clm_contract_finance" model="ir.rule">
+            <field name="name">NextContract Contract: Finance User</field>
+            <field name="model_id" ref="model_clm_contract"/>
+            <field name="groups" eval="[(4, ref('group_clm_finance'))]"/>
+            <field name="domain_force">[
+                '|', '|', '|', '|',
+                ('finance_owner_id', '=', user.id),
+                ('user_id', '=', user.id),
+                ('state', '=', 'awaiting_finance'),
+                '&amp;', ('department_id', '!=', False), ('department_id', '=', user.employee_id.department_id.id),
+                ('confidentiality_level', '!=', 'restricted')
+            ]</field>
+        </record>
+
+        <!-- f. Approver / Management: assigned ownership, workflow involvement, or non-restricted -->
+        <record id="rule_clm_contract_approver" model="ir.rule">
+            <field name="name">NextContract Contract: Approver / Management</field>
+            <field name="model_id" ref="model_clm_contract"/>
+            <field name="groups" eval="[(4, ref('group_clm_manager'))]"/>
+            <field name="domain_force">[
+                '|', '|',
+                ('user_id', '=', user.id),
+                ('legal_owner_id', '=', user.id),
+                ('confidentiality_level', '!=', 'restricted')
+            ]</field>
+        </record>
+
+        <!-- b. Legal Reviewer: full company access -->
+        <record id="rule_clm_contract_legal" model="ir.rule">
+            <field name="name">NextContract Contract: Legal Reviewer Full Access</field>
+            <field name="model_id" ref="model_clm_contract"/>
+            <field name="groups" eval="[(4, ref('group_clm_legal'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <!-- a. Legal Admin: full access -->
+        <record id="rule_clm_contract_admin" model="ir.rule">
+            <field name="name">NextContract Contract: Legal Admin Full Access</field>
+            <field name="model_id" ref="model_clm_contract"/>
+            <field name="groups" eval="[(4, ref('group_clm_legal_admin'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <!-- Contract Type multi-company -->
+        <record id="rule_clm_contract_type_multi_company" model="ir.rule">
+            <field name="name">NextContract Contract Type: Multi-Company</field>
+            <field name="model_id" ref="model_clm_contract_type"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <!-- Audit: Legal Admin only -->
+        <record id="rule_clm_audit_event_admin" model="ir.rule">
+            <field name="name">NextContract Audit: Legal Admin Only</field>
+            <field name="model_id" ref="model_clm_audit_event"/>
+            <field name="groups" eval="[(4, ref('group_clm_legal_admin'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+    </data>
+</odoo>

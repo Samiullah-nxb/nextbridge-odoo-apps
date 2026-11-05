@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        ─── Dashboards ───────────────────────────────────────────────────────
+
+        Dashboards are analysis screens, not forms: they open on a chart, carry
+        their own filter set, and keep the list and form available for drilling
+        into a single contract. Every dashboard in NextContract follows the same
+        shape — graph first, pivot second, then list and form.
+    -->
+    <record id="view_clm_contract_search_reporting" model="ir.ui.view">
+        <field name="name">clm.contract.search.reporting</field>
+        <field name="model">clm.contract</field>
+        <field name="inherit_id" ref="clm.view_clm_contract_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <separator/>
+                <filter string="Pending Signature" name="filter_pending_signature" domain="[('signature_status', '=', 'pending')]"/>
+                <filter string="Missing Signed Copy" name="filter_missing_signed_copy" domain="[('state', '=', 'executed'), ('signature_status', '!=', 'signed')]"/>
+                <separator/>
+                <filter string="Expiring in 30 Days" name="filter_expiring_30_days" domain="[('expiry_date', '&lt;=', (context_today() + datetime.timedelta(days=30)).strftime('%Y-%m-%d')), ('expiry_date', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Expiring in 90 Days" name="filter_expiring_90_days" domain="[('expiry_date', '&lt;=', (context_today() + datetime.timedelta(days=90)).strftime('%Y-%m-%d')), ('expiry_date', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Expired" name="filter_expired" domain="[('expiry_date', '&lt;', context_today().strftime('%Y-%m-%d')), ('state', '!=', 'terminated')]"/>
+                <separator/>
+                <filter string="High Risk" name="filter_high_risk" domain="[('risk_level', '=', 'high')]"/>
+                <filter string="Critical Risk" name="filter_critical_risk" domain="[('risk_level', '=', 'critical')]"/>
+                <separator/>
+                <filter string="Effective Date" name="group_by_effective_date" context="{'group_by': 'effective_date'}"/>
+                <filter string="Expiry Date" name="group_by_expiry_date" context="{'group_by': 'expiry_date'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_clm_contract_pivot" model="ir.ui.view">
+        <field name="name">clm.contract.pivot</field>
+        <field name="model">clm.contract</field>
+        <field name="arch" type="xml">
+            <pivot string="Contracts Analysis" sample="1">
+                <field name="contract_type_id" type="row"/>
+                <field name="state" type="col"/>
+                <field name="contract_value" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_clm_contract_graph" model="ir.ui.view">
+        <field name="name">clm.contract.graph</field>
+        <field name="model">clm.contract</field>
+        <field name="arch" type="xml">
+            <graph string="Contracts Analysis" type="bar" stacked="1" sample="1">
+                <field name="contract_type_id"/>
+                <field name="state"/>
+                <field name="contract_value" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Portfolio: what the company holds, by type, status and value. -->
+    <record id="action_clm_reporting_kpi" model="ir.actions.act_window">
+        <field name="name">Contract Portfolio</field>
+        <field name="res_model">clm.contract</field>
+        <field name="view_mode">graph,pivot,list,form</field>
+        <field name="search_view_id" ref="clm.view_clm_contract_search"/>
+        <field name="context">{'search_default_active': 1, 'search_default_group_by_type': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No contracts to analyse yet</p>
+            <p>Once contracts are active, this screen breaks the portfolio down
+               by type, status, counterparty and value.</p>
+        </field>
+    </record>
+
+    <!-- Expiry & renewal: what needs attention in the next quarter. -->
+    <record id="action_clm_reporting_expiry" model="ir.actions.act_window">
+        <field name="name">Expiry &amp; Renewal</field>
+        <field name="res_model">clm.contract</field>
+        <field name="view_mode">list,graph,pivot,form</field>
+        <field name="search_view_id" ref="clm.view_clm_contract_search"/>
+        <field name="context">{'search_default_filter_expiring_90_days': 1, 'search_default_group_by_expiry_date': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Nothing expiring in the next 90 days</p>
+            <p>Contracts approaching their expiry or renewal notice date appear
+               here. Clear the filter to see the whole portfolio.</p>
+        </field>
+    </record>
+</odoo>

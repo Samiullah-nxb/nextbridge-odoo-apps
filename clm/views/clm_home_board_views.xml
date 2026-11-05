@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_clm_home_board" model="ir.actions.client">
+        <field name="name">NextContract Home</field>
+        <field name="tag">clm_home_board</field>
+        <field name="target">current</field>
+    </record>
+</odoo>

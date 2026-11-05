@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="clm.DocxTagEditor">
+        <div class="o_clm_docx_editor"
+             t-ref="root"
+             role="region"
+             aria-label="Document Template editor"
+             t-att-aria-busy="state.loading || state.busy ? 'true' : 'false'">
+            <div class="o_clm_docx_sr_only" aria-live="polite" aria-atomic="true" t-esc="state.liveMessage"/>
+
+            <div t-if="state.loading" class="o_clm_docx_muted p-4" role="status">
+                Loading Document Template…
+            </div>
+            <div t-elif="state.error" class="alert alert-danger m-3" role="alert" t-esc="state.error"/>
+            <t t-else="">
+                <div class="o_clm_docx_bar" role="toolbar" aria-label="Document actions">
+                    <div class="o_clm_docx_bar_meta">
+                        <span class="o_clm_docx_filename"
+                              t-esc="state.documentName || 'Untitled document'"/>
+                        <span t-if="state.versionNumber"
+                              class="o_clm_docx_pill"
+                              role="status"
+                              t-esc="state.versionName || ('v' + state.versionNumber)"/>
+                        <span t-if="state.isOriginalActive"
+                              class="o_clm_docx_pill"
+                              role="status">Original — use Save as New Version</span>
+                        <span t-if="state.dirty"
+                              class="o_clm_docx_pill o_clm_docx_pill_warn"
+                              role="status">Unsaved</span>
+                        <span t-if="state.readonly"
+                              class="o_clm_docx_pill"
+                              role="status">Read only</span>
+                    </div>
+                    <div class="o_clm_docx_bar_actions">
+                        <button type="button" class="btn btn-link btn-sm"
+                                t-on-click="onReload"
+                                t-att-disabled="state.busy"
+                                aria-label="Reload Document Template">Reload</button>
+                        <button type="button" class="btn btn-link btn-sm"
+                                t-on-click="onValidate"
+                                t-att-disabled="state.busy"
+                                aria-label="Validate placeholders in the document">Validate</button>
+                        <button type="button" class="btn btn-secondary btn-sm"
+                                t-if="state.canSaveInplace"
+                                t-on-click="onSaveInplace"
+                                t-att-disabled="state.busy || state.readonly || !state.dirty"
+                                aria-label="Save Changes to this Template Version">Save Changes</button>
+                        <button type="button" class="btn btn-primary btn-sm"
+                                t-on-click="onSaveAsNewVersion"
+                                t-att-disabled="state.busy || state.readonly || !state.dirty"
+                                aria-label="Save as New Template Version">Save as New Version</button>
+                    </div>
+                </div>
+
+                <div t-if="state.errors.length"
+                     class="o_clm_docx_banner o_clm_docx_banner_error"
+                     t-att-class="{'o_clm_docx_banner_collapsed': !state.errorsExpanded}"
+                     role="alert"
+                     aria-live="assertive">
+                    <button type="button"
+                            class="o_clm_docx_banner_toggle"
+                            t-on-click="() => this.state.errorsExpanded = !this.state.errorsExpanded"
+                            t-att-aria-expanded="state.errorsExpanded ? 'true' : 'false'">
+                        <span class="o_clm_docx_banner_title">
+                            Validation errors (<t t-esc="state.errors.length"/>)
+                        </span>
+                        <span class="o_clm_docx_banner_chevron"
+                              aria-hidden="true"
+                              t-esc="state.errorsExpanded ? '▴' : '▾'"/>
+                    </button>
+                    <t t-if="state.errorsExpanded">
+                        <div class="o_clm_docx_banner_hint">
+                            Tip: press <kbd>Tab</kbd> in the document to auto-fix incomplete
+                            <code>{{ }}</code> / <code>{% %}</code> tags.
+                        </div>
+                        <ul class="o_clm_docx_banner_list">
+                            <t t-foreach="state.errors" t-as="err" t-key="err_index">
+                                <li t-esc="err"/>
+                            </t>
+                        </ul>
+                    </t>
+                    <div t-else="" class="o_clm_docx_banner_summary" t-esc="state.errors[0]"/>
+                </div>
+                <div t-if="state.warnings.length"
+                     class="o_clm_docx_banner o_clm_docx_banner_warn"
+                     t-att-class="{'o_clm_docx_banner_collapsed': !state.warningsExpanded}"
+                     role="status"
+                     aria-live="polite">
+                    <button type="button"
+                            class="o_clm_docx_banner_toggle"
+                            t-on-click="() => this.state.warningsExpanded = !this.state.warningsExpanded"
+                            t-att-aria-expanded="state.warningsExpanded ? 'true' : 'false'">
+                        <span class="o_clm_docx_banner_title">
+                            Validation warnings (<t t-esc="state.warnings.length"/>)
+                        </span>
+                        <span class="o_clm_docx_banner_chevron"
+                              aria-hidden="true"
+                              t-esc="state.warningsExpanded ? '▴' : '▾'"/>
+                    </button>
+                    <t t-if="state.warningsExpanded">
+                        <ul class="o_clm_docx_banner_list">
+                            <t t-foreach="state.warnings" t-as="warn" t-key="warn_index">
+                                <li t-esc="warn"/>
+                            </t>
+                        </ul>
+                    </t>
+                    <div t-else="" class="o_clm_docx_banner_summary" t-esc="state.warnings[0]"/>
+                </div>
+
+                <div class="o_clm_docx_workspace">
+                    <aside class="o_clm_docx_sidebar" aria-label="Placeholder insert panel">
+                        <div class="o_clm_docx_sidebar_title" id="o_clm_docx_sidebar_heading">
+                            Placeholders
+                        </div>
+
+                        <label class="o_clm_docx_sidebar_label" t-att-for="tagInputId">
+                            Contract fields
+                        </label>
+                        <div class="o_clm_docx_tag_combo"
+                             t-ref="tagCombo"
+                             t-att-class="{'o_clm_docx_tag_combo_open': state.tagMenuOpen}">
+                            <div class="o_clm_docx_tag_combo_control">
+                                <span class="o_clm_docx_tag_combo_icon" aria-hidden="true">⌕</span>
+                                <input type="search"
+                                       t-att-id="tagInputId"
+                                       class="o_clm_docx_tag_combo_input"
+                                       placeholder="Search contract fields…"
+                                       autocomplete="off"
+                                       role="combobox"
+                                       aria-autocomplete="list"
+                                       aria-haspopup="listbox"
+                                       t-att-aria-controls="tagListboxId"
+                                       t-att-aria-expanded="state.tagMenuOpen ? 'true' : 'false'"
+                                       t-att-aria-activedescendant="tagActiveDescendantId"
+                                       t-att-disabled="state.readonly || state.busy"
+                                       t-att-value="state.tagQuery"
+                                       t-ref="tagInput"
+                                       t-on-input="onTagSearchInput"
+                                       t-on-focus="onTagSearchFocus"
+                                       t-on-keydown="onTagSearchKeydown"/>
+                                <button t-if="state.tagQuery"
+                                        type="button"
+                                        class="o_clm_docx_tag_combo_clear"
+                                        aria-label="Clear contract field search"
+                                        title="Clear"
+                                        t-on-click="onClearTagSearch">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                                <button type="button"
+                                        class="o_clm_docx_tag_combo_toggle"
+                                        t-att-aria-label="state.tagMenuOpen ? 'Close contract fields list' : 'Open contract fields list'"
+                                        t-att-aria-expanded="state.tagMenuOpen ? 'true' : 'false'"
+                                        t-att-aria-controls="tagListboxId"
+                                        title="Browse contract fields"
+                                        t-att-disabled="state.readonly || state.busy"
+                                        t-on-click="onTagComboToggle">
+                                    <span aria-hidden="true" t-esc="state.tagMenuOpen ? '▴' : '▾'"/>
+                                </button>
+                            </div>
+                            <div t-if="state.tagMenuOpen"
+                                 t-att-id="tagListboxId"
+                                 class="o_clm_docx_tag_menu"
+                                 role="listbox"
+                                 aria-label="Contract fields"
+                                 t-ref="tagList">
+                                <div class="o_clm_docx_tag_menu_meta" aria-hidden="true">
+                                    <span t-esc="tagQueryNormalized
+                                        ? (flatTagOptions.length + ' of ' + totalTagCount + ' fields')
+                                        : (totalTagCount + ' fields')"/>
+                                    <span class="o_clm_docx_tag_menu_hint">↑↓ Enter · Esc</span>
+                                </div>
+                                <div t-if="!flatTagOptions.length" class="o_clm_docx_tag_empty" role="status">
+                                    <t t-if="tagQueryNormalized">No fields match “<t t-esc="state.tagQuery"/>”.</t>
+                                    <t t-else="">No contract fields available.</t>
+                                </div>
+                                <t t-else="">
+                                    <t t-foreach="fieldTags" t-as="tag" t-key="tag.key">
+                                        <button type="button"
+                                                t-att-id="optionId('tag', tag.key)"
+                                                class="o_clm_docx_tag_option"
+                                                role="option"
+                                                t-att-class="{'o_clm_docx_tag_option_active': isTagHighlighted(tag)}"
+                                                t-att-aria-selected="isTagHighlighted(tag) ? 'true' : 'false'"
+                                                t-att-aria-label="optionAriaLabel(tag)"
+                                                t-on-click="() => this.onSelectTag(tag)"
+                                                t-on-mousemove="() => this.state.tagHighlight = flatTagOptions.indexOf(tag)">
+                                            <span class="o_clm_docx_tag_option_label" t-esc="tag.label"/>
+                                            <code aria-hidden="true" t-esc="'{{ ' + tag.key + ' }}'"/>
+                                        </button>
+                                    </t>
+                                </t>
+                            </div>
+                        </div>
+
+                        <label class="o_clm_docx_sidebar_label" t-att-for="clauseInputId">
+                            Clause fields
+                        </label>
+                        <div class="o_clm_docx_sidebar_hint" t-att-id="clauseHintId">
+                            Use inside the clause set
+                        </div>
+                        <div class="o_clm_docx_tag_combo"
+                             t-ref="clauseCombo"
+                             t-att-class="{'o_clm_docx_tag_combo_open': state.clauseMenuOpen}">
+                            <div class="o_clm_docx_tag_combo_control">
+                                <span class="o_clm_docx_tag_combo_icon" aria-hidden="true">⌕</span>
+                                <input type="search"
+                                       t-att-id="clauseInputId"
+                                       class="o_clm_docx_tag_combo_input"
+                                       placeholder="Search clause fields…"
+                                       autocomplete="off"
+                                       role="combobox"
+                                       aria-autocomplete="list"
+                                       aria-haspopup="listbox"
+                                       t-att-aria-controls="clauseListboxId"
+                                       t-att-aria-describedby="clauseHintId"
+                                       t-att-aria-expanded="state.clauseMenuOpen ? 'true' : 'false'"
+                                       t-att-aria-activedescendant="clauseActiveDescendantId"
+                                       t-att-disabled="state.readonly || state.busy"
+                                       t-att-value="state.clauseQuery"
+                                       t-ref="clauseInput"
+                                       t-on-input="onClauseSearchInput"
+                                       t-on-focus="onClauseSearchFocus"
+                                       t-on-keydown="onClauseSearchKeydown"/>
+                                <button t-if="state.clauseQuery"
+                                        type="button"
+                                        class="o_clm_docx_tag_combo_clear"
+                                        aria-label="Clear clause field search"
+                                        title="Clear"
+                                        t-on-click="onClearClauseSearch">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                                <button type="button"
+                                        class="o_clm_docx_tag_combo_toggle"
+                                        t-att-aria-label="state.clauseMenuOpen ? 'Close clause fields list' : 'Open clause fields list'"
+                                        t-att-aria-expanded="state.clauseMenuOpen ? 'true' : 'false'"
+                                        t-att-aria-controls="clauseListboxId"
+                                        title="Browse clause fields"
+                                        t-att-disabled="state.readonly || state.busy"
+                                        t-on-click="onClauseComboToggle">
+                                    <span aria-hidden="true" t-esc="state.clauseMenuOpen ? '▴' : '▾'"/>
+                                </button>
+                            </div>
+                            <div t-if="state.clauseMenuOpen"
+                                 t-att-id="clauseListboxId"
+                                 class="o_clm_docx_tag_menu"
+                                 role="listbox"
+                                 aria-label="Clause fields"
+                                 t-ref="clauseList">
+                                <div class="o_clm_docx_tag_menu_meta" aria-hidden="true">
+                                    <span t-esc="clauseQueryNormalized
+                                        ? (flatClauseOptions.length + ' of ' + totalClauseTagCount + ' fields')
+                                        : (totalClauseTagCount + ' fields')"/>
+                                    <span class="o_clm_docx_tag_menu_hint">↑↓ Enter · Esc</span>
+                                </div>
+                                <div t-if="!flatClauseOptions.length" class="o_clm_docx_tag_empty" role="status">
+                                    <t t-if="clauseQueryNormalized">No fields match “<t t-esc="state.clauseQuery"/>”.</t>
+                                    <t t-else="">No clause fields available.</t>
+                                </div>
+                                <t t-else="">
+                                    <t t-foreach="clauseFieldTags" t-as="tag" t-key="tag.key">
+                                        <button type="button"
+                                                t-att-id="optionId('clause', tag.key)"
+                                                class="o_clm_docx_tag_option"
+                                                role="option"
+                                                t-att-class="{'o_clm_docx_tag_option_active': isClauseTagHighlighted(tag)}"
+                                                t-att-aria-selected="isClauseTagHighlighted(tag) ? 'true' : 'false'"
+                                                t-att-aria-label="optionAriaLabel(tag)"
+                                                t-on-click="() => this.onSelectClauseTag(tag)"
+                                                t-on-mousemove="() => this.state.clauseHighlight = flatClauseOptions.indexOf(tag)">
+                                            <span class="o_clm_docx_tag_option_label" t-esc="tag.label"/>
+                                            <code aria-hidden="true" t-esc="'{{ ' + tag.key + ' }}'"/>
+                                        </button>
+                                    </t>
+                                </t>
+                            </div>
+                        </div>
+
+                        <div class="o_clm_docx_sidebar_label" id="o_clm_docx_blocks_heading">Blocks</div>
+                        <div class="o_clm_docx_sidebar_blocks" role="group" aria-labelledby="o_clm_docx_blocks_heading">
+                            <button type="button" class="btn btn-secondary btn-sm o_clm_docx_sidebar_btn"
+                                    t-on-click="onInsertClauseLoop"
+                                    t-att-disabled="state.busy || state.readonly"
+                                    title="Insert title, category, and standard wording for every clause"
+                                    aria-label="Insert Clause Collection">
+                                Insert Clause Collection
+                            </button>
+                            <button type="button" class="btn btn-secondary btn-sm o_clm_docx_sidebar_btn"
+                                    t-on-click="onInsertAllClauses"
+                                    t-att-disabled="state.busy || state.readonly"
+                                    title="Insert each clause as title, category, and content — delete any line you do not need"
+                                    aria-label="Insert and Customize Clauses">
+                                Insert &amp; Customize Clauses
+                            </button>
+                            <button type="button" class="btn btn-secondary btn-sm o_clm_docx_sidebar_btn"
+                                    t-on-click="onInsertSignatureBlock"
+                                    t-att-disabled="state.busy || state.readonly"
+                                    aria-label="Insert signature block for provider and counterparty">
+                                Insert signature block
+                            </button>
+                        </div>
+                    </aside>
+
+                    <div class="o_clm_docx_stage"
+                         role="region"
+                         aria-label="Document preview and editor">
+                        <div class="o_clm_docx_page"
+                             t-att-class="{'o_clm_docx_page_readonly': state.readonly}">
+                            <div t-if="state.headers.length"
+                                 class="o_clm_docx_header"
+                                 t-ref="headerRoot"
+                                 aria-label="Document header">
+                                <t t-foreach="state.headers" t-as="hdr" t-key="hdr_index">
+                                    <div class="o_clm_docx_header_line"
+                                         t-att-data-header-index="hdr_index"
+                                         t-att-style="hdr.styleCss"/>
+                                </t>
+                            </div>
+                            <div class="o_clm_docx_wysiwyg_wrap">
+                                <t t-if="state.editorReady">
+                                    <Wysiwyg t-key="state.loadToken"
+                                             class="'o_clm_docx_wysiwyg'"
+                                             contentClass="'o_clm_docx_editable note-editable'"
+                                             config="wysiwygConfig"
+                                             onLoad.bind="onEditorLoad"/>
+                                </t>
+                                <div t-else=""
+                                     class="o_clm_docx_editable o_clm_docx_readonly_html"
+                                     t-ref="readonlyHtml"
+                                     role="document"
+                                     aria-label="Document content"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+
+    <t t-name="clm.BaseDocxUploadField">
+        <div class="o_clm_base_docx_upload" t-if="!props.readonly">
+            <button type="button"
+                    class="btn btn-secondary btn-sm o_clm_base_docx_upload_btn"
+                    t-on-click="onUploadClick"
+                    title="Upload a .docx file"
+                    aria-label="Upload Document Template">
+                <i class="fa fa-upload me-1" role="img" aria-hidden="true"/>Upload
+            </button>
+            <input type="file"
+                   class="d-none"
+                   t-ref="fileInput"
+                   accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                   t-on-change="onFileSelected"/>
+        </div>
+    </t>
+
+    <t t-name="clm.DocxPreviewHtmlField">
+        <!-- Neutral shell: PDF.js must fill the dialog; HTML extract wraps
+             itself in .o_clm_base_docx_preview_body when needed. -->
+        <div class="o_clm_docx_preview_html_field o_field_html"
+             t-ref="root"
+             role="document"
+             aria-label="Document Template preview"/>
+    </t>
+
+    <t t-name="clm.ExclusiveActiveBooleanField">
+        <div class="o_clm_exclusive_active o_field_boolean">
+            <input type="checkbox"
+                   class="form-check-input"
+                   t-att-checked="checked"
+                   t-on-change="onChange"
+                   aria-label="Set as Active Template Version"/>
+        </div>
+    </t>
+
+    <t t-name="clm.UsedIconBooleanField">
+        <div class="o_clm_used_icon" t-att-aria-label="ariaLabel" role="img">
+            <i t-if="used"
+               class="fa fa-check"
+               aria-hidden="true"/>
+            <i t-else=""
+               class="fa fa-times o_clm_used_icon_no"
+               aria-hidden="true"/>
+        </div>
+    </t>
+</templates>

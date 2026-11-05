@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_clm_contract_request_list" model="ir.ui.view">
+        <field name="name">clm.contract.request.list</field>
+        <field name="model">clm.contract.request</field>
+        <field name="arch" type="xml">
+            <list string="Contract Requests" class="o_clm_list"
+                  decoration-muted="state == 'rejected'">
+                <field name="request_ref"/>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="contract_type_id"/>
+                <field name="requester_id" optional="show"/>
+                <field name="department_id" optional="show"/>
+                <field name="urgency" optional="show" widget="badge"
+                       decoration-danger="urgency == 'critical'"
+                       decoration-warning="urgency == 'high'"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="estimated_value" optional="hide" sum="Estimated Value" width="140px"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'new'"
+                       decoration-warning="state in ('submitted', 'intake')"
+                       decoration-success="state in ('accepted', 'converted')"
+                       decoration-danger="state == 'rejected'"/>
+                <field name="company_id" optional="hide" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_clm_contract_request_form" model="ir.ui.view">
+        <field name="name">clm.contract.request.form</field>
+        <field name="model">clm.contract.request</field>
+        <field name="arch" type="xml">
+            <!--
+                Intake reads as a request workflow: who is asking, what for,
+                what it is worth, and what Legal needs to decide. The sections
+                below follow that order, and Purpose — the one piece of prose
+                on the screen — gets the full sheet width rather than a third
+                of a two-cell group.
+            -->
+            <form string="Contract Request" class="o_clm_form">
+                <header>
+                    <button name="action_submit" type="object" string="Submit Request"
+                            class="btn-primary" invisible="state != 'new'"/>
+                    <button name="action_start_intake" type="object" string="Start Legal Intake"
+                            class="btn-primary" invisible="state != 'submitted'"
+                            groups="clm.group_clm_legal"/>
+                    <button name="action_accept" type="object" string="Accept Request"
+                            class="btn-primary" invisible="state not in ('submitted', 'intake')"
+                            groups="clm.group_clm_legal"/>
+                    <button name="action_open_conversion_wizard" type="object" string="Convert to Contract"
+                            class="btn-primary" invisible="state != 'accepted'"
+                            groups="clm.group_clm_legal_admin"/>
+                    <button name="action_reject" type="object" string="Reject Request"
+                            class="o_clm_action_danger"
+                            invisible="state not in ('submitted', 'intake')"
+                            groups="clm.group_clm_legal"/>
+                    <field name="state" widget="statusbar" statusbar_visible="new,submitted,intake,accepted,converted"/>
+                </header>
+                <sheet>
+                    <div class="oe_title o_clm_page_header" name="clm_page_header">
+                        <div class="o_clm_kicker">
+                            Intake Request
+                            <field name="request_ref" readonly="1" class="oe_inline"
+                                   invisible="request_ref == 'New'"/>
+                        </div>
+                        <h1><field name="name" placeholder="What is being requested, e.g. Digital Marketing Services Agreement"/></h1>
+                        <div class="o_clm_subtitle">
+                            <span invisible="not partner_id">
+                                <i class="fa fa-building-o" role="img" aria-label="Counterparty"/>
+                                <field name="partner_id" readonly="1" options="{'no_open': True}"/>
+                            </span>
+                            <span invisible="not contract_type_id">
+                                <i class="fa fa-file-text-o" role="img" aria-label="Contract type"/>
+                                <field name="contract_type_id" readonly="1" options="{'no_open': True}"/>
+                            </span>
+                            <span invisible="not requester_id">
+                                <i class="fa fa-user-o" role="img" aria-label="Requester"/>
+                                <field name="requester_id" readonly="1" options="{'no_open': True}"/>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-danger" role="alert" invisible="state != 'rejected'">
+                        <strong>This request was rejected.</strong>
+                        <field name="rejection_reason" readonly="1" nolabel="1" class="o_clm_longtext"/>
+                    </div>
+                    <div class="alert alert-success" role="alert" invisible="not contract_id">
+                        <i class="fa fa-check-circle me-1" role="img" aria-label="Converted"/>
+                        This request has been converted into
+                        <field name="contract_id" readonly="1" class="oe_inline"/>.
+                    </div>
+
+                    <group>
+                        <group string="Request Details">
+                            <field name="requester_id"/>
+                            <field name="department_id"/>
+                            <field name="business_owner_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Contract Basics">
+                            <field name="partner_id"/>
+                            <field name="partner_signatory_id"
+                                       invisible="not partner_id"
+                                       context="{'default_parent_id': partner_id, 'default_is_company': False}"/>
+                            <field name="contract_type_id"/>
+                            <field name="template_id"/>
+                            <field name="required_legal_action"/>
+                            <field name="urgency"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Commercial">
+                            <field name="currency_id" invisible="1"/>
+                            <field name="estimated_value"/>
+                        </group>
+                        <group string="Timing">
+                            <field name="start_date"/>
+                            <field name="expected_execution_date"/>
+                        </group>
+                    </group>
+
+                    <!--
+                        Purpose is prose, so it sits outside every group: a
+                        `<field>` directly under the sheet spans its full width
+                        instead of the ~35% a two-cell group would give it.
+                    -->
+                    <separator string="Purpose &amp; Business Need"/>
+                    <field name="purpose" nolabel="1" class="o_clm_longtext o_clm_longtext_tall"
+                           placeholder="Why this contract is needed, what the counterparty will deliver, and anything Legal should know before drafting."/>
+
+                    <notebook>
+                        <page string="Approval &amp; Documents" name="approval">
+                            <group>
+                                <group string="Review">
+                                    <field name="assigned_reviewer_id" groups="clm.group_clm_legal"/>
+                                    <field name="procurement_owner_id"/>
+                                </group>
+                                <group string="References">
+                                    <field name="reference"/>
+                                    <field name="contract_id" invisible="not contract_id"/>
+                                </group>
+                            </group>
+
+                            <separator string="Internal Approvals Required"/>
+                            <field name="internal_approvals" nolabel="1" class="o_clm_longtext"
+                                   placeholder="Which internal approvals this request already has, or still needs."/>
+
+                            <separator string="Supporting Documents"/>
+                            <div class="o_clm_hint mb-2">
+                                Quotes, statements of work, counterparty paper and anything
+                                else Legal needs to draft from.
+                            </div>
+                            <field name="supporting_document_ids" widget="many2many_binary" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_clm_contract_request_search" model="ir.ui.view">
+        <field name="name">clm.contract.request.search</field>
+        <field name="model">clm.contract.request</field>
+        <field name="arch" type="xml">
+            <search string="Contract Requests">
+                <field name="name" string="Request"
+                       filter_domain="['|', ('name', 'ilike', self), ('request_ref', 'ilike', self)]"/>
+                <field name="partner_id"/>
+                <field name="requester_id"/>
+                <field name="contract_type_id"/>
+                <filter string="My Requests" name="my_requests" domain="[('requester_id', '=', uid)]"/>
+                <separator/>
+                <filter string="Awaiting Legal" name="awaiting_legal" domain="[('state', 'in', ('submitted', 'intake'))]"/>
+                <filter string="Accepted" name="accepted" domain="[('state', '=', 'accepted')]"/>
+                <filter string="Converted" name="converted" domain="[('state', '=', 'converted')]"/>
+                <filter string="Rejected" name="rejected" domain="[('state', '=', 'rejected')]"/>
+                <separator/>
+                <filter string="Urgent" name="urgent" domain="[('urgency', 'in', ('high', 'critical'))]"/>
+                <group>
+                    <filter string="Status" name="group_by_state" context="{'group_by': 'state'}"/>
+                    <filter string="Department" name="group_by_department" context="{'group_by': 'department_id'}"/>
+                    <filter string="Contract Type" name="group_by_type" context="{'group_by': 'contract_type_id'}"/>
+                    <filter string="Requester" name="group_by_requester" context="{'group_by': 'requester_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_clm_contract_request" model="ir.actions.act_window">
+        <field name="name">Contract Requests</field>
+        <field name="res_model">clm.contract.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_clm_contract_request_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Raise your first contract request</p>
+            <p>A request captures what the business needs before any contract
+               exists. Legal reviews it, accepts it, and converts it into a
+               contract that keeps the request as its origin.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_clm_intake" name="Intake" parent="clm.menu_clm_root" sequence="20"/>
+    <menuitem id="menu_clm_contract_requests" name="Contract Requests" parent="menu_clm_intake" action="action_clm_contract_request" sequence="10"/>
+</odoo>

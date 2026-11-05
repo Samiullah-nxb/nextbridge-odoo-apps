@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Surface the intake-originated data on the contract it was converted into. -->
+    <record id="view_clm_contract_form_intake" model="ir.ui.view">
+        <field name="name">clm.contract.form.intake</field>
+        <field name="model">clm.contract</field>
+        <field name="inherit_id" ref="clm.view_clm_contract_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='signing_date']" position="before">
+                <field name="expected_execution_date"/>
+            </xpath>
+            <!--
+                `repository` is the named anchor the base Details tab declares
+                for blocks like this one. It replaced an xpath on the parent of
+                `remarks`, which stopped being a group when Remarks moved to
+                full width.
+            -->
+            <xpath expr="//group[@name='repository']" position="after">
+                <group name="intake_origin" invisible="not request_id">
+                    <group string="Intake Origin">
+                        <field name="request_id" readonly="1"/>
+                        <field name="required_legal_action" readonly="1"/>
+                        <field name="urgency" readonly="1"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

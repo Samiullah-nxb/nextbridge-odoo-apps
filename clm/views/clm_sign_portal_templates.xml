@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Hide Communication history on Sign portal detail pages. -->
+    <template id="clm_sign_portal_hide_communication"
+              inherit_id="sign.sign_portal_my_request">
+        <xpath expr="//hr" position="replace"/>
+        <xpath expr="//div[h3[normalize-space()='Communication history']]" position="replace"/>
+    </template>
+
+    <!-- Signature requests list: show contract name under the document link. -->
+    <template id="clm_sign_portal_list_contract_name"
+              inherit_id="sign.sign_portal_my_requests">
+        <xpath expr="//a[contains(@t-attf-href, '/my/signature/')]" position="replace">
+            <a t-attf-href="/my/signature/#{sign_request_item.id}?{{ keep_query() }}">
+                <t t-set="clm_contract"
+                   t-value="sign_request_item.sign_request_id.sudo().clm_contract_id"/>
+                <span class="d-block fw-semibold" t-esc="sign_request_item.reference"/>
+                <span t-if="clm_contract and clm_contract.name"
+                      class="d-block small text-muted"
+                      t-esc="clm_contract.name"/>
+            </a>
+        </xpath>
+    </template>
+
+    <!-- Enhanced Sign portal request detail layout. -->
+    <template id="clm_sign_portal_enhance_request"
+              inherit_id="sign.sign_portal_my_request">
+        <xpath expr="//h3" position="replace">
+            <t t-set="sign_req" t-value="my_sign_item.sign_request_id"/>
+            <t t-set="clm_contract" t-value="sign_req.sudo().clm_contract_id"/>
+            <t t-set="req_state" t-value="sign_req.state"/>
+            <t t-set="badge_class"
+               t-value="'text-bg-success' if req_state == 'signed' else ('text-bg-danger' if req_state in ('canceled', 'refused') else ('text-bg-warning' if req_state == 'sent' else 'text-bg-info'))"/>
+            <div class="o_clm_sign_header d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
+                <div class="min-w-0">
+                    <p class="text-muted text-uppercase small mb-1 fw-semibold letter-spacing-1 o_clm_sign_kicker">
+                        Signature request
+                    </p>
+                    <h3 class="mb-1 o_clm_sign_title">
+                        <span t-field="my_sign_item.reference"/>
+                    </h3>
+                    <p t-if="clm_contract and clm_contract.name"
+                       class="text-muted mb-0"
+                       t-esc="clm_contract.name"/>
+                </div>
+                <span t-field="sign_req.state"
+                      t-attf-class="badge rounded-pill {{badge_class}} fs-6 px-3 py-2 align-self-center"
+                      title="Current status of the signature request"/>
+            </div>
+        </xpath>
+
+        <xpath expr="//div[hasclass('o_sign_portal')]" position="replace">
+            <div class="o_sign_portal o_clm_sign_portal">
+                <t t-set="sign_req" t-value="my_sign_item.sign_request_id"/>
+                <t t-set="request_item" t-value="sign_req.request_item_ids"/>
+                <t t-set="is_read_only" t-value="my_sign_item.state in ['completed', 'canceled']"/>
+                <t t-set="is_signed" t-value="sign_req.state == 'signed'"/>
+
+                <div t-if="is_signed" class="alert alert-success d-flex align-items-center gap-2 mb-4" role="status">
+                    <i class="fa fa-check-circle flex-shrink-0"/>
+                    <div>
+                        <strong class="d-block">Document signed</strong>
+                        <span class="small">You can view or download the completed file below.</span>
+                    </div>
+                </div>
+                <div t-elif="my_sign_item.state == 'canceled'" class="alert alert-danger d-flex align-items-center gap-2 mb-4" role="status">
+                    <i class="fa fa-times-circle flex-shrink-0"/>
+                    <div>
+                        <strong class="d-block">Request cancelled</strong>
+                        <span class="small">This signature request is no longer available to sign.</span>
+                    </div>
+                </div>
+                <div t-elif="not is_read_only" class="alert alert-primary d-flex align-items-center gap-2 mb-4" role="status">
+                    <i class="fa fa-pencil-square-o flex-shrink-0"/>
+                    <div>
+                        <strong class="d-block">Action required</strong>
+                        <span class="small">Open the document to review and sign.</span>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-12 col-lg-7">
+                        <div class="o_clm_sign_panel h-100">
+                            <div class="o_clm_sign_panel_head">
+                                <i class="fa fa-file-text-o me-2"/>
+                                Summary
+                            </div>
+                            <dl class="o_clm_sign_meta mb-0">
+                                <div t-if="sign_req.sudo().clm_contract_id" class="o_clm_sign_meta_row">
+                                    <dt>Contract</dt>
+                                    <dd t-esc="sign_req.sudo().clm_contract_id.name or sign_req.sudo().clm_contract_id.contract_ref"/>
+                                </div>
+                                <div class="o_clm_sign_meta_row">
+                                    <dt>Creation date</dt>
+                                    <dd>
+                                        <span t-field="my_sign_item.create_date" t-options="{'widget': 'date'}"/>
+                                    </dd>
+                                </div>
+                                <t t-if="len(request_item) == 1 and request_item.state == 'completed'">
+                                    <div class="o_clm_sign_meta_row">
+                                        <dt>Signed on</dt>
+                                        <dd>
+                                            <t t-out="request_item.signing_date" t-options="{'widget': 'date'}"/>
+                                        </dd>
+                                    </div>
+                                </t>
+                                <div class="o_clm_sign_meta_row">
+                                    <dt>Sent by</dt>
+                                    <dd t-out="my_sign_item.create_uid.name"/>
+                                </div>
+                                <div t-if="sign_req.validity" class="o_clm_sign_meta_row">
+                                    <dt>Expiry date</dt>
+                                    <dd>
+                                        <t t-out="sign_req.validity" t-options="{'widget': 'date'}"/>
+                                    </dd>
+                                </div>
+                            </dl>
+
+                            <t t-if="len(request_item) &gt; 1">
+                                <div class="o_clm_sign_panel_head mt-4">
+                                    <i class="fa fa-users me-2"/>
+                                    Signers
+                                </div>
+                                <ul class="o_clm_sign_signers list-unstyled mb-0">
+                                    <t t-foreach="request_item" t-as="sign">
+                                        <li class="o_clm_sign_signer" t-att-data-id="sign.id">
+                                            <div class="o_clm_sign_signer_main">
+                                                <span class="fw-semibold"
+                                                      t-esc="sign.partner_id.name if sign.partner_id else 'Public user'"/>
+                                            </div>
+                                            <div class="o_clm_sign_signer_status">
+                                                <t t-if="sign.state == 'sent'">
+                                                    <span class="badge rounded-pill text-bg-warning">
+                                                        Waiting signature
+                                                    </span>
+                                                    <span t-if="not sign.is_mail_sent" class="d-block small text-muted mt-1">
+                                                        Email access has not been sent
+                                                    </span>
+                                                </t>
+                                                <t t-elif="sign.state == 'canceled'">
+                                                    <span class="badge rounded-pill text-bg-danger">
+                                                        Cancelled
+                                                    </span>
+                                                </t>
+                                                <t t-elif="sign.state == 'completed'">
+                                                    <span class="badge rounded-pill text-bg-success">
+                                                        Signed
+                                                        <t t-if="sign.signing_date">
+                                                            · <span t-field="sign.signing_date" t-options="{'widget': 'date'}"/>
+                                                        </t>
+                                                    </span>
+                                                </t>
+                                                <t t-else="">
+                                                    <span class="badge rounded-pill text-bg-secondary"
+                                                          t-esc="sign.state"/>
+                                                </t>
+                                            </div>
+                                        </li>
+                                    </t>
+                                </ul>
+                            </t>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-lg-5">
+                        <div class="o_clm_sign_panel o_clm_sign_actions h-100">
+                            <div class="o_clm_sign_panel_head">
+                                <i class="fa fa-pencil me-2"/>
+                                Actions
+                            </div>
+                            <p class="text-muted small mb-3">
+                                <t t-if="is_read_only and clm_use_final_pdf">
+                                    Open the final signed contract PDF (NextContract layout with electronic signatures).
+                                </t>
+                                <t t-elif="is_read_only">Open the signed PDF to review it, or download a copy.</t>
+                                <t t-else="">Review the contract carefully, then complete your signature.</t>
+                            </p>
+                            <div class="d-grid gap-2">
+                                <a t-att-href="url"
+                                   t-attf-class="btn {{'btn-primary' if not is_read_only else 'btn-outline-primary'}} btn-lg o_clm_sign_cta"
+                                   t-att-target="'_blank' if is_read_only else None">
+                                    <i t-attf-class="fa {{'fa-eye' if is_read_only else 'fa-pencil-square-o'}} me-2"/>
+                                    <t t-if="is_read_only">View Document</t>
+                                    <t t-else="">Sign Document</t>
+                                </a>
+                                <a t-if="is_signed and clm_use_final_pdf"
+                                   class="btn btn-light btn-lg border"
+                                   t-att-href="clm_final_download_url"
+                                   title="Download final signed contract PDF"
+                                   target="_blank"
+                                   role="button">
+                                    <i class="fa fa-download me-2"/>
+                                    Download signed PDF
+                                </a>
+                                <a t-elif="is_signed"
+                                   class="btn btn-light btn-lg border"
+                                   t-attf-href="/sign/download/{{sign_req.id}}/{{sign_req.access_token}}/completed"
+                                   title="Download signed document"
+                                   target="_blank"
+                                   role="button">
+                                    <i class="fa fa-download me-2"/>
+                                    Download signed PDF
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+</odoo>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_clm_ai_field_suggestion_form" model="ir.ui.view">
+        <field name="name">clm.ai.field.suggestion.form</field>
+        <field name="model">clm.ai.field.suggestion</field>
+        <field name="arch" type="xml">
+            <form class="o_clm_form">
+                <header>
+                    <button name="action_approve" type="object" string="Approve"
+                            class="btn-primary" icon="fa-check" invisible="status != 'pending'"/>
+                    <button name="action_open_mapping_wizard" type="object" string="Map / Resolve"
+                            class="btn-primary" icon="fa-link" invisible="status != 'needs_mapping'"/>
+                    <button name="action_reject" type="object" string="Reject"
+                            class="o_clm_action_danger" icon="fa-times"
+                            invisible="status not in ['pending', 'needs_mapping']"/>
+                    <field name="status" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title o_clm_page_header" name="clm_page_header">
+                        <div class="o_clm_kicker">
+                            AI Suggestion · <field name="name" readonly="1" class="oe_inline"/>
+                        </div>
+                        <h1 class="o_clm_title"><field name="field_name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="field_name" readonly="status != 'pending'"/>
+                            <field name="description"/>
+                            <field name="suggested_value" readonly="status != 'pending'"/>
+                            <field name="context_reasoning"/>
+                            <field name="confidence" widget="percentage" readonly="1"/>
+                        </group>
+                        <group string="Mapping Details">
+                            <field name="status" readonly="1" widget="badge"/>
+                            <field name="contract_id" readonly="1"/>
+                            <field name="job_id" readonly="1"/>
+                            <field name="reviewed_by_id" readonly="1"/>
+                            <field name="reviewed_at" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Source Evidence">
+                            <field name="source_page" readonly="1"/>
+                        </group>
+                    </group>
+                    <separator string="Source Text"/>
+                    <field name="source_text" readonly="1" nolabel="1" class="o_clm_longtext"/>
+                    <div invisible="status == 'pending'">
+                        <separator string="Review Comment"/>
+                        <field name="review_comment" nolabel="1" class="o_clm_longtext"/>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

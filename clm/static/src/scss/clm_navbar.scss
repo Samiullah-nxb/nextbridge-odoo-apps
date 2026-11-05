@@ -1,0 +1,53 @@
+// Part of NextContract. See LICENSE file for full copyright and licensing details.
+//
+// ─── NextContract navbar / app menu sidebar ──────────────────────────────────
+//
+// Unlike clm_layout.scss and clm_components.scss, the rules below are NOT
+// scoped to a NextContract class: the small-screen app menu sidebar and the
+// navbar are Odoo chrome shared by every app, and there is no NextContract
+// hook inside them. They are deliberately kept to affordance-only changes
+// (cursor, and the brand label the desktop navbar already shows), so they
+// cannot alter the behaviour or the layout of another app.
+
+// ─────────────────────────────────────────────────────────────────────────────
+// App menu sidebar (burger drawer) — hit targets must look clickable
+//
+// web.SectionMenu renders menu entries as bare <li t-on-click="..."> elements.
+// An <li> has no default pointer cursor, so on a tablet running a desktop
+// browser (and for anyone driving a phone emulator with a mouse) the entries
+// read as static text. Give every actionable row the pointer.
+//
+// A section that only groups other entries is a heading, not a target: those
+// <li>s carry a nested <ul>, so they keep the default cursor while their
+// children are matched by the plain `li` rule above them.
+// ─────────────────────────────────────────────────────────────────────────────
+
+.o_app_menu_sidebar,
+.o_burger_menu {
+    .o_burger_menu_content {
+        li {
+            cursor: pointer;
+        }
+
+        li:has(> ul) {
+            cursor: default;
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Current app label in the small-screen navbar
+//
+// On desktop the navbar carries o_menu_brand, so the header always names the
+// app you are in. On small screens Odoo drops it and leaves only the burger
+// icon, which makes the header say nothing about where you are. Put the
+// current app's name back next to the toggle.
+// ─────────────────────────────────────────────────────────────────────────────
+
+.o_main_navbar .o_menu_toggle .o_clm_navbar_current_app {
+    // The breadcrumb and the systray share the same row: never let a long app
+    // name push them off screen.
+    max-width: 40vw;
+    font-weight: 500;
+    color: inherit;
+}

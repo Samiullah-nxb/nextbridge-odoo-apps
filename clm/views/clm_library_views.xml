@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ─── Clauses ────────────────────────────────────────────────────── -->
+    <record id="view_clm_clause_list" model="ir.ui.view">
+        <field name="name">clm.clause.list</field>
+        <field name="model">clm.clause</field>
+        <field name="arch" type="xml">
+            <list string="Clauses" class="o_clm_list"
+                  decoration-muted="state in ('superseded', 'retired')">
+                <field name="name"/>
+                <field name="category"/>
+                <field name="jurisdiction" optional="hide"/>
+                <field name="owner_id" optional="hide"/>
+                <field name="risk_level" widget="badge"
+                       decoration-danger="risk_level in ('high', 'critical')"
+                       decoration-warning="risk_level == 'medium'"
+                       decoration-success="risk_level == 'low'"/>
+                <field name="editability" optional="show"/>
+                <field name="version"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state == 'under_review'"
+                       decoration-success="state in ('approved', 'published')"
+                       decoration-muted="state in ('superseded', 'retired')"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_clm_clause_form" model="ir.ui.view">
+        <field name="name">clm.clause.form</field>
+        <field name="model">clm.clause</field>
+        <field name="arch" type="xml">
+            <form string="Clause" class="o_clm_form">
+                <header>
+                    <button name="action_submit_review" type="object" string="Submit for Review"
+                            class="btn-primary" icon="fa-paper-plane-o" invisible="state != 'draft'"/>
+                    <button name="action_approve" type="object" string="Approve"
+                            class="btn-primary" icon="fa-check" invisible="state != 'under_review'"
+                            groups="clm.group_clm_legal_admin"/>
+                    <button name="action_publish" type="object" string="Publish"
+                            class="btn-primary" icon="fa-globe" invisible="state != 'approved'"
+                            groups="clm.group_clm_legal_admin"/>
+                    <button name="action_lock" type="object" string="Lock"
+                            icon="fa-lock" invisible="editability == 'locked'"/>
+                    <button name="action_unlock" type="object" string="Unlock"
+                            icon="fa-unlock" invisible="editability != 'locked'"
+                            groups="clm.group_clm_legal_admin"/>
+                    <button name="action_supersede" type="object" string="Supersede"
+                            class="o_clm_action_danger" invisible="state != 'published'"
+                            groups="clm.group_clm_legal_admin"/>
+                    <button name="action_retire" type="object" string="Retire"
+                            class="o_clm_action_danger"
+                            invisible="state not in ('published', 'superseded')"
+                            groups="clm.group_clm_legal_admin"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,under_review,approved,published"/>
+                </header>
+                <sheet>
+                    <div class="oe_title o_clm_page_header" name="clm_page_header">
+                        <div class="o_clm_kicker">Clause Library</div>
+                        <h1><field name="name" placeholder="e.g. Limitation of Liability"/></h1>
+                        <div class="o_clm_subtitle">
+                            <span invisible="not category">
+                                <i class="fa fa-folder-o" role="img" aria-label="Category"/>
+                                <field name="category" readonly="1"/>
+                            </span>
+                            <span>
+                                <i class="fa fa-code-fork" role="img" aria-label="Version"/>
+                                <field name="version" readonly="1"/>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="alert alert-info" role="alert" invisible="editability != 'locked'">
+                        <i class="fa fa-lock me-1" role="img" aria-label="Locked"/>
+                        <strong>This clause is locked.</strong>
+                        Contracts must use it verbatim; Legal Admin can unlock it.
+                    </div>
+                    <group>
+                        <group string="Classification">
+                            <field name="category"/>
+                            <field name="risk_level"/>
+                            <field name="jurisdiction"/>
+                            <field name="applicable_contract_type_ids" widget="many2many_tags"/>
+                        </group>
+                        <group string="Ownership &amp; Approval">
+                            <field name="owner_id"/>
+                            <field name="editability"/>
+                            <field name="approved_by_id"/>
+                            <field name="approval_date"/>
+                            <field name="version"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Standard Wording" name="standard_wording">
+                            <field name="standard_wording" nolabel="1"
+                                   class="o_clm_longtext o_clm_longtext_tall"
+                                   placeholder="The approved wording. Contracts start from this text."/>
+                        </page>
+                        <page string="Alternate Wording" name="alternate_wording">
+                            <div class="o_clm_hint mb-2">
+                                A pre-approved fallback that may be offered during
+                                negotiation without re-opening legal review.
+                            </div>
+                            <field name="alternate_wording" nolabel="1"
+                                   class="o_clm_longtext o_clm_longtext_tall"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_clm_clause_search" model="ir.ui.view">
+        <field name="name">clm.clause.search</field>
+        <field name="model">clm.clause</field>
+        <field name="arch" type="xml">
+            <search string="Clauses">
+                <field name="name"/>
+                <field name="category"/>
+                <field name="owner_id"/>
+                <filter string="Published" name="published" domain="[('state', '=', 'published')]"/>
+                <filter string="Awaiting Review" name="under_review" domain="[('state', '=', 'under_review')]"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <separator/>
+                <filter string="High Risk" name="high_risk" domain="[('risk_level', 'in', ('high', 'critical'))]"/>
+                <group>
+                    <filter string="Category" name="group_by_category" context="{'group_by': 'category'}"/>
+                    <filter string="Status" name="group_by_state" context="{'group_by': 'state'}"/>
+                    <filter string="Risk" name="group_by_risk" context="{'group_by': 'risk_level'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ─── Templates ──────────────────────────────────────────────────── -->
+    <record id="view_clm_template_list" model="ir.ui.view">
+        <field name="name">clm.template.list</field>
+        <field name="model">clm.template</field>
+        <field name="arch" type="xml">
+            <list string="Templates" class="o_clm_list"
+                  decoration-muted="state in ('superseded', 'retired')">
+                <field name="name"/>
+                <field name="contract_type_id"/>
+                <field name="version_number" width="140px"/>
+                <field name="clause_count" string="Clauses" optional="show"/>
+                <field name="owner_id" optional="hide"/>
+                <field name="effective_date"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-success="state in ('approved', 'published')"
+                       decoration-muted="state in ('superseded', 'retired')"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_clm_template_form" model="ir.ui.view">
+        <field name="name">clm.template.form</field>
+        <field name="model">clm.template</field>
+        <field name="arch" type="xml">
+            <form string="Template" class="o_clm_form">
+                <header>
+                    <button name="action_approve" type="object" string="Approve"
+                            class="btn-primary" icon="fa-check" invisible="state != 'draft'"
+                            groups="clm.group_clm_legal_admin"/>
+                    <button name="action_publish" type="object" string="Publish"
+                            class="btn-primary" icon="fa-globe" invisible="state != 'approved'"
+                            groups="clm.group_clm_legal_admin"/>
+                    <button name="action_supersede" type="object" string="Supersede"
+                            class="o_clm_action_danger" invisible="state != 'published'"
+                            groups="clm.group_clm_legal_admin"/>
+                    <button name="action_retire" type="object" string="Retire"
+                            class="o_clm_action_danger"
+                            invisible="state not in ('published', 'superseded')"
+                            groups="clm.group_clm_legal_admin"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,approved,published"/>
+                </header>
+                <sheet>
+                    <div class="oe_title o_clm_page_header" name="clm_page_header">
+                        <div class="o_clm_kicker">Template</div>
+                        <h1><field name="name" placeholder="e.g. Master Services Agreement — Standard"/></h1>
+                        <div class="o_clm_subtitle">
+                            <span invisible="not contract_type_id">
+                                <i class="fa fa-file-text-o" role="img" aria-label="Contract type"/>
+                                <field name="contract_type_id" readonly="1" options="{'no_open': True}"/>
+                            </span>
+                            <span>
+                                <i class="fa fa-code-fork" role="img" aria-label="Version"/>
+                                <field name="version_number" readonly="1"/>
+                            </span>
+                        </div>
+                    </div>
+                    <group>
+                        <group string="Applicability">
+                            <field name="contract_type_id"/>
+                            <field name="version_number"/>
+                            <field name="effective_date"/>
+                            <label for="base_document_id"/>
+                            <div class="o_row o_clm_base_docx_row">
+                                <field name="base_document_id" nolabel="1"
+                                       options="{'no_create_edit': True}"/>
+                                <field name="base_docx_upload_filename" nolabel="1"
+                                       widget="clm_base_docx_upload"/>
+                            </div>
+                            <field name="base_docx_upload" invisible="1"/>
+                            <field name="base_document_original_id" invisible="1"/>
+                            <field name="base_document_previous_id" invisible="1"/>
+                            <field name="has_base_document" invisible="1"/>
+                            <field name="has_previous_base_document" invisible="1"/>
+                            <field name="base_docx_version_count" invisible="1"/>
+                        </group>
+                        <group string="Ownership &amp; Approval">
+                            <field name="owner_id"/>
+                            <field name="approved_by_id"/>
+                            <field name="approval_date"/>
+                            <field name="clause_count"/>
+                        </group>
+                    </group>
+                    <div class="o_clm_base_docx_versions w-100"
+                         invisible="not has_base_document">
+                        <div class="o_clm_hint mb-2">
+                            Upload or select a document template version to edit.
+                            Only one Template Version can be <strong>Active</strong>
+                            (used for new contracts). Editing the original (or any
+                            version already used by a contract) only allows
+                            <strong>Save as New Version</strong> — the original file
+                            is never overwritten. Unused versions can be deleted;
+                            used versions cannot.
+                        </div>
+                        <field name="base_docx_version_ids" nolabel="1"
+                               class="o_clm_base_docx_versions_list w-100"
+                               options="{'no_open': True}">
+                            <list create="0" delete="0" no_open="1"
+                                  decoration-success="is_active"
+                                  decoration-muted="not is_active"
+                                  class="o_clm_base_docx_versions_table">
+                                <field name="revision_label" string="Version #" width="88px"/>
+                                <field name="version_number" column_invisible="1"/>
+                                <field name="name" string="Document Template"/>
+                                <field name="status_label" string="Status" width="96px"/>
+                                <field name="document_id" column_invisible="1"/>
+                                <field name="is_original" column_invisible="1"/>
+                                <field name="is_used" string="Used" width="72px"
+                                       class="o_clm_docx_version_used_col"
+                                       widget="clm_used_icon"/>
+                                <field name="active" column_invisible="1"/>
+                                <field name="is_active" string="Active" width="80px"
+                                         widget="clm_exclusive_active"
+                                         class="o_clm_docx_version_active_col"/>
+                                <field name="source" optional="hide"/>
+                                <field name="create_uid" string="Saved by" optional="hide"/>
+                                <field name="create_date" string="Saved on" width="148px"/>
+                                <field name="note" optional="hide"/>
+                                <button name="action_preview" type="object"
+                                        icon="fa-eye" title="View Version"
+                                        aria-label="View Version"/>
+                                <button name="action_download" type="object"
+                                        icon="fa-download" title="Download Version"
+                                        aria-label="Download Version"/>
+                                <button name="action_edit" type="object"
+                                        icon="fa-pencil" title="Edit (Save as New Version for original / used)"
+                                        aria-label="Edit"/>
+                                <button name="action_delete" type="object"
+                                        icon="fa-trash" title="Delete"
+                                        aria-label="Delete"
+                                        invisible="is_used or is_original or is_active"
+                                        confirm="Delete this Template Version? It has not been used by any contract."/>
+                            </list>
+                        </field>
+                    </div>
+                    <notebook>
+                        <page string="Template Body" name="body"
+                              invisible="has_base_document">
+                            <field name="content" nolabel="1"/>
+                        </page>
+                        <page string="Document Template" name="base_docx"
+                              invisible="not has_base_document"
+                              autofocus="autofocus">
+                            <field name="docx_editor_anchor"
+                                   widget="clm_docx_tag_editor"
+                                   nolabel="1"
+                                   class="o_clm_docx_field w-100"/>
+                        </page>
+                        <page string="Clause Lines" name="clause_lines">
+                            <div class="o_clm_empty" invisible="clause_line_ids">
+                                <i class="fa fa-list-ol" role="img" aria-label="No clauses"/>
+                                <div class="o_clm_empty_title">No clauses in this template</div>
+                                <div class="o_clm_empty_text">
+                                    Add the library clauses this template assembles, in the
+                                    order they appear in the finished contract.
+                                </div>
+                            </div>
+                            <field name="clause_line_ids" nolabel="1">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="section"/>
+                                    <field name="clause_id"/>
+                                    <field name="label"/>
+                                    <field name="required"/>
+                                    <field name="enabled"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_clm_template_search" model="ir.ui.view">
+        <field name="name">clm.template.search</field>
+        <field name="model">clm.template</field>
+        <field name="arch" type="xml">
+            <search string="Templates">
+                <field name="name"/>
+                <field name="contract_type_id"/>
+                <field name="owner_id"/>
+                <filter string="Published" name="published" domain="[('state', '=', 'published')]"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <group>
+                    <filter string="Contract Type" name="group_by_type" context="{'group_by': 'contract_type_id'}"/>
+                    <filter string="Status" name="group_by_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_clm_clause" model="ir.actions.act_window">
+        <field name="name">Clauses</field>
+        <field name="res_model">clm.clause</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_clm_clause_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add your first clause</p>
+            <p>The clause library holds the approved wording contracts are
+               assembled from. Each clause carries its own review state, risk
+               level and version.</p>
+        </field>
+    </record>
+
+    <record id="action_clm_template" model="ir.actions.act_window">
+        <field name="name">Templates</field>
+        <field name="res_model">clm.template</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_clm_template_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first template</p>
+            <p>A template is a contract type's standard paper: a body plus the
+               ordered clauses every contract drafted from it starts with.</p>
+        </field>
+    </record>
+</odoo>

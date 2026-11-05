@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_clm_ai" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.clm.ai</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="NextContract AI Configuration" string="NextContract AI Configuration" name="clm_ai">
+                    <block title="NextContract AI Configuration" name="clm_ai_setting_container">
+                        <setting id="clm_ai_enabled_setting" help="Enable AI assisted extraction and clause analysis">
+                            <field name="clm_ai_enabled"/>
+                        </setting>
+                        <setting id="clm_ai_gemini_api_key_setting" string="Gemini API Key" help="API Key for Google Gemini" invisible="not clm_ai_enabled">
+                            <!-- password attribute hides the key after saving -->
+                            <field name="clm_ai_gemini_api_key" password="True"/>
+                        </setting>
+                        <setting id="clm_ai_gemini_model_setting" string="Gemini Model" help="The Gemini model to use for AI tasks" invisible="not clm_ai_enabled">
+                            <field name="clm_ai_gemini_model" class="w-75"/>
+                        </setting>
+                        <setting id="clm_ai_confidence_setting" string="Review Thresholds"
+                                 help="Suggestions at or above the high threshold are pre-selected; below the low threshold they block confirmation.">
+                            <field name="clm_ai_confidence_high" class="oe_inline"/> % high
+                            <field name="clm_ai_confidence_low" class="oe_inline"/> % low
+                        </setting>
+                        <setting id="clm_ai_document_limits_setting" string="Document Limits"
+                                 help="Documents longer than the page limit fail rather than being truncated.">
+                            <field name="clm_ai_max_pages" class="oe_inline"/> pages max
+                            <field name="clm_ai_inline_payload_limit_mb" class="oe_inline"/> MB inline limit
+                        </setting>
+                        <setting id="clm_ai_generate_text_layer_setting"
+                                 help="Transcribe scanned pages for full-text search. Costs output tokens on every page of every document.">
+                            <field name="clm_ai_generate_text_layer"/>
+                        </setting>
+                        <setting id="clm_ai_cloud_consent_setting" string="Cloud Processing Consent"
+                                 help="Required before any cloud AI provider (e.g. Gemini) may receive contract content for this company.">
+                            <field name="clm_ai_cloud_processing_acknowledged" readonly="1"/>
+                            <div class="content-group" invisible="not clm_ai_cloud_processing_acknowledged">
+                                <field name="clm_ai_cloud_consent_user_id" readonly="1"/>
+                                <field name="clm_ai_cloud_consent_date" readonly="1"/>
+                            </div>
+                            <button name="action_acknowledge_cloud_ai_processing" type="object"
+                                    string="Acknowledge" class="btn-primary"
+                                    invisible="clm_ai_cloud_processing_acknowledged"/>
+                            <button name="action_revoke_cloud_ai_processing" type="object"
+                                    string="Revoke" class="btn-secondary"
+                                    invisible="not clm_ai_cloud_processing_acknowledged"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

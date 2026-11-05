@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_clm_risk_assessment_list" model="ir.ui.view">
+        <field name="name">clm.risk.assessment.list</field>
+        <field name="model">clm.risk.assessment</field>
+        <field name="arch" type="xml">
+            <list string="Risk Assessments" class="o_clm_list">
+                <field name="contract_id"/>
+                <field name="create_date" string="Assessed On"/>
+                <field name="calculated_score" optional="hide" width="150px"/>
+                <field name="final_score" width="110px"/>
+                <field name="final_rating" widget="badge"
+                       decoration-danger="final_rating in ('high', 'critical')"
+                       decoration-warning="final_rating == 'medium'"
+                       decoration-success="final_rating == 'low'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_clm_risk_assessment_form" model="ir.ui.view">
+        <field name="name">clm.risk.assessment.form</field>
+        <field name="model">clm.risk.assessment</field>
+        <field name="arch" type="xml">
+            <form class="o_clm_form">
+                <header>
+                    <button name="action_recalculate" type="object" string="Recalculate Risk"
+                            class="btn-primary" icon="fa-refresh"/>
+                </header>
+                <sheet>
+                    <field name="contract_id" invisible="1"/>
+                    <div class="oe_title o_clm_page_header" name="clm_page_header">
+                        <div class="o_clm_kicker">Risk Assessment</div>
+                        <h1 class="o_clm_title"><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Calculated Risk">
+                            <field name="calculated_score"/>
+                            <field name="calculated_rating"/>
+                        </group>
+                        <group string="Override">
+                            <field name="override_score"/>
+                            <field name="override_rating"/>
+                            <field name="override_by_id" invisible="not override_by_id"/>
+                            <field name="override_date" invisible="not override_date"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Final Risk">
+                            <field name="final_score" readonly="1"/>
+                            <field name="final_rating" readonly="1"
+                                   decoration-danger="final_rating in ('high', 'critical')"
+                                   decoration-warning="final_rating == 'medium'"
+                                   decoration-success="final_rating == 'low'"/>
+                        </group>
+                    </group>
+                    <separator string="Override Reason"/>
+                    <field name="override_reason" nolabel="1" class="o_clm_longtext"
+                           required="override_rating != False"
+                           placeholder="Why the calculated rating was overridden. Required whenever an override rating is set."/>
+
+                    <notebook>
+                        <page string="Risk Factors" name="factors">
+                            <field name="item_ids" nolabel="1">
+                                <list editable="bottom">
+                                    <field name="factor_id"/>
+                                    <field name="source_type" readonly="1"/>
+                                    <field name="weight" readonly="1"/>
+                                    <field name="evidence"/>
+                                    <field name="comments"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_clm_risk_assessment" model="ir.actions.act_window">
+        <field name="name">Risk Assessments</field>
+        <field name="res_model">clm.risk.assessment</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No risk assessments yet</p>
+            <p>An assessment scores a contract against the configured risk
+               factors. The score can be overridden, with a recorded reason.</p>
+        </field>
+    </record>
+</odoo>

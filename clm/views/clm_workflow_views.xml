@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_clm_workflow_task_list" model="ir.ui.view">
+        <field name="name">clm.workflow.task.list</field>
+        <field name="model">clm.workflow.task</field>
+        <field name="arch" type="xml">
+            <list string="Workflow Tasks" class="o_clm_list"
+                  decoration-danger="is_overdue"
+                  decoration-muted="status in ('completed', 'cancelled')">
+                <field name="contract_id"/>
+                <field name="name"/>
+                <field name="task_type"/>
+                <field name="assigned_user_id"/>
+                <field name="due_date"/>
+                <field name="is_required" optional="hide"/>
+                <field name="is_overdue" optional="hide"/>
+                <field name="status" widget="badge"
+                       decoration-info="status == 'pending'"
+                       decoration-warning="status == 'in_progress'"
+                       decoration-success="status == 'completed'"
+                       decoration-danger="status == 'rejected'"
+                       decoration-muted="status == 'cancelled'"/>
+                <button name="action_approve" type="object" string="Approve" icon="fa-check"
+                        invisible="status in ('completed', 'rejected', 'cancelled')"/>
+                <button name="action_reject" type="object" string="Reject" icon="fa-times"
+                        invisible="status in ('completed', 'rejected', 'cancelled')"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_clm_workflow_task_form" model="ir.ui.view">
+        <field name="name">clm.workflow.task.form</field>
+        <field name="model">clm.workflow.task</field>
+        <field name="arch" type="xml">
+            <form string="Workflow Task" class="o_clm_form">
+                <header>
+                    <button name="action_approve" type="object" string="Approve"
+                            class="btn-primary" icon="fa-check"
+                            invisible="status in ('completed', 'rejected', 'cancelled')"/>
+                    <button name="action_open_delegate_wizard" type="object" string="Delegate"
+                            icon="fa-share"
+                            invisible="status in ('completed', 'rejected', 'cancelled')"/>
+                    <button name="action_reject" type="object" string="Reject"
+                            class="o_clm_action_danger" icon="fa-times"
+                            invisible="status in ('completed', 'rejected', 'cancelled')"/>
+                    <field name="status" widget="statusbar" statusbar_visible="pending,in_progress,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title o_clm_page_header" name="clm_page_header">
+                        <div class="o_clm_kicker">Workflow Task</div>
+                        <h1 class="o_clm_title"><field name="name" readonly="1"/></h1>
+                        <div class="o_clm_subtitle">
+                            <span>
+                                <i class="fa fa-file-text-o" role="img" aria-label="Contract"/>
+                                <field name="contract_id" readonly="1" options="{'no_open': True}"/>
+                            </span>
+                            <span invisible="not assigned_user_id">
+                                <i class="fa fa-user-o" role="img" aria-label="Assigned to"/>
+                                <field name="assigned_user_id" readonly="1" options="{'no_open': True}"/>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="alert alert-danger" role="alert" invisible="not is_overdue">
+                        <i class="fa fa-exclamation-triangle me-1" role="img" aria-label="Overdue"/>
+                        <strong>This task is overdue.</strong>
+                    </div>
+                    <group>
+                        <group string="Task">
+                            <field name="contract_id"/>
+                            <field name="name"/>
+                            <field name="task_type"/>
+                            <field name="rule_id"/>
+                        </group>
+                        <group string="Assignment">
+                            <field name="assigned_user_id"/>
+                            <field name="original_assigned_user_id"/>
+                            <field name="due_date"/>
+                            <field name="is_required"/>
+                            <field name="is_overdue"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_clm_workflow_task_search" model="ir.ui.view">
+        <field name="name">clm.workflow.task.search</field>
+        <field name="model">clm.workflow.task</field>
+        <field name="arch" type="xml">
+            <search string="Workflow Tasks">
+                <field name="name"/>
+                <field name="contract_id"/>
+                <field name="assigned_user_id"/>
+                <filter string="My Tasks" name="my_tasks" domain="[('assigned_user_id', '=', uid)]"/>
+                <filter string="Pending" name="pending" domain="[('status', 'in', ('pending', 'in_progress'))]"/>
+                <filter string="Overdue" name="overdue" domain="[('is_overdue', '=', True)]"/>
+                <separator/>
+                <filter string="Archived (earlier review cycles)" name="archived" domain="[('active', '=', False)]"/>
+                <group>
+                    <filter string="Status" name="group_by_status" context="{'group_by': 'status'}"/>
+                    <filter string="Assigned To" name="group_by_assignee" context="{'group_by': 'assigned_user_id'}"/>
+                    <filter string="Contract" name="group_by_contract" context="{'group_by': 'contract_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_clm_workflow_task" model="ir.actions.act_window">
+        <field name="name">Workflow Tasks</field>
+        <field name="res_model">clm.workflow.task</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_clm_workflow_task_search"/>
+        <field name="context">{'search_default_my_tasks': 1, 'search_default_pending': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Nothing is waiting on you</p>
+            <p>Approval and review tasks appear here as contracts move through
+               the workflow. Clear the filters to see other people's tasks and
+               earlier review cycles.</p>
+        </field>
+    </record>
+
+    <record id="action_clm_delegate_wizard" model="ir.actions.act_window">
+        <field name="name">Delegate Task</field>
+        <field name="res_model">clm.delegate.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="view_clm_workflow_rule_list" model="ir.ui.view">
+        <field name="name">clm.workflow.rule.list</field>
+        <field name="model">clm.workflow.rule</field>
+        <field name="arch" type="xml">
+            <list string="Workflow Rules" class="o_clm_list">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="stage_trigger"/>
+                <field name="task_type"/>
+                <field name="task_name"/>
+                <field name="is_required"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_clm_workflow_rule_form" model="ir.ui.view">
+        <field name="name">clm.workflow.rule.form</field>
+        <field name="model">clm.workflow.rule</field>
+        <field name="arch" type="xml">
+            <form string="Workflow Rule" class="o_clm_form">
+                <sheet>
+                    <div class="oe_title o_clm_page_header" name="clm_page_header">
+                        <div class="o_clm_kicker">Workflow Rule</div>
+                        <h1><field name="name" placeholder="e.g. Finance approval above 50,000"/></h1>
+                    </div>
+                    <group>
+                        <group string="Trigger">
+                            <field name="stage_trigger"/>
+                            <field name="contract_type_id"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="min_contract_value"/>
+                        </group>
+                        <group string="Task Raised">
+                            <field name="task_type"/>
+                            <field name="task_name"/>
+                            <field name="is_required"/>
+                            <field name="assign_to_legal_admin"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Ordering">
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_clm_workflow_rule" model="ir.actions.act_window">
+        <field name="name">Workflow Rules</field>
+        <field name="res_model">clm.workflow.rule</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Define a workflow rule</p>
+            <p>A rule decides which approval tasks are raised when a contract
+               reaches a stage — optionally only above a value threshold or for
+               a particular contract type.</p>
+        </field>
+    </record>
+</odoo>

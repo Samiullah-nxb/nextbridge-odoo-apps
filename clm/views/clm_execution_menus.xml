@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_clm_activation_checklist"
+              name="Activation Checklist"
+              parent="clm.menu_clm_configuration"
+              action="action_clm_activation_checklist_item"
+              sequence="40"
+              groups="clm.group_clm_legal_admin"/>
+
+    <menuitem id="menu_clm_process_alerts"
+              name="Process Contract Alerts"
+              parent="clm.menu_clm_configuration"
+              action="action_clm_process_all_alerts"
+              sequence="60"
+              groups="clm.group_clm_legal_admin"/>
+</odoo>

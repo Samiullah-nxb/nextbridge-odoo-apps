@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        ─── Contract Lifecycle Overview ──────────────────────────────────────
+
+        A dedicated, read-only screen for one contract. It deliberately carries
+        no statusbar: the lifecycle chart *is* the state display. Every button
+        calls a transition method that already exists on clm.contract, with the
+        same visibility conditions the contract form uses, so the backend stays
+        the only source of workflow truth.
+
+        Its furniture — page header, facts strip, sections, action rows, empty
+        states — is the shared NextContract design system from clm_base, so
+        this screen reads as the same product as the contract form.
+    -->
+    <record id="view_clm_contract_lifecycle_form" model="ir.ui.view">
+        <field name="name">clm.contract.lifecycle.form</field>
+        <field name="model">clm.contract</field>
+        <!-- Never the default form: this view is reached through its own
+             action, so it must not outrank clm.view_clm_contract_form. -->
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <form string="Contract Lifecycle" create="false" edit="false"
+                  class="o_clm_form o_clm_lifecycle_form">
+                <header>
+                    <!--
+                        One primary per state, matching the contract form:
+                          draft                → Submit for Review
+                          review / negotiation → Approve
+                          approved             → Send for Signature
+                          pending_signature    → Sign with Odoo Sign
+                          executed             → Activate Contract
+                        Destructive actions carry o_clm_action_danger and the
+                        design system floats them to the end of the bar.
+                    -->
+                    <button name="action_submit_for_review" type="object"
+                            string="Submit for Review" class="btn-primary"
+                            icon="fa-paper-plane-o" invisible="state != 'draft'"/>
+                    <button name="action_approve" type="object"
+                            string="Approve" class="btn-primary" icon="fa-check"
+                            invisible="state not in ('in_review', 'internal_review_done', 'sent_to_counterparty', 'in_negotiation')"/>
+                    <button name="action_send_for_signature" type="object"
+                            string="Send for Signature" class="btn-primary"
+                            icon="fa-paper-plane-o" invisible="state != 'approved'"/>
+                    <button name="action_open_odoo_sign" type="object"
+                            string="Sign with Odoo Sign" class="btn-primary"
+                            icon="fa-pencil" invisible="state != 'pending_signature'"/>
+                    <button name="%(clm.action_clm_manual_signature_wizard)d"
+                            type="action" string="Mark as Manually Signed"
+                            class="btn-primary" icon="fa-pencil-square-o"
+                            invisible="state != 'pending_signature'"/>
+                    <button name="action_activate" type="object"
+                            string="Activate Contract" class="btn-primary" icon="fa-play"
+                            invisible="state != 'executed'"
+                            confirm="Activate this contract into the live repository? The Activation Checklist must be complete."/>
+
+                    <!-- Review and approval — clm_workflow transitions -->
+                    <button name="action_complete_internal_review" type="object"
+                            string="Complete Internal Review"
+                            invisible="state not in ('in_review', 'awaiting_business', 'awaiting_finance', 'awaiting_procurement', 'awaiting_compliance')"/>
+                    <button name="action_send_to_counterparty" type="object"
+                            string="Send to Counterparty"
+                            invisible="state != 'internal_review_done'"/>
+                    <button name="action_send_to_negotiation" type="object"
+                            string="Start Negotiation"
+                            invisible="state not in ('in_review', 'internal_review_done', 'sent_to_counterparty')"/>
+                    <!-- Returns the contract to Draft, so it is offered only
+                         where clm.contract allows that transition. -->
+                    <button name="action_return_for_clarification" type="object"
+                            string="Return for Changes" icon="fa-reply"
+                            invisible="state != 'in_review'"/>
+                    <button name="action_prepare_signature_draft" type="object"
+                            string="Prepare Signature Draft"
+                            invisible="state != 'approved'"/>
+
+                    <!-- Repository -->
+                    <button name="action_open_renew_wizard" type="object" string="Renew"
+                            icon="fa-refresh"
+                            invisible="state not in ('active', 'expiring_soon')"
+                            groups="clm.group_clm_legal_admin"/>
+                    <button name="action_open_archive_wizard" type="object" string="Archive"
+                            icon="fa-archive"
+                            invisible="state not in ('active', 'executed', 'expired', 'terminated')"
+                            groups="clm.group_clm_legal_admin"/>
+                    <button name="action_reopen" type="object" string="Reopen"
+                            icon="fa-undo" invisible="state != 'cancelled'"/>
+
+                    <button name="action_mark_expired" type="object" string="Mark Expired"
+                            class="o_clm_action_danger"
+                            invisible="state not in ('active', 'expiring_soon')"
+                            confirm="Mark this contract as Expired?"
+                            groups="clm.group_clm_legal_admin"/>
+                    <button name="action_open_terminate_wizard" type="object" string="Terminate"
+                            class="o_clm_action_danger"
+                            invisible="state not in ('active', 'expiring_soon')"
+                            groups="clm.group_clm_legal_admin"/>
+                    <button name="action_cancel" type="object" string="Cancel Contract"
+                            class="o_clm_action_danger" icon="fa-ban"
+                            confirm="Cancel this contract?"
+                            invisible="state in ('executed', 'active', 'expiring_soon', 'renewed', 'expired', 'terminated', 'archived', 'cancelled')"/>
+                </header>
+
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_contract_record" type="object"
+                                class="oe_stat_button" icon="fa-pencil-square-o">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Open</span>
+                                <span class="o_stat_text">Contract</span>
+                            </div>
+                        </button>
+                        <button name="%(clm.action_clm_contract_version)d"
+                                type="action" class="oe_stat_button" icon="fa-clone"
+                                groups="clm.group_clm_user,clm.group_clm_legal"
+                                context="{'default_contract_id': id, 'search_default_contract_id': id}">
+                            <field name="version_count" widget="statinfo" string="Versions"/>
+                        </button>
+                    </div>
+
+                    <!-- ─── Page header ────────────────────────────────── -->
+                    <div class="oe_title o_clm_page_header" name="clm_page_header">
+                        <div class="o_clm_kicker">
+                            Contract Lifecycle ·
+                            <field name="contract_ref" readonly="1" class="oe_inline"/>
+                        </div>
+                        <h1 class="o_clm_title"><field name="name" readonly="1"/></h1>
+                        <div class="o_clm_subtitle">
+                            <span invisible="not partner_id">
+                                <i class="fa fa-building-o" role="img" aria-label="Counterparty"/>
+                                <field name="partner_id" readonly="1" options="{'no_open': True}"/>
+                            </span>
+                            <span invisible="not contract_type_id">
+                                <i class="fa fa-file-text-o" role="img" aria-label="Contract type"/>
+                                <field name="contract_type_id" readonly="1" options="{'no_open': True}"/>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- ─── Where it stands, at a glance ───────────────── -->
+                    <div class="o_clm_facts">
+                        <div class="o_clm_fact">
+                            <span class="o_clm_fact_label">Status</span>
+                            <span class="o_clm_fact_value">
+                                <field name="state" readonly="1"/>
+                            </span>
+                        </div>
+                        <div class="o_clm_fact">
+                            <span class="o_clm_fact_label">Current Stage</span>
+                            <span class="o_clm_fact_value">
+                                <field name="lifecycle_stage_label" readonly="1"/>
+                            </span>
+                        </div>
+                        <div class="o_clm_fact">
+                            <span class="o_clm_fact_label">Owner</span>
+                            <span class="o_clm_fact_value">
+                                <field name="user_id" readonly="1" options="{'no_open': True}"/>
+                            </span>
+                        </div>
+                        <div class="o_clm_fact">
+                            <span class="o_clm_fact_label">Department</span>
+                            <span class="o_clm_fact_value">
+                                <field name="department_id" readonly="1" options="{'no_open': True}"/>
+                            </span>
+                        </div>
+                        <div class="o_clm_fact">
+                            <span class="o_clm_fact_label">Contract Value</span>
+                            <span class="o_clm_fact_value">
+                                <field name="currency_id" invisible="1"/>
+                                <field name="contract_value" readonly="1"/>
+                            </span>
+                        </div>
+                        <div class="o_clm_fact">
+                            <span class="o_clm_fact_label">Effective</span>
+                            <span class="o_clm_fact_value">
+                                <field name="effective_date" readonly="1"/>
+                            </span>
+                        </div>
+                        <div class="o_clm_fact">
+                            <span class="o_clm_fact_label">Expires</span>
+                            <span class="o_clm_fact_value">
+                                <field name="expiry_date" readonly="1"/>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- ─── Visual lifecycle ───────────────────────────── -->
+                    <div class="o_clm_section">
+                        <h2 class="o_clm_section_title">Contract Lifecycle</h2>
+                        <field name="lifecycle_chart_html" nolabel="1" readonly="1"/>
+                    </div>
+
+                    <!-- ─── The current stage in detail ────────────────── -->
+                    <div class="o_clm_section">
+                        <h2 class="o_clm_section_title">Current Stage</h2>
+                        <group>
+                            <group string="Stage" name="current_stage">
+                                <field name="lifecycle_stage_label" string="Stage"/>
+                                <field name="lifecycle_stage_status" string="Status"/>
+                                <field name="lifecycle_stage_assignee" string="Assigned To"/>
+                                <field name="lifecycle_stage_started" string="Started"
+                                       invisible="not lifecycle_stage_started"/>
+                            </group>
+                            <group string="Progress">
+                                <field name="lifecycle_position" string="Position"
+                                       invisible="not lifecycle_position"/>
+                                <field name="lifecycle_returned_count" string="Times Returned"
+                                       invisible="not lifecycle_returned_count"/>
+                                <field name="legal_owner_id" readonly="1"
+                                       invisible="not legal_owner_id"/>
+                                <field name="company_id" readonly="1"
+                                       groups="base.group_multi_company"/>
+                            </group>
+                        </group>
+                    </div>
+
+                    <!-- ─── What the stage is waiting on ───────────────── -->
+                    <div class="o_clm_section"
+                         groups="clm.group_clm_user,clm.group_clm_legal,clm.group_clm_manager,clm.group_clm_finance,clm.group_clm_procurement"
+                         invisible="not lifecycle_open_task_ids">
+                        <h2 class="o_clm_section_title">Open Workflow Tasks</h2>
+                        <field name="lifecycle_open_task_ids" nolabel="1" readonly="1">
+                            <list create="false" delete="false" edit="false">
+                                <field name="name"/>
+                                <field name="task_type"/>
+                                <field name="assigned_user_id"/>
+                                <field name="due_date"/>
+                                <field name="is_required" optional="show"/>
+                                <field name="status" widget="badge"
+                                       decoration-info="status == 'pending'"
+                                       decoration-warning="status == 'in_progress'"
+                                       decoration-success="status == 'completed'"
+                                       decoration-danger="status == 'rejected'"
+                                       decoration-muted="status == 'cancelled'"/>
+                                <button name="action_approve" type="object"
+                                        string="Approve" icon="fa-check"/>
+                                <button name="action_reject" type="object"
+                                        string="Reject" icon="fa-times"/>
+                            </list>
+                        </field>
+                    </div>
+
+                    <!-- ─── Documents / final contract ─────────────────── -->
+                    <div class="o_clm_section">
+                        <h2 class="o_clm_section_title">Final Contract</h2>
+                        <field name="final_contract_available" invisible="1"/>
+                        <field name="final_contract_kind" invisible="1"/>
+                        <field name="lifecycle_final_stored" invisible="1"/>
+                        <field name="signed_artifact_available" invisible="1"/>
+                        <field name="signed_artifact_is_pdf" invisible="1"/>
+
+                        <div class="o_clm_empty" invisible="final_contract_available">
+                            <i class="fa fa-file-text-o" role="img" aria-label="Not available"/>
+                            <div class="o_clm_empty_title">No final contract yet</div>
+                            <div class="o_clm_empty_text">
+                                It becomes available once an approved version is prepared
+                                for signature, or once the contract has been executed.
+                            </div>
+                        </div>
+
+                        <div invisible="not final_contract_available">
+                            <div class="o_clm_flags">
+                                <span class="badge text-bg-success"
+                                      invisible="state not in ('executed', 'active', 'expiring_soon', 'renewed', 'expired', 'terminated', 'archived')">
+                                    <i class="fa fa-check" role="img" aria-label="Done"/>Executed
+                                </span>
+                                <span class="badge text-bg-light border"
+                                      invisible="state in ('executed', 'active', 'expiring_soon', 'renewed', 'expired', 'terminated', 'archived')">
+                                    <i class="fa fa-circle-o" role="img" aria-label="Pending"/>Not executed
+                                </span>
+                                <span class="badge text-bg-success"
+                                      invisible="not signed_artifact_available">
+                                    <i class="fa fa-check" role="img" aria-label="Done"/>Signed
+                                </span>
+                                <span class="badge text-bg-light border"
+                                      invisible="signed_artifact_available">
+                                    <i class="fa fa-circle-o" role="img" aria-label="Pending"/>No signed document on file
+                                </span>
+                                <span class="badge text-bg-success"
+                                      invisible="not lifecycle_final_stored">
+                                    <i class="fa fa-check" role="img" aria-label="Done"/>Stored
+                                </span>
+                                <span class="badge text-bg-light border"
+                                      invisible="lifecycle_final_stored">
+                                    <i class="fa fa-circle-o" role="img" aria-label="Pending"/>Not stored in Documents
+                                </span>
+                            </div>
+
+                            <group>
+                                <group string="Final Version">
+                                    <field name="final_version_label" string="Version"/>
+                                    <field name="final_contract_status" string="Status"/>
+                                    <field name="final_contract_label" string="Document"/>
+                                </group>
+                                <group string="Execution">
+                                    <field name="execution_date" readonly="1"
+                                           invisible="not execution_date"/>
+                                    <field name="signature_status" readonly="1"
+                                           invisible="not signature_status"/>
+                                    <field name="signed_artifact_label" string="Signed Document"
+                                           readonly="1" invisible="not signed_artifact_available"/>
+                                    <field name="final_version_id" string="Version Record"
+                                           readonly="1"
+                                           groups="clm.group_clm_user,clm.group_clm_legal"/>
+                                </group>
+                            </group>
+
+                            <!-- Signed: the artifact on file is authoritative and
+                                 is offered separately from the generated PDF. -->
+                            <div invisible="final_contract_kind != 'signed'">
+                                <div class="o_clm_actions">
+                                    <button name="action_view_final_pdf" type="object"
+                                            string="View Final Contract" class="btn-primary"
+                                            icon="fa-eye"/>
+                                    <button name="action_download_final_pdf" type="object"
+                                            string="Download PDF" class="btn-secondary"
+                                            icon="fa-file-pdf-o"/>
+                                    <button name="action_download_final_docx" type="object"
+                                            string="Download DOCX" class="btn-secondary"
+                                            icon="fa-file-word-o"/>
+                                </div>
+                                <div class="o_clm_hint">
+                                    View Final Contract opens the generated NextContract PDF.
+                                </div>
+                                <div class="alert alert-warning mt-3" role="alert"
+                                     invisible="signed_artifact_available">
+                                    <strong>No signed document on file.</strong>
+                                    This contract is marked executed, but the PDF and DOCX
+                                    above are generated from the final approved content and
+                                    are not signed artifacts.
+                                </div>
+                            </div>
+
+                            <!-- Approved, not yet signed -->
+                            <div invisible="final_contract_kind != 'approved'">
+                                <div class="o_clm_actions">
+                                    <button name="action_view_final_pdf" type="object"
+                                            string="View Contract PDF" class="btn-primary"
+                                            icon="fa-eye"/>
+                                    <button name="action_download_final_pdf" type="object"
+                                            string="Download PDF" class="btn-secondary"
+                                            icon="fa-file-pdf-o"/>
+                                    <button name="action_download_final_docx" type="object"
+                                            string="Download DOCX" class="btn-secondary"
+                                            icon="fa-file-word-o"/>
+                                </div>
+                                <div class="o_clm_hint">
+                                    This is the final approved contract. It has not been
+                                    signed yet.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ─── Version history ────────────────────────────── -->
+                    <div class="o_clm_section"
+                         groups="clm.group_clm_user,clm.group_clm_legal">
+                        <h2 class="o_clm_section_title">Document Versions</h2>
+                        <div class="o_clm_empty" invisible="version_ids">
+                            <i class="fa fa-clone" role="img" aria-label="No versions"/>
+                            <div class="o_clm_empty_title">No document versions yet</div>
+                            <div class="o_clm_empty_text">
+                                A version is captured each time the contract text is frozen.
+                                Use Create New Version on the contract to capture the current
+                                wording.
+                            </div>
+                        </div>
+                        <field name="version_ids" nolabel="1" readonly="1"
+                               invisible="not version_ids">
+                            <list create="false" delete="false" edit="false"
+                                  decoration-bf="version_type == 'executed'"
+                                  decoration-muted="status == 'superseded'">
+                                <field name="version_number" string="Version"/>
+                                <field name="version_type"/>
+                                <field name="change_classification" optional="show"/>
+                                <field name="document_id" optional="hide"/>
+                                <field name="created_by_id"/>
+                                <field name="create_date" string="Created On"/>
+                                <field name="status" widget="badge"
+                                       decoration-info="status == 'draft'"
+                                       decoration-success="status == 'active'"
+                                       decoration-muted="status == 'superseded'"/>
+                            </list>
+                        </field>
+                        <div class="o_clm_hint" invisible="not version_ids">
+                            Earlier versions stay available here and under
+                            NextContract → Contracts → Contract Versions.
+                        </div>
+                    </div>
+
+                    <!-- ─── Lifecycle history ──────────────────────────── -->
+                    <div class="o_clm_section">
+                        <h2 class="o_clm_section_title">Contract History</h2>
+                        <field name="lifecycle_history_html" nolabel="1" readonly="1"/>
+                    </div>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_clm_contract_lifecycle" model="ir.actions.act_window">
+        <field name="name">Contract Lifecycle</field>
+        <field name="res_model">clm.contract</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_clm_contract_lifecycle_form"/>
+        <field name="target">current</field>
+    </record>
+
+    <!-- ─── Entry point: a button on every row of the Contracts list ────── -->
+    <record id="view_clm_contract_list_lifecycle" model="ir.ui.view">
+        <field name="name">clm.contract.list.lifecycle</field>
+        <field name="model">clm.contract</field>
+        <field name="inherit_id" ref="clm.view_clm_contract_list"/>
+        <field name="arch" type="xml">
+            <!-- Last column, so it reads as the row's action. Clicking the row
+                 itself still opens the contract form, as it always has. -->
+            <xpath expr="//list" position="inside">
+                <button name="action_open_lifecycle" type="object"
+                        string="View Lifecycle" icon="fa-sitemap"
+                        title="Open the visual lifecycle overview for this contract"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ─── Entry point: a stat button on the contract form ─────────────── -->
+    <record id="view_clm_contract_form_lifecycle" model="ir.ui.view">
+        <field name="name">clm.contract.form.lifecycle</field>
+        <field name="model">clm.contract</field>
+        <field name="inherit_id" ref="clm.view_clm_contract_form"/>
+        <field name="arch" type="xml">
+            <!-- clm_documents already put a button box on this form; this
+                 joins it rather than adding a second one. -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_open_lifecycle" type="object"
+                        class="oe_stat_button" icon="fa-sitemap">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">View</span>
+                        <span class="o_stat_text">Lifecycle</span>
+                    </div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>

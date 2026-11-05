@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_clm_clause_admin,clm.clause.admin,model_clm_clause,clm.group_clm_legal_admin,1,1,1,1
+access_clm_clause_user,clm.clause.user,model_clm_clause,clm.group_clm_user,1,0,0,0
+access_clm_template_admin,clm.template.admin,model_clm_template,clm.group_clm_legal_admin,1,1,1,1
+access_clm_template_user,clm.template.user,model_clm_template,clm.group_clm_user,1,0,0,0
+access_clm_template_clause_line_admin,clm.template.clause.line.admin,model_clm_template_clause_line,clm.group_clm_legal_admin,1,1,1,1
+access_clm_template_clause_line_user,clm.template.clause.line.user,model_clm_template_clause_line,clm.group_clm_user,1,0,0,0
+access_clm_base_docx_preview_wizard_admin,clm.base.docx.preview.wizard.admin,model_clm_base_docx_preview_wizard,clm.group_clm_legal_admin,1,1,1,1
+access_clm_base_docx_preview_wizard_user,clm.base.docx.preview.wizard.user,model_clm_base_docx_preview_wizard,clm.group_clm_user,1,1,1,0
+access_clm_template_base_docx_version_admin,clm.template.base.docx.version.admin,model_clm_template_base_docx_version,clm.group_clm_legal_admin,1,1,1,1
+access_clm_template_base_docx_version_user,clm.template.base.docx.version.user,model_clm_template_base_docx_version,clm.group_clm_user,1,1,1,0

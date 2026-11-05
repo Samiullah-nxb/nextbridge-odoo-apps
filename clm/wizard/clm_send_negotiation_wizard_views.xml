@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_clm_send_negotiation_wizard_form" model="ir.ui.view">
+        <field name="name">clm.send.negotiation.wizard.form</field>
+        <field name="model">clm.send.negotiation.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Send to Counterparty" class="o_clm_form o_clm_dialog">
+                <group>
+                    <field name="version_id" readonly="1"/>
+                    <field name="contract_id" readonly="1"/>
+                    <field name="partner_id"/>
+                    <field name="response_deadline"/>
+                    <field name="notes"/>
+                </group>
+                <footer>
+                    <button name="action_send" type="object" string="Send for Negotiation" class="btn-primary"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

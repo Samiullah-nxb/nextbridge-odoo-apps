@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_clm_contract_form_purchase" model="ir.ui.view">
+        <field name="name">clm.contract.form.purchase</field>
+        <field name="model">clm.contract</field>
+        <field name="inherit_id" ref="clm.view_clm_contract_form"/>
+        <!--
+            Tab order on the contract form is set by view priority; see the
+            comment on clm.view_clm_contract_form. 40 is the last of the
+            contributing views, so Purchase Orders closes the operational tabs.
+        -->
+        <field name="priority">40</field>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='field_values']" position="before">
+                <!--
+                    Purchase orders are linked from the Purchase app, never
+                    created here, so the tab only appears once there is
+                    something in it.
+                -->
+                <page string="Purchase Orders" name="purchase_orders"
+                      invisible="not purchase_order_ids">
+                    <field name="purchase_order_ids" nolabel="1" readonly="1">
+                        <list>
+                            <field name="name"/>
+                            <field name="date_order"/>
+                            <field name="partner_id"/>
+                            <field name="currency_id" column_invisible="1"/>
+                            <field name="amount_total" sum="Total"/>
+                            <field name="state" widget="badge"
+                                   decoration-info="state == 'draft'"
+                                   decoration-warning="state in ('sent', 'to approve')"
+                                   decoration-success="state in ('purchase', 'done')"
+                                   decoration-danger="state == 'cancel'"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

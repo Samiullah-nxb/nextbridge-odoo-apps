@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_clm_base_docx_preview_wizard_form" model="ir.ui.view">
+        <field name="name">clm.base.docx.preview.wizard.form</field>
+        <field name="model">clm.base.docx.preview.wizard</field>
+        <field name="arch" type="xml">
+            <form class="o_clm_form o_clm_preview_dialog"
+                  create="false" delete="false" edit="false">
+                <field name="template_id" invisible="1"/>
+                <field name="document_id" invisible="1"/>
+                <field name="kind" invisible="1"/>
+                <field name="pdf_attachment_id" invisible="1"/>
+                <field name="title" invisible="1"/>
+                <field name="file_name" invisible="1"/>
+                <field name="display_name" invisible="1"/>
+                <div class="o_clm_base_docx_preview_wizard">
+                    <field name="preview_html" nolabel="1" readonly="1"
+                           widget="clm_docx_preview_html"
+                           class="o_clm_base_docx_preview_field"/>
+                </div>
+                <footer>
+                    <button name="action_download" type="object"
+                            string="Download DOCX" class="btn-primary"
+                            icon="fa-file-word-o" data-hotkey="q"/>
+                    <button name="action_download_pdf" type="object"
+                            string="Download PDF" class="btn-secondary"
+                            icon="fa-file-pdf-o"
+                            invisible="not pdf_attachment_id"/>
+                    <button string="Close" special="cancel" class="btn-secondary" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="contract_type_nda" model="clm.contract.type">
+            <field name="name">NDA</field>
+            <field name="code">nda</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="contract_type_services" model="clm.contract.type">
+            <field name="name">Services Agreement</field>
+            <field name="code">services</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="contract_type_supply" model="clm.contract.type">
+            <field name="name">Supply Agreement</field>
+            <field name="code">supply</field>
+            <field name="sequence">30</field>
+        </record>
+        <record id="contract_type_consultancy" model="clm.contract.type">
+            <field name="name">Consultancy Agreement</field>
+            <field name="code">consultancy</field>
+            <field name="sequence">40</field>
+        </record>
+        <record id="contract_type_software_saas" model="clm.contract.type">
+            <field name="name">Software/SaaS Agreement</field>
+            <field name="code">software_saas</field>
+            <field name="sequence">50</field>
+        </record>
+        <record id="contract_type_lease" model="clm.contract.type">
+            <field name="name">Lease Agreement</field>
+            <field name="code">lease</field>
+            <field name="sequence">60</field>
+        </record>
+        <record id="contract_type_addendum" model="clm.contract.type">
+            <field name="name">Addendum</field>
+            <field name="code">addendum</field>
+            <field name="sequence">70</field>
+        </record>
+        <record id="contract_type_novation" model="clm.contract.type">
+            <field name="name">Novation Agreement</field>
+            <field name="code">novation</field>
+            <field name="sequence">80</field>
+        </record>
+        <record id="contract_type_intercompany" model="clm.contract.type">
+            <field name="name">Inter-company Agreement</field>
+            <field name="code">intercompany</field>
+            <field name="sequence">90</field>
+        </record>
+        <record id="contract_type_termination_notice" model="clm.contract.type">
+            <field name="name">Termination Notice</field>
+            <field name="code">termination_notice</field>
+            <field name="sequence">100</field>
+        </record>
+        <record id="contract_type_extension_letter" model="clm.contract.type">
+            <field name="name">Extension Letter</field>
+            <field name="code">extension_letter</field>
+            <field name="sequence">110</field>
+        </record>
+        <record id="contract_type_amendment" model="clm.contract.type">
+            <field name="name">Amendment Agreement</field>
+            <field name="code">amendment</field>
+            <field name="sequence">120</field>
+        </record>
+        <record id="contract_type_procurement_po" model="clm.contract.type">
+            <field name="name">Procurement PO Terms</field>
+            <field name="code">procurement_po</field>
+            <field name="sequence">130</field>
+        </record>
+    </data>
+</odoo>

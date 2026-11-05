@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="field_def_governing_law" model="clm.contract.field.definition">
+        <field name="name">Governing Law</field>
+        <field name="code">governing_law</field>
+        <field name="value_type">char</field>
+        <field name="ai_extractable" eval="True"/>
+        <field name="ai_hint">Extract the governing law or jurisdiction clause from the contract.</field>
+    </record>
+    <record id="field_def_dispute_forum" model="clm.contract.field.definition">
+        <field name="name">Dispute Resolution Forum</field>
+        <field name="code">dispute_forum</field>
+        <field name="value_type">char</field>
+        <field name="ai_extractable" eval="True"/>
+        <field name="ai_hint">Extract the dispute resolution forum or arbitration venue.</field>
+    </record>
+    <record id="field_def_tax_treatment" model="clm.contract.field.definition">
+        <field name="name">Tax Treatment</field>
+        <field name="code">tax_treatment</field>
+        <field name="value_type">text</field>
+        <field name="ai_extractable" eval="True"/>
+    </record>
+    <record id="field_def_liability_cap" model="clm.contract.field.definition">
+        <field name="name">Limitation of Liability</field>
+        <field name="code">liability_cap</field>
+        <field name="value_type">text</field>
+        <field name="ai_extractable" eval="True"/>
+    </record>
+    <record id="field_def_indemnity" model="clm.contract.field.definition">
+        <field name="name">Indemnity Position</field>
+        <field name="code">indemnity_position</field>
+        <field name="value_type">text</field>
+        <field name="ai_extractable" eval="True"/>
+    </record>
+    <record id="field_def_confidentiality_period" model="clm.contract.field.definition">
+        <field name="name">Confidentiality Period</field>
+        <field name="code">confidentiality_period</field>
+        <field name="value_type">char</field>
+        <field name="ai_extractable" eval="True"/>
+    </record>
+    <record id="field_def_bank_guarantee" model="clm.contract.field.definition">
+        <field name="name">Performance Security / Bank Guarantee</field>
+        <field name="code">bank_guarantee</field>
+        <field name="value_type">text</field>
+        <field name="ai_extractable" eval="True"/>
+    </record>
+    <record id="field_def_insurance" model="clm.contract.field.definition">
+        <field name="name">Insurance Requirement</field>
+        <field name="code">insurance_required</field>
+        <field name="value_type">boolean</field>
+        <field name="ai_extractable" eval="True"/>
+    </record>
+    <record id="field_def_payment_milestones" model="clm.contract.field.definition">
+        <field name="name">Payment Milestones</field>
+        <field name="code">payment_milestones</field>
+        <field name="value_type">text</field>
+        <field name="ai_extractable" eval="True"/>
+    </record>
+    <record id="field_def_storage_location" model="clm.contract.field.definition">
+        <field name="name">Storage Location</field>
+        <field name="code">storage_location</field>
+        <field name="value_type">char</field>
+        <field name="ai_extractable" eval="False"/>
+    </record>
+</odoo>

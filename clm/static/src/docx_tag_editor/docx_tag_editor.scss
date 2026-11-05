@@ -1,0 +1,1242 @@
+/* Base DOCX editor — chrome follows Odoo theme; document paper stays print-white. */
+
+.o_clm_docx_editor {
+    --clm-docx-ink: #e8eaed;
+    --clm-docx-muted: #9aa0a6;
+    --clm-docx-line: rgba(255, 255, 255, 0.1);
+    /* Odoo dark-mode surface (sampled from Odoo chrome). */
+    --clm-docx-stage: #2a2e39;
+    --clm-docx-stage-border: #21232a;
+    --clm-docx-accent: var(--bs-primary, #714b67);
+    --clm-docx-accent-strong: var(--bs-primary, #714b67);
+    --clm-docx-active: rgba(255, 255, 255, 0.08);
+    --clm-docx-surface: #2a2e39;
+    --clm-docx-surface-2: #323644;
+    --clm-docx-control-border: #3e4352;
+    --clm-docx-control-text: #f8f9fa;
+    --clm-docx-placeholder: #9aa0a6;
+    --clm-docx-menu-border: #3e4352;
+    --clm-docx-menu-shadow: 0 10px 28px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.2);
+    --clm-docx-option-hover: rgba(255, 255, 255, 0.08);
+    --clm-docx-code: #c4b0be;
+    --clm-docx-label: #c0c4cc;
+    --clm-docx-warn-bg: rgba(245, 158, 11, 0.2);
+    --clm-docx-warn-fg: #fbbf24;
+    --clm-docx-error-bg: rgba(248, 113, 113, 0.16);
+    --clm-docx-error-fg: #fca5a5;
+    --clm-docx-page-shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 12px 28px rgba(0, 0, 0, 0.35);
+    --clm-docx-focus-ring: 0 0 0 0.25rem rgba(113, 75, 103, 0.35);
+
+    width: 100%;
+    max-width: 100%;
+    height: calc(100vh - 48px);
+    max-height: calc(100vh - 48px);
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    box-sizing: border-box;
+    /* Do not set `color` here — it inherits into the Wysiwyg toolbar /
+       power buttons on the white page and makes icons invisible until hover. */
+    overflow: hidden;
+}
+
+/* Break Odoo Char-field width constraints so the preview uses the full form. */
+.o_form_view .o_field_widget.o_clm_docx_field,
+.o_form_view .o_field_widget[name="docx_editor_anchor"],
+.o_form_view .o_field_clm_docx_tag_editor,
+.o_form_view .o_notebook .tab-content .o_clm_docx_field,
+.o_form_view .o_notebook .tab-content .o_field_widget:has(.o_clm_docx_editor) {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 1 1 100%;
+    display: block;
+    border: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+}
+
+.o_form_view .o_notebook .tab-pane:has(.o_clm_docx_editor) {
+    width: 100%;
+    max-width: 100%;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+.o_clm_docx_editor {
+    border: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.o_clm_docx_muted {
+    color: var(--clm-docx-muted);
+}
+
+.o_clm_docx_tag_issue {
+    color: #dc2626 !important;
+    background: rgba(220, 38, 38, 0.14) !important;
+    border-bottom: 2px solid #dc2626;
+    border-radius: 2px;
+    padding: 0 0.1em;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+}
+
+.o_clm_docx_tag_issue_warn {
+    color: #d97706 !important;
+    background: rgba(217, 119, 6, 0.14) !important;
+    border-bottom-color: #d97706;
+}
+
+.o_clm_docx_editable img.o_clm_docx_img,
+.o_clm_docx_editable img {
+    max-width: 100%;
+    max-height: 180px;
+    height: auto;
+}
+
+.o_clm_docx_bar,
+.o_clm_docx_sidebar,
+.o_clm_docx_banner {
+    color: var(--clm-docx-ink);
+}
+
+.o_clm_docx_bar {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 1rem;
+    row-gap: 0.5rem;
+    width: 100% !important;
+    max-width: 100% !important;
+    align-self: stretch;
+    flex: 0 0 auto;
+    box-sizing: border-box;
+    padding: 0.35rem 0.75rem;
+    border-radius: 0.65rem;
+    background: var(--clm-docx-surface-2);
+    border: 1px solid var(--clm-docx-line);
+}
+
+.o_clm_docx_bar_meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+    justify-self: start;
+}
+
+.o_clm_docx_filename {
+    font-size: 0.8125rem;
+    color: var(--clm-docx-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 320px;
+}
+
+.o_clm_docx_bar_actions {
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    justify-self: end;
+    gap: 0.35rem 0.45rem;
+}
+
+// The bar is always dark, so button colors must not depend on the Odoo theme.
+.o_clm_docx_bar_actions .btn {
+    --btn-disabled-opacity: 0.45;
+    font-weight: 600;
+}
+
+.o_clm_docx_bar_actions .btn-link {
+    color: var(--clm-docx-ink);
+    background: transparent;
+    border-color: transparent;
+
+    &:hover:not(:disabled) {
+        color: #fff;
+        background: var(--clm-docx-active);
+    }
+}
+
+.o_clm_docx_bar_actions .btn-secondary {
+    color: var(--clm-docx-ink);
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+
+    &:hover:not(:disabled) {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.24);
+    }
+}
+
+.o_clm_docx_bar_actions .btn-primary {
+    color: #fff;
+}
+
+.o_clm_docx_pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    background: var(--clm-docx-active);
+    color: var(--clm-docx-muted);
+}
+
+.o_clm_docx_pill_warn {
+    background: var(--clm-docx-warn-bg);
+    color: var(--clm-docx-warn-fg);
+}
+
+.o_clm_docx_banner {
+    margin: 0;
+    padding: 0.4rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.8125rem;
+    line-height: 1.35;
+    flex: 0 0 auto;
+    max-height: 28vh;
+    overflow: auto;
+}
+
+.o_clm_docx_banner_collapsed {
+    max-height: none;
+    overflow: hidden;
+}
+
+.o_clm_docx_banner_toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.o_clm_docx_banner_toggle:hover .o_clm_docx_banner_title {
+    text-decoration: underline;
+}
+
+.o_clm_docx_banner_chevron {
+    flex: 0 0 auto;
+    opacity: 0.85;
+}
+
+.o_clm_docx_banner_summary {
+    margin-top: 0.15rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    opacity: 0.9;
+}
+
+.o_clm_docx_banner_error {
+    background: var(--clm-docx-error-bg);
+    color: var(--clm-docx-error-fg);
+}
+
+.o_clm_docx_banner_warn {
+    background: var(--clm-docx-warn-bg);
+    color: var(--clm-docx-warn-fg);
+}
+
+.o_clm_docx_workspace {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: 0.75rem;
+    width: 100%;
+    min-height: 0;
+    flex: 1 1 auto;
+    align-items: stretch;
+    overflow: hidden;
+}
+
+.o_clm_docx_sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    align-self: stretch;
+    min-height: 0;
+    max-height: 100%;
+    overflow: auto;
+    padding: 0.75rem;
+    box-sizing: border-box;
+    background: var(--clm-docx-surface-2);
+    border: 1px solid var(--clm-docx-line);
+    border-radius: 0.65rem;
+}
+
+.o_clm_docx_sidebar_title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--clm-docx-muted);
+    margin-bottom: 0.15rem;
+}
+
+.o_clm_docx_sr_only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+.o_clm_docx_banner_title {
+    font-weight: 700;
+    margin-bottom: 0;
+}
+
+.o_clm_docx_banner_list {
+    margin: 0.35rem 0 0;
+    padding-left: 1.1rem;
+}
+
+.o_clm_docx_banner_hint {
+    margin-top: 0.35rem;
+    margin-bottom: 0.25rem;
+    font-size: 0.75rem;
+    opacity: 0.9;
+
+    kbd {
+        display: inline-block;
+        padding: 0.05rem 0.35rem;
+        border: 1px solid currentColor;
+        border-radius: 0.25rem;
+        font-size: 0.7rem;
+        font-family: inherit;
+        line-height: 1.2;
+    }
+
+    code {
+        font-size: 0.72rem;
+    }
+}
+
+.o_clm_docx_sidebar_blocks {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+
+/* Visible keyboard focus for accessibility (WCAG focus visible). */
+.o_clm_docx_editor :focus-visible {
+    outline: 2px solid var(--clm-docx-accent-strong) !important;
+    outline-offset: 2px !important;
+}
+
+.o_clm_docx_tag_combo_control:focus-within {
+    border-color: var(--clm-docx-accent-strong);
+    box-shadow: var(--clm-docx-focus-ring);
+}
+
+.o_clm_docx_tag_option:focus-visible {
+    background: var(--clm-docx-option-hover);
+}
+
+.o_clm_docx_sidebar_btn:focus-visible,
+.o_clm_docx_bar_actions .btn:focus-visible {
+    outline: 2px solid var(--clm-docx-accent-strong) !important;
+    outline-offset: 2px !important;
+}
+
+// The same treatment a field label gets on a form: size, weight, case and
+// tracking carry the hierarchy, and only then a step in colour.
+.o_clm_docx_sidebar_label {
+    display: block;
+    margin-top: var(--clm-space-3);
+    margin-bottom: var(--clm-space-1);
+    font-size: var(--clm-font-label);
+    font-weight: var(--clm-weight-label);
+    letter-spacing: var(--clm-tracking-label);
+    text-transform: uppercase;
+    line-height: var(--clm-label-line-height);
+    color: inherit;
+    color: color-mix(in srgb, currentColor var(--clm-text-label), transparent);
+    cursor: pointer;
+}
+
+.o_clm_docx_sidebar_hint {
+    margin-top: -0.2rem;
+    font-size: 0.68rem;
+    color: var(--clm-docx-muted);
+    line-height: 1.25;
+}
+
+.o_clm_docx_sidebar .o_clm_docx_tag_combo {
+    width: 100%;
+}
+
+.o_clm_docx_sidebar_btn {
+    width: 100%;
+    justify-content: center;
+    white-space: normal;
+    line-height: 1.25;
+}
+
+.o_clm_docx_stage {
+    background: var(--clm-docx-stage);
+    border: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+    border-radius: 0;
+    padding: 0;
+    overflow: auto;
+    min-height: 0;
+    height: 100%;
+    max-height: 100%;
+    width: 100% !important;
+    max-width: none !important;
+    box-sizing: border-box;
+}
+
+.o_clm_docx_page {
+    display: flex;
+    flex-direction: column;
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 100%;
+    height: auto;
+    margin: 0 !important;
+    box-sizing: border-box;
+    /* Always light paper — match Word / print colours. */
+    background: #ffffff;
+    color: #000000;
+    /* Bootstrap reboot sets h1–h6 to var(--bs-heading-color). In Odoo dark
+       mode that variable is light ink, which makes Header 1 invisible on
+       white paper. Pin paper typography to print-black. */
+    --bs-body-color: #000000;
+    --bs-heading-color: #000000;
+    --bs-secondary-color: #4b5563;
+    border: 0 !important;
+    outline: none !important;
+    /* No paper shadow — it reads as an outer box line. */
+    box-shadow: none !important;
+    border-radius: 0;
+    padding: 2.5rem 2.75rem 3.5rem;
+    font-family: "Calibri", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.15;
+    overflow: visible;
+}
+
+/* Keep HtmlEditor chrome (toolbar / power buttons / overlays) readable
+   on the white page — do not inherit the dark-theme ink colour. */
+.o_clm_docx_page .o-we-toolbar,
+.o_clm_docx_page .o-we-toolbar .btn,
+.o_clm_docx_page .o-we-toolbar-dropdown,
+.o_clm_docx_page .o-we-toolbar-dropdown .btn,
+.o_clm_docx_wysiwyg .o-we-toolbar,
+.o_clm_docx_wysiwyg .o-we-toolbar .btn {
+    color: #212529;
+}
+
+.o_clm_docx_page .o-we-toolbar .btn:hover,
+.o_clm_docx_wysiwyg .o-we-toolbar .btn:hover {
+    color: #000000;
+}
+
+.o_clm_docx_editor [data-oe-local-overlay-id="oe-power-buttons-overlay"] .power_button,
+.o_clm_docx_page .power_button {
+    color: #212529;
+    opacity: 0.85;
+}
+
+.o_clm_docx_editor [data-oe-local-overlay-id="oe-power-buttons-overlay"] .power_button:hover,
+.o_clm_docx_page .power_button:hover {
+    opacity: 1;
+    color: #000000;
+}
+
+.o_clm_docx_wysiwyg_wrap {
+    flex: 1 1 auto;
+    min-height: 24rem;
+    width: 100% !important;
+    max-width: none !important;
+}
+
+.o_clm_docx_wysiwyg {
+    min-height: 100%;
+    height: auto;
+    width: 100% !important;
+    max-width: none !important;
+}
+
+.o_clm_docx_wysiwyg .o-wysiwyg,
+.o_clm_docx_wysiwyg .o-wysiwyg > .flex-grow-1 {
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 24rem;
+}
+
+.o_clm_docx_editable {
+    min-height: 24rem !important;
+    outline: none;
+    font-family: "Calibri", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.35;
+    color: #000000;
+    --bs-body-color: #000000;
+    --bs-heading-color: #000000;
+}
+
+/* Header styles must stay readable on white paper even when dark-mode
+   Bootstrap heading tokens would otherwise paint them white. Intentional
+   non-light colours from DOCX still win via inline style= on spans. */
+.o_clm_docx_page h1,
+.o_clm_docx_page h2,
+.o_clm_docx_page h3,
+.o_clm_docx_page h4,
+.o_clm_docx_page h5,
+.o_clm_docx_page h6,
+.o_clm_docx_editable h1,
+.o_clm_docx_editable h2,
+.o_clm_docx_editable h3,
+.o_clm_docx_editable h4,
+.o_clm_docx_editable h5,
+.o_clm_docx_editable h6 {
+    color: #000000;
+}
+
+/* Let the form sheet expand so the Base DOCX page can use available width/height. */
+.o_form_view .o_form_sheet:has(.o_clm_docx_editor),
+.o_form_view .o_form_sheet_bg:has(.o_clm_docx_editor) .o_form_sheet {
+    max-width: none !important;
+    width: 100% !important;
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+}
+
+.o_form_view .o_notebook:has(.o_clm_docx_editor) {
+    margin-bottom: 0 !important;
+}
+
+.o_form_view .o_notebook .tab-pane:has(.o_clm_docx_editor) {
+    padding-top: 0.35rem !important;
+}
+
+.o_clm_docx_wysiwyg,
+.o_clm_docx_wysiwyg_wrap,
+.o_clm_docx_wysiwyg .o-wysiwyg,
+.o_clm_docx_editable,
+.o_clm_docx_editable:focus,
+.o_clm_docx_editable.odoo-editor-editable {
+    border: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.o_clm_docx_page_readonly {
+    opacity: 0.92;
+}
+
+.o_clm_docx_line {
+    position: relative;
+    margin: 0;
+    border-radius: 2px;
+    transition: background 0.12s ease;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.o_clm_docx_line_empty .o_clm_docx_line_input:empty::before {
+    content: attr(data-placeholder);
+    color: #9ca3af;
+    font-style: italic;
+    pointer-events: none;
+}
+
+.o_clm_docx_line_active {
+    background: var(--clm-docx-active);
+}
+
+.o_clm_docx_line_input {
+    display: block;
+    width: 100%;
+    min-height: 1.15em;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    line-height: inherit;
+    padding: 0.05rem 0.2rem;
+    margin: 0;
+    box-shadow: none !important;
+    white-space: pre-wrap;
+    word-break: break-word;
+    cursor: text;
+}
+
+.o_clm_docx_line_input:focus {
+    outline: none;
+    box-shadow: none !important;
+}
+
+.o_clm_docx_line_input span {
+    white-space: pre-wrap;
+}
+
+.o_clm_docx_header {
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.o_clm_docx_header_line {
+    margin: 0 0 0.35rem;
+    min-height: 0.5rem;
+}
+
+.o_clm_docx_img {
+    max-width: 100%;
+    max-height: 180px;
+    height: auto;
+    width: auto;
+    object-fit: contain;
+    display: inline-block;
+    vertical-align: middle;
+    background:
+        linear-gradient(45deg, #f3f4f6 25%, transparent 25%),
+        linear-gradient(-45deg, #f3f4f6 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #f3f4f6 75%),
+        linear-gradient(-45deg, transparent 75%, #f3f4f6 75%);
+    background-size: 12px 12px;
+    background-position: 0 0, 0 6px, 6px -6px, -6px 0;
+}
+
+.o_clm_docx_empty {
+    color: var(--clm-docx-muted);
+    font-style: italic;
+    font-family: system-ui, sans-serif;
+    font-size: 0.875rem;
+}
+
+.o_clm_docx_tag_combo {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    z-index: 1;
+}
+
+.o_clm_docx_tag_combo_open {
+    z-index: 50;
+}
+
+.o_clm_docx_sidebar .o_clm_docx_tag_combo_open {
+    z-index: 60;
+}
+
+// ─── Placeholder search combos ───────────────────────────────────────────────
+//
+// These are hand-built OWL comboboxes, not Odoo fields, so none of the field
+// layout system in clm_base/clm_layout.scss reaches them — they kept the boxed
+// look (1px border all round, 0.5rem radius, a filled surface) that every other
+// control in the application moved away from.
+//
+// They are rebuilt here on the SAME tokens the form fields use, so a change to
+// --clm-control-height or --clm-field-border moves these with everything else
+// rather than leaving them behind again:
+//
+//   one rule on the bottom edge, no box and no fill
+//   the value on the left edge, the chevron hard against the right
+//   --clm-control-height tall, so they match a form row
+//   focus doubles the rule in the accent colour, with no ring
+//
+.o_clm_docx_tag_combo_control {
+    display: flex;
+    align-items: center;
+    position: relative;
+    min-height: var(--clm-control-height);
+    border: 0;
+    border-bottom: var(--clm-underline-width) solid;
+    border-bottom-color: color-mix(in srgb, currentColor var(--clm-field-border), transparent);
+    border-radius: 0;
+    background: transparent;
+    transition: border-bottom-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.o_clm_docx_tag_combo_control:hover {
+    border-bottom-color: color-mix(in srgb, currentColor var(--clm-field-border-hover), transparent);
+}
+
+// Drawn as border + inset shadow rather than border-width: 2px, so the control
+// does not shift by a pixel when it takes focus.
+.o_clm_docx_tag_combo_open .o_clm_docx_tag_combo_control,
+.o_clm_docx_tag_combo_control:focus-within {
+    border-bottom-color: var(--clm-focus-ring);
+    box-shadow: inset 0 calc(-1 * var(--clm-underline-width)) 0 0 var(--clm-focus-ring);
+}
+
+// The leading magnifier indented the text, which is the one thing that would
+// still have set these apart from every other control. The placeholder already
+// says "Search …", and the chevron on the right marks it as a list.
+.o_clm_docx_tag_combo_icon {
+    display: none;
+}
+
+.o_clm_docx_tag_combo_input {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 100%;
+    border: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    color: var(--clm-docx-control-text) !important;
+    -webkit-text-fill-color: var(--clm-docx-control-text) !important;
+    caret-color: var(--clm-docx-control-text);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.35;
+    // No left padding: the value starts on the same line as the label above it.
+    // On the right, room for the chevron and the clear button.
+    padding: 0.25rem calc(var(--clm-caret-gutter) + 1.35rem) 0.25rem 0;
+    opacity: 1 !important;
+}
+
+.o_clm_docx_tag_combo_input::placeholder {
+    color: var(--clm-docx-placeholder) !important;
+    -webkit-text-fill-color: var(--clm-docx-placeholder) !important;
+    opacity: 1;
+}
+
+.o_clm_docx_tag_combo_input::-webkit-search-cancel-button {
+    display: none;
+}
+
+.o_clm_docx_tag_combo_input:disabled {
+    cursor: not-allowed;
+    opacity: 0.6 !important;
+}
+
+.o_clm_docx_tag_combo_clear,
+.o_clm_docx_tag_combo_toggle {
+    flex: 0 0 auto;
+    border: 0;
+    background: transparent;
+    color: var(--clm-docx-muted);
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+}
+
+.o_clm_docx_tag_combo_clear {
+    position: absolute;
+    right: var(--clm-caret-gutter);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.35rem;
+    height: 1.35rem;
+    border-radius: 0.3rem;
+    font-size: 1rem;
+}
+
+// The chevron sits where every other dropdown in the application puts it: hard
+// against the right edge, centred on the control. It is drawn as the same CSS
+// triangle (o-caret-down, $caret-width 4px) the form fields draw, so the glyph
+// matches rather than merely resembling it.
+.o_clm_docx_tag_combo_toggle {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: var(--clm-caret-gutter);
+    height: 1.5rem;
+    border-radius: 0;
+    font-size: 0;          // hide whatever glyph the template supplies
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.o_clm_docx_tag_combo_toggle::after {
+    content: "";
+    width: 0;
+    height: 0;
+    border-left: var(--clm-caret-size) solid transparent;
+    border-right: var(--clm-caret-size) solid transparent;
+    border-top: var(--clm-caret-size) solid currentColor;
+}
+
+.o_clm_docx_tag_combo_clear:hover,
+.o_clm_docx_tag_combo_toggle:hover:not(:disabled) {
+    color: var(--clm-docx-ink);
+    background: var(--clm-docx-active);
+}
+
+.o_clm_docx_tag_combo_toggle:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.o_clm_docx_tag_menu {
+    position: absolute;
+    top: calc(100% + 0.35rem);
+    left: 0;
+    right: 0;
+    z-index: 1;
+    max-height: 360px;
+    overflow: auto;
+    padding: 0.4rem;
+    border-radius: 0.65rem;
+    border: 1px solid var(--clm-docx-menu-border);
+    background: var(--clm-docx-surface);
+    box-shadow: var(--clm-docx-menu-shadow);
+    color: var(--clm-docx-ink);
+}
+
+.o_clm_docx_tag_menu_meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.2rem 0.45rem 0.45rem;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--clm-docx-muted);
+}
+
+.o_clm_docx_tag_menu_hint {
+    font-weight: 500;
+    opacity: 0.85;
+}
+
+.o_clm_docx_tag_empty {
+    padding: 0.85rem 0.55rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--clm-docx-muted);
+    line-height: 1.4;
+}
+
+.o_clm_docx_tag_group + .o_clm_docx_tag_group {
+    margin-top: 0.35rem;
+    padding-top: 0.35rem;
+    border-top: 1px solid var(--clm-docx-line);
+}
+
+.o_clm_docx_tag_group_label {
+    padding: 0.2rem 0.45rem 0.35rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--clm-docx-muted);
+}
+
+.o_clm_docx_tag_option {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.1rem;
+    width: 100%;
+    text-align: left;
+    border: 0;
+    border-radius: 0.45rem;
+    background: transparent;
+    padding: 0.45rem 0.55rem;
+    cursor: pointer;
+    color: inherit;
+}
+
+.o_clm_docx_tag_option:hover,
+.o_clm_docx_tag_option_active {
+    background: var(--clm-docx-option-hover);
+}
+
+.o_clm_docx_tag_option code {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--clm-docx-code);
+    background: transparent;
+    padding: 0;
+    line-height: 1.3;
+}
+
+.o_clm_docx_tag_option > span,
+.o_clm_docx_tag_option_label {
+    font-size: 0.8rem;
+    font-weight: 650;
+    color: var(--clm-docx-ink);
+    line-height: 1.3;
+}
+
+.o_clm_docx_tag_option_snippet {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.o_clm_docx_tag_option_snippet .o_clm_docx_tag_option_label {
+    font-size: 0.8rem;
+    font-weight: 650;
+    color: var(--clm-docx-ink);
+}
+
+@media (max-width: 992px) {
+    .o_clm_docx_editor {
+        height: auto;
+        max-height: none;
+        overflow: visible;
+    }
+
+    .o_clm_docx_workspace {
+        grid-template-columns: 1fr;
+        min-height: 0;
+        overflow: visible;
+    }
+
+    .o_clm_docx_sidebar {
+        order: -1;
+        max-height: none;
+        overflow: visible;
+    }
+
+    .o_clm_docx_stage {
+        max-height: 70vh;
+        min-height: 20rem;
+    }
+
+    .o_clm_docx_tag_combo {
+        width: 100%;
+    }
+
+    .o_clm_docx_page {
+        padding: 1.75rem 1.5rem 2.5rem;
+    }
+}
+
+/* Shared native PDF.js preview (Document Template + contracts). */
+.o_clm_pdf_preview {
+    max-width: none;
+    width: 100%;
+    margin: 0;
+}
+
+.o_clm_pdf_toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    margin: 0 0 8px;
+}
+
+.o_clm_pdf_fullscreen_btn {
+    display: inline-flex;
+    align-items: center;
+}
+
+.o_clm_pdf_open_tab {
+    color: #0b5ed7 !important;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+
+    &:hover,
+    &:focus {
+        color: #084298 !important;
+    }
+}
+
+.o_clm_pdf_viewer_frame {
+    width: 100%;
+    height: #{'min(78vh, 920px)'};
+    min-height: 480px;
+    background: #525659;
+    border: 1px solid #c5c8ce;
+    border-radius: 2px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.o_clm_pdf_viewer_frame:fullscreen,
+.o_clm_pdf_viewer_frame:-webkit-full-screen {
+    width: 100vw;
+    height: 100vh;
+    border: 0;
+    border-radius: 0;
+    background: #323639;
+}
+
+.o_clm_pdf_iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #525659;
+}
+
+.o_clm_pdf_text_layer {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: pre-wrap;
+    border: 0;
+}
+
+.o_dialog .o_clm_preview_dialog {
+    .modal-body,
+    .o_form_view,
+    .o_form_view .o_form_sheet_bg,
+    .o_form_view .o_form_sheet {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        max-width: none !important;
+        width: 100% !important;
+    }
+
+    .o_clm_preview_pdf {
+        padding-left: 8px;
+        padding-right: 8px;
+        width: 100%;
+        max-width: none;
+        box-sizing: border-box;
+    }
+
+    .o_clm_pdf_viewer_frame {
+        height: #{'min(80vh, 960px)'};
+        width: 100%;
+    }
+
+    // Field widgets in this dialog must not shrink to a page-width card.
+    .o_clm_base_docx_preview_wizard,
+    .o_clm_base_docx_preview_field,
+    .o_clm_docx_preview_html_field,
+    .o_field_widget {
+        width: 100% !important;
+        max-width: none !important;
+    }
+}
+
+/* Base DOCX history preview modal */
+.o_clm_base_docx_preview_wizard {
+    width: 100%;
+    max-width: none;
+
+    .o_clm_base_docx_preview_meta {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+        min-width: 0;
+        padding: 0 12px;
+    }
+
+    .o_clm_base_docx_preview_title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        margin-bottom: 0 !important;
+    }
+
+    .o_clm_base_docx_preview_filename {
+        color: var(--o-gray-500, #6c757d);
+        margin-bottom: 0 !important;
+        word-break: break-all;
+    }
+}
+
+// HTML-extract fallback only (inner wrapper from the wizard). PDF.js must not
+// inherit this scroll-card — that was the narrow white box in the dialog.
+.o_clm_base_docx_preview_body {
+    max-height: 560px;
+    overflow: auto;
+    border: 1px solid var(--border-color, #dee2e6);
+    border-radius: 0.5rem;
+    padding: 1rem 1.15rem;
+    background: #fff;
+    color: #1a1a1a;
+
+    .o_clm_docx_header {
+        margin-bottom: 0.75rem;
+    }
+
+    .o_clm_docx_preview_sep {
+        display: none !important;
+    }
+
+    .o_clm_docx_img {
+        max-height: 220px;
+    }
+
+    p, h1, h2, h3, h4, li {
+        margin-bottom: 0.45rem;
+    }
+}
+
+.o_clm_docx_preview_html_field {
+    width: 100%;
+    max-width: none;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    max-height: none;
+    overflow: visible;
+}
+
+.o_clm_base_docx_history_actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+// Side-by-side: standard many2one (same as Contract Type) + Upload button outside.
+.o_clm_base_docx_row {
+    display: flex !important;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+
+    > .o_field_widget.o_field_many2one {
+        flex: 1 1 0%;
+        min-width: 0;
+        width: auto !important;
+        max-width: none;
+    }
+
+    > .o_field_widget.o_clm_base_docx_upload_field {
+        flex: 0 0 auto;
+        width: auto !important;
+        margin: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+}
+
+.o_clm_base_docx_upload_btn {
+    white-space: nowrap;
+}
+
+.o_clm_base_docx_versions {
+    width: 100%;
+    max-width: 100%;
+    margin: 0.75rem 0 1rem;
+    clear: both;
+
+    .o_clm_base_docx_versions_list,
+    .o_list_view,
+    .o_list_table,
+    .o_field_x2many,
+    .o_field_one2many {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .o_clm_exclusive_active {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 1.5rem;
+        margin-inline: auto;
+
+        .form-check-input {
+            width: 1.1rem;
+            height: 1.1rem;
+            margin: 0;
+            cursor: pointer;
+            accent-color: var(--o-cc1-btn-primary, #714b67);
+        }
+    }
+
+    // Center Active checkboxes under the column header (Odoo booleans default right).
+    .o_list_table,
+    .o_clm_base_docx_versions_table {
+        thead th {
+            white-space: nowrap;
+            text-overflow: clip;
+            overflow: visible;
+            text-transform: none;
+            letter-spacing: normal;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            vertical-align: bottom;
+            padding-inline: 0.45rem;
+        }
+
+        td:has(.o_clm_exclusive_active),
+        .o_data_cell:has(.o_clm_exclusive_active),
+        .o_data_cell.o_clm_exclusive_active_field,
+        thead th[data-name="is_active"] {
+            text-align: center !important;
+        }
+
+        thead th[data-name="is_used"],
+        thead th[data-name="is_active"] {
+            text-align: center !important;
+        }
+
+        td.o_clm_docx_version_used_col,
+        td.o_clm_docx_version_active_col {
+            text-align: center !important;
+            vertical-align: middle !important;
+        }
+
+        td.o_clm_docx_version_used_col .o_field_widget.o_clm_used_icon_field {
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            width: 100% !important;
+            margin-inline: auto;
+            min-height: 0;
+        }
+
+        .o_clm_used_icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-height: 1.5rem;
+            font-size: 1.05rem;
+            line-height: 1;
+
+            .fa-check {
+                color: var(--o-success, #28a745);
+            }
+
+            .o_clm_used_icon_no {
+                color: var(--o-danger, #dc3545);
+                opacity: 1;
+            }
+        }
+
+        .o_field_widget.o_clm_exclusive_active_field {
+            display: flex !important;
+            justify-content: center;
+            width: 100%;
+        }
+    }
+
+    .o_clm_base_docx_active_check {
+        padding: 0.15rem 0.35rem !important;
+        min-width: 1.75rem;
+        font-size: 1.1rem !important;
+        line-height: 1 !important;
+
+        .fa-check-square {
+            color: var(--o-cc1-btn-primary, #714b67);
+        }
+    }
+}

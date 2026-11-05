@@ -1,0 +1,558 @@
+// Part of NextContract. See LICENSE file for full copyright and licensing details.
+//
+// Draftable-style side-by-side document compare + optional PDF preview panes.
+
+.o_clm_comparison_form {
+    .o_clm_redline_field,
+    .o_clm_changes_field {
+        margin-top: var(--clm-space-2, 0.5rem);
+
+        .o_field_html,
+        .o_readonly,
+        .note-editable,
+        .odoo-editor-editable {
+            max-width: 100%;
+        }
+
+        .o_field_html {
+            border: 0;
+            background: transparent;
+        }
+    }
+
+    .o_clm_fact_value.text-success {
+        color: #16a34a !important;
+    }
+
+    .o_clm_fact_value.text-danger {
+        color: #dc2626 !important;
+    }
+
+    .o_clm_fact_value.o_clm_fact_zero {
+        color: color-mix(in srgb, currentColor 55%, transparent) !important;
+        font-weight: 600;
+    }
+
+    .o_clm_hint {
+        margin-bottom: 0.75rem;
+        font-size: 0.875rem;
+        color: color-mix(in srgb, currentColor 60%, transparent);
+    }
+
+    .o_clm_pdf_compare_section {
+        margin-top: var(--clm-space-4, 1rem);
+    }
+
+    .o_clm_pdf_compare_header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .o_clm_pdf_compare_banner {
+        flex: 1 1 auto;
+        min-width: 0;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.65rem;
+        padding: 0.65rem 0.85rem;
+        border-radius: 8px;
+        border: 1px solid color-mix(in srgb, #2563eb 28%, transparent);
+        background: color-mix(in srgb, #2563eb 10%, transparent);
+        color: color-mix(in srgb, currentColor 88%, transparent);
+    }
+
+    .o_clm_pdf_compare_banner_icon {
+        flex-shrink: 0;
+        margin-top: 0.15rem;
+        color: #2563eb;
+        font-size: 1rem;
+    }
+
+    .o_clm_pdf_compare_banner_body {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .o_clm_pdf_compare_banner_title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        line-height: 1.3;
+    }
+
+    .o_clm_pdf_compare_banner_legend {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.35rem 0.45rem;
+        font-size: 0.8125rem;
+        line-height: 1.35;
+        color: color-mix(in srgb, currentColor 72%, transparent);
+    }
+
+    .o_clm_pdf_compare_banner_sep {
+        opacity: 0.55;
+    }
+
+    .o_clm_pdf_compare_swatch {
+        display: inline-block;
+        width: 0.7rem;
+        height: 0.7rem;
+        border-radius: 2px;
+        flex-shrink: 0;
+    }
+
+    .o_clm_pdf_compare_swatch_del {
+        background: #e11d48;
+        box-shadow: 0 0 0 1px rgba(185, 28, 28, 0.25);
+    }
+
+    .o_clm_pdf_compare_swatch_add {
+        background: #16a34a;
+        box-shadow: 0 0 0 1px rgba(21, 128, 61, 0.25);
+    }
+
+    .o_clm_compare_fullscreen_btn {
+        display: inline-flex;
+        align-items: center;
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
+
+    // Primary PDF side-by-side compare: Original | Draftable minimap | Revised
+    .o_clm_pdf_compare_row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 22px minmax(0, 1fr);
+        gap: 0.35rem;
+        align-items: stretch;
+        margin-top: 0.5rem;
+        flex: 1;
+        min-height: 0;
+    }
+
+    @media (max-width: 991.98px) {
+        .o_clm_pdf_compare_row {
+            grid-template-columns: 1fr;
+        }
+
+        .o_clm_pdf_compare_gutter_wrap {
+            display: none;
+        }
+    }
+
+    .o_clm_pdf_compare_gutter_wrap {
+        width: 22px;
+        min-width: 22px !important;
+        max-width: 22px;
+        min-height: 0;
+        align-self: stretch;
+        display: flex !important;
+        flex-direction: column;
+        // Align gutter with PDF viewer area (below version label + toolbar).
+        padding-top: 4.75rem;
+        box-sizing: border-box;
+
+        .o_field_widget,
+        .o_field_html,
+        .o_readonly {
+            display: block !important;
+            width: 100% !important;
+            height: 100% !important;
+            min-height: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: 0 !important;
+            background: transparent !important;
+        }
+    }
+
+    // Fixed-height minimap track (does not scroll with the PDFs).
+    .o_clm_pdf_compare_gutter {
+        flex: 1 1 auto;
+        width: 100%;
+        min-height: 480px;
+        height: 65vh;
+        overflow: hidden;
+        position: relative;
+        background: #eceef2;
+        border: 1px solid #c5c9d1;
+        border-radius: 2px;
+        cursor: pointer;
+        touch-action: none;
+        user-select: none;
+
+        &.o_clm_gutter_dragging {
+            cursor: grabbing;
+        }
+    }
+
+    // Draggable grey thumb = currently visible page range.
+    .o_clm_pdf_gutter_viewport {
+        position: absolute;
+        left: 1px;
+        right: 1px;
+        top: 0;
+        height: 40%;
+        background: #c5cad3;
+        border: 1px solid #9aa3b0;
+        border-radius: 2px;
+        pointer-events: none; // gutter handles drag hit-testing
+        z-index: 1;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+
+        &.is-dragging {
+            background: #b0b7c4;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+    }
+
+    .o_clm_pdf_gutter_rail {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+        pointer-events: none;
+
+        .o_field_widget,
+        .o_field_html,
+        .o_readonly {
+            display: contents !important;
+        }
+    }
+
+    // Thin horizontal change ticks (Draftable-style).
+    .o_clm_pdf_gutter_tick {
+        position: absolute;
+        left: 3px;
+        right: 3px;
+        height: 2px !important;
+        min-height: 2px !important;
+        border-radius: 0;
+        pointer-events: none;
+        z-index: 2;
+    }
+
+    .o_clm_pdf_gutter_del {
+        background: #e11d48;
+    }
+
+    .o_clm_pdf_gutter_add {
+        background: #16a34a;
+    }
+
+    .o_clm_pdf_gutter_chg {
+        background: #e11d48;
+    }
+
+    .o_clm_pdf_compare_col {
+        min-width: 0;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--clm-border, color-mix(in srgb, currentColor 16%, transparent));
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .o_clm_compare_pdf_label {
+        padding: 0.55rem 0.85rem 0.25rem;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        // Separator sits under the toolbar (not between label and Fullscreen).
+        border-bottom: 0;
+    }
+
+    // Comparison page only: keep Fullscreen / Open-in-tab clear of the divider.
+    .o_clm_pdf_compare_col .o_clm_pdf_toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+        margin: 0.35rem 0.85rem 0 !important;
+        padding: 0 0 0.7rem !important;
+        border-bottom: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+    }
+
+    .o_clm_pdf_compare_col .o_clm_pdf_preview,
+    .o_clm_pdf_compare_col .o_field_html,
+    .o_clm_pdf_compare_col .o_clm_pdf_viewer_frame {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .o_clm_pdf_compare_col .o_clm_pdf_viewer_frame {
+        height: auto;
+        min-height: 480px;
+        border-top: 0;
+    }
+
+    .o_clm_pdf_iframe {
+        width: 100%;
+        height: 65vh;
+        min-height: 480px;
+        border: 0;
+        background: #525659;
+        flex: 1;
+    }
+
+    // Hide default scrollbars — middle minimap is the scroll affordance.
+    .o_clm_pdf_compare_col,
+    .o_clm_pdf_compare_col .o_clm_pdf_preview,
+    .o_clm_pdf_compare_col .o_clm_pdf_viewer_frame,
+    .o_clm_pdf_compare_col .o_clm_pdf_iframe {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+
+        &::-webkit-scrollbar {
+            width: 0 !important;
+            height: 0 !important;
+            display: none !important;
+        }
+    }
+}
+
+// Native fullscreen + CSS fallback (when requestFullscreen is blocked)
+.o_clm_pdf_compare_section:fullscreen,
+.o_clm_pdf_compare_section:-webkit-full-screen,
+.o_clm_pdf_compare_section.o_clm_compare_fs_active {
+    display: flex !important;
+    flex-direction: column;
+    width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    margin: 0;
+    padding: 0.75rem 1rem 1rem;
+    box-sizing: border-box;
+    background: #1e1f22;
+    color: #f3f4f6;
+    overflow: hidden;
+    z-index: 2000;
+
+    .o_clm_pdf_compare_header {
+        flex: 0 0 auto;
+        margin-bottom: 0.65rem;
+    }
+
+    .o_clm_section_title,
+    .o_clm_hint,
+    .o_clm_compare_pdf_label {
+        color: #f3f4f6;
+    }
+
+    .o_clm_hint {
+        color: color-mix(in srgb, #f3f4f6 65%, transparent);
+    }
+
+    .o_clm_pdf_compare_banner {
+        border-color: color-mix(in srgb, #60a5fa 35%, transparent);
+        background: color-mix(in srgb, #3b82f6 16%, transparent);
+        color: #e5e7eb;
+    }
+
+    .o_clm_pdf_compare_banner_icon {
+        color: #93c5fd;
+    }
+
+    .o_clm_pdf_compare_banner_legend {
+        color: color-mix(in srgb, #f3f4f6 72%, transparent);
+    }
+
+    // Explicit remaining viewport height — Odoo field wrappers break flex chains.
+    .o_clm_pdf_compare_row {
+        flex: 1 1 auto;
+        min-height: 0;
+        height: calc(100vh - 5.5rem) !important;
+        margin-top: 0;
+        gap: 0.55rem;
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) 22px minmax(0, 1fr);
+        grid-template-rows: minmax(0, 1fr);
+        align-items: stretch;
+    }
+
+    .o_clm_pdf_compare_gutter_wrap {
+        padding-top: 4.75rem;
+        height: 100%;
+        min-height: 0;
+        width: 22px;
+        min-width: 22px !important;
+    }
+
+    .o_clm_pdf_compare_gutter {
+        height: 100% !important;
+        min-height: 0 !important;
+        background: #3a3d44;
+        border-color: #4a4e57;
+    }
+
+    .o_clm_pdf_gutter_viewport {
+        background: #5c616c;
+        opacity: 0.9;
+    }
+
+    .o_clm_pdf_compare_col {
+        min-height: 0 !important;
+        height: 100% !important;
+        background: #2b2d31;
+        border-color: #3f4248;
+        border-radius: 6px;
+        display: flex !important;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    // Stretch every Odoo / preview wrapper so the iframe can fill the column.
+    .o_clm_pdf_compare_col > *,
+    .o_clm_pdf_compare_col .o_field_widget,
+    .o_clm_pdf_compare_col .o_field_html,
+    .o_clm_pdf_compare_col .o_readonly,
+    .o_clm_pdf_compare_col .o_clm_compare_pdf_pane,
+    .o_clm_pdf_compare_col .o_clm_pdf_preview,
+    .o_clm_pdf_compare_col .o_clm_pdf_viewer_frame {
+        display: flex !important;
+        flex-direction: column !important;
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        height: 100% !important;
+        max-height: 100% !important;
+        width: 100%;
+        margin: 0 !important;
+        box-sizing: border-box;
+    }
+
+    .o_clm_compare_pdf_label,
+    .o_clm_pdf_toolbar {
+        flex: 0 0 auto !important;
+        height: auto !important;
+        max-height: none !important;
+    }
+
+    .o_clm_pdf_compare_col .o_clm_pdf_toolbar {
+        margin: 0.35rem 0.85rem 0 !important;
+        padding: 0 0 0.7rem !important;
+        border-bottom-color: #3f4248;
+    }
+
+    .o_clm_pdf_compare_col .o_clm_pdf_viewer_frame {
+        border: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        min-height: 0 !important;
+        // Override library min(78vh, 920px) fixed height.
+        height: 100% !important;
+    }
+
+    .o_clm_pdf_iframe {
+        flex: 1 1 auto !important;
+        width: 100% !important;
+        height: 100% !important;
+        min-height: 0 !important;
+        max-height: none !important;
+    }
+
+    .o_clm_pdf_toolbar .o_clm_pdf_fullscreen_btn {
+        display: none;
+    }
+}
+
+.o_clm_pdf_compare_section.o_clm_compare_fs_active {
+    position: fixed;
+    inset: 0;
+}
+
+body.o_clm_compare_fs_open {
+    overflow: hidden;
+}
+
+// Asset-level overrides so already-generated HTML stays readable in dark mode
+.o_clm_doc_compare {
+    .o_clm_doc_line_del .o_clm_doc_line_inner {
+        background: rgba(220, 38, 38, 0.22) !important;
+    }
+
+    .o_clm_doc_line_add .o_clm_doc_line_inner {
+        background: rgba(34, 197, 94, 0.22) !important;
+    }
+
+    del {
+        color: inherit !important;
+        background: rgba(220, 38, 38, 0.4) !important;
+        text-decoration: line-through;
+    }
+
+    ins {
+        color: inherit !important;
+        background: rgba(34, 197, 94, 0.4) !important;
+        text-decoration: none !important;
+        font-weight: 600;
+    }
+}
+
+.o_dark .o_clm_doc_compare,
+.o_web_client.o_dark .o_clm_doc_compare,
+html[data-color-scheme="dark"] .o_clm_doc_compare {
+    del {
+        color: #fecaca !important;
+    }
+
+    ins {
+        color: #dcfce7 !important;
+    }
+
+    .o_clm_doc_stat_del {
+        color: #fca5a5 !important;
+    }
+
+    .o_clm_doc_stat_add {
+        color: #86efac !important;
+    }
+}
+
+.o_dark .o_clm_comparison_form,
+.o_form_dark .o_clm_comparison_form,
+html[data-color-scheme="dark"] .o_clm_comparison_form {
+    .o_clm_fact_value.text-success {
+        color: #86efac !important;
+    }
+
+    .o_clm_fact_value.text-danger {
+        color: #fca5a5 !important;
+    }
+}
+
+.o_clm_redline {
+    del {
+        color: inherit !important;
+        background: color-mix(in srgb, #dc2626 38%, transparent) !important;
+    }
+
+    ins {
+        color: inherit !important;
+        background: color-mix(in srgb, #16a34a 38%, transparent) !important;
+        font-weight: 600;
+        text-decoration: none !important;
+    }
+}
+
+.o_dark .o_clm_redline,
+.o_web_client.o_dark .o_clm_redline,
+html[data-color-scheme="dark"] .o_clm_redline {
+    del {
+        color: #fecaca !important;
+        background: rgba(220, 38, 38, 0.45) !important;
+    }
+
+    ins {
+        color: #dcfce7 !important;
+        background: rgba(34, 197, 94, 0.45) !important;
+    }
+}

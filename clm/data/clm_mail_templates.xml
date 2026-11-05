@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Light-only color-scheme + bgcolor tables so dark-mode clients do not invert branding -->
+
+        <record id="mail_template_clm_intake_submitted" model="mail.template">
+            <field name="name">NextContract: Intake Request Submitted</field>
+            <field name="model_id" ref="model_clm_contract_request"/>
+            <field name="subject">NextContract Intake Submitted: {{ object.request_ref }} — {{ object.name }}</field>
+            <field name="description">Sent to Legal when a business user submits a contract request.</field>
+            <field name="body_html" type="html">
+<div style="margin:0;padding:0;background:#f3f4f6;">
+  <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">
+    <meta name="color-scheme" content="light only"/>
+    <meta name="supported-color-schemes" content="light"/>
+  </div>
+  <style>
+    :root { color-scheme: light only; supported-color-schemes: light; }
+  </style>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f3f4f6" style="background-color:#f3f4f6 !important;padding:24px 12px;font-family:Arial,Helvetica,sans-serif;">
+    <tr><td align="center">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="max-width:600px;width:100%;background-color:#ffffff !important;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;">
+        <tr>
+          <td bgcolor="#4f46e5" style="background-color:#4f46e5 !important;padding:18px 24px;color:#ffffff !important;">
+            <div style="font-size:13px;letter-spacing:0.04em;color:#ffffff !important;opacity:0.95;">CONTRACT LIFECYCLE MANAGEMENT</div>
+            <div style="font-size:20px;font-weight:bold;margin-top:4px;color:#ffffff !important;">New Intake Request Submitted</div>
+          </td>
+        </tr>
+        <tr>
+          <td bgcolor="#ffffff" style="background-color:#ffffff !important;padding:24px;color:#1f2937 !important;font-size:14px;line-height:1.5;">
+            <p style="margin:0 0 12px 0;color:#1f2937 !important;">Hello Legal Team,</p>
+            <p style="margin:0 0 16px 0;color:#1f2937 !important;">A new contract request needs intake screening.</p>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:0 0 20px 0;">
+              <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;width:40%;">Request ID</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;font-weight:bold;color:#111827 !important;"><t t-out="object.request_ref or ''"/></td></tr>
+              <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;">Title</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#111827 !important;"><t t-out="object.name or ''"/></td></tr>
+              <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;">Requester</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#111827 !important;"><t t-out="object.requester_id.name or ''"/></td></tr>
+              <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;">Counterparty</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#111827 !important;"><t t-out="object.partner_id.name or 'Not set'"/></td></tr>
+              <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;">Contract Type</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#111827 !important;"><t t-out="object.contract_type_id.name or 'Not set'"/></td></tr>
+              <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;">Urgency</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;text-transform:capitalize;color:#111827 !important;"><t t-out="object.urgency or ''"/></td></tr>
+              <tr><td style="padding:8px 0;color:#6b7280 !important;">Estimated Value</td><td style="padding:8px 0;color:#111827 !important;"><t t-out="object.estimated_value or 0"/></td></tr>
+            </table>
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+              <td bgcolor="#4f46e5" style="background-color:#4f46e5 !important;border-radius:6px;">
+                <a t-attf-href="{{ object.get_base_url() }}/web#id={{ object.id }}&amp;model=clm.contract.request&amp;view_type=form"
+                   style="display:inline-block;padding:12px 18px;font-weight:bold;color:#ffffff !important;text-decoration:none;">
+                  Open Request in NextContract
+                </a>
+              </td>
+            </tr></table>
+          </td>
+        </tr>
+        <tr>
+          <td bgcolor="#f9fafb" style="background-color:#f9fafb !important;padding:14px 24px;color:#6b7280 !important;font-size:12px;border-top:1px solid #e5e7eb;">
+            This is an automated NextContract notification.
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</div>
+            </field>
+        </record>
+
+        <record id="mail_template_clm_intake_accepted" model="mail.template">
+            <field name="name">NextContract: Intake Request Accepted</field>
+            <field name="model_id" ref="model_clm_contract_request"/>
+            <field name="subject">NextContract Intake Accepted: {{ object.request_ref }} — {{ object.name }}</field>
+            <field name="description">Sent to requester when Legal accepts the request.</field>
+            <field name="body_html" type="html">
+<div style="margin:0;padding:0;background:#f3f4f6;">
+  <style>:root { color-scheme: light only; supported-color-schemes: light; }</style>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f3f4f6" style="background-color:#f3f4f6 !important;padding:24px 12px;font-family:Arial,Helvetica,sans-serif;">
+    <tr><td align="center">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="max-width:600px;width:100%;background-color:#ffffff !important;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;">
+        <tr>
+          <td bgcolor="#059669" style="background-color:#059669 !important;padding:18px 24px;color:#ffffff !important;">
+            <div style="font-size:13px;letter-spacing:0.04em;color:#ffffff !important;">CONTRACT LIFECYCLE MANAGEMENT</div>
+            <div style="font-size:20px;font-weight:bold;margin-top:4px;color:#ffffff !important;">Intake Request Accepted</div>
+          </td>
+        </tr>
+        <tr>
+          <td bgcolor="#ffffff" style="background-color:#ffffff !important;padding:24px;color:#1f2937 !important;font-size:14px;line-height:1.5;">
+            <p style="margin:0 0 12px 0;color:#1f2937 !important;">Hello <t t-out="object.requester_id.name or 'Requester'"/>,</p>
+            <p style="margin:0 0 16px 0;color:#1f2937 !important;">Your contract request has been <strong>accepted</strong> by Legal.</p>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:0 0 20px 0;">
+              <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;width:40%;">Request ID</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;font-weight:bold;color:#111827 !important;"><t t-out="object.request_ref or ''"/></td></tr>
+              <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;">Title</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#111827 !important;"><t t-out="object.name or ''"/></td></tr>
+              <tr><td style="padding:8px 0;color:#6b7280 !important;">Status</td><td style="padding:8px 0;color:#059669 !important;font-weight:bold;">Accepted</td></tr>
+            </table>
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+              <td bgcolor="#059669" style="background-color:#059669 !important;border-radius:6px;">
+                <a t-attf-href="{{ object.get_base_url() }}/web#id={{ object.id }}&amp;model=clm.contract.request&amp;view_type=form"
+                   style="display:inline-block;padding:12px 18px;font-weight:bold;color:#ffffff !important;text-decoration:none;">Open Request in NextContract</a>
+              </td>
+            </tr></table>
+          </td>
+        </tr>
+        <tr>
+          <td bgcolor="#f9fafb" style="background-color:#f9fafb !important;padding:14px 24px;color:#6b7280 !important;font-size:12px;border-top:1px solid #e5e7eb;">This is an automated NextContract notification.</td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</div>
+            </field>
+        </record>
+
+        <record id="mail_template_clm_intake_rejected" model="mail.template">
+            <field name="name">NextContract: Intake Request Rejected</field>
+            <field name="model_id" ref="model_clm_contract_request"/>
+            <field name="subject">NextContract Intake Rejected: {{ object.request_ref }} — {{ object.name }}</field>
+            <field name="description">Sent to requester when Legal rejects the request.</field>
+            <field name="body_html" type="html">
+<div style="margin:0;padding:0;background:#f3f4f6;">
+  <style>:root { color-scheme: light only; supported-color-schemes: light; }</style>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f3f4f6" style="background-color:#f3f4f6 !important;padding:24px 12px;font-family:Arial,Helvetica,sans-serif;">
+    <tr><td align="center">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="max-width:600px;width:100%;background-color:#ffffff !important;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;">
+        <tr>
+          <td bgcolor="#dc2626" style="background-color:#dc2626 !important;padding:18px 24px;color:#ffffff !important;">
+            <div style="font-size:13px;letter-spacing:0.04em;color:#ffffff !important;">CONTRACT LIFECYCLE MANAGEMENT</div>
+            <div style="font-size:20px;font-weight:bold;margin-top:4px;color:#ffffff !important;">Intake Request Rejected</div>
+          </td>
+        </tr>
+        <tr>
+          <td bgcolor="#ffffff" style="background-color:#ffffff !important;padding:24px;color:#1f2937 !important;font-size:14px;line-height:1.5;">
+            <p style="margin:0 0 12px 0;color:#1f2937 !important;">Hello <t t-out="object.requester_id.name or 'Requester'"/>,</p>
+            <p style="margin:0 0 16px 0;color:#1f2937 !important;">Your contract request has been <strong>rejected</strong> by Legal.</p>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:0 0 20px 0;">
+              <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;width:40%;">Request ID</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;font-weight:bold;color:#111827 !important;"><t t-out="object.request_ref or ''"/></td></tr>
+              <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;">Title</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#111827 !important;"><t t-out="object.name or ''"/></td></tr>
+              <tr><td style="padding:8px 0;color:#6b7280 !important;">Reason</td><td style="padding:8px 0;color:#111827 !important;"><t t-out="object.rejection_reason or 'Not provided'"/></td></tr>
+            </table>
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+              <td bgcolor="#dc2626" style="background-color:#dc2626 !important;border-radius:6px;">
+                <a t-attf-href="{{ object.get_base_url() }}/web#id={{ object.id }}&amp;model=clm.contract.request&amp;view_type=form"
+                   style="display:inline-block;padding:12px 18px;font-weight:bold;color:#ffffff !important;text-decoration:none;">Open Request in NextContract</a>
+              </td>
+            </tr></table>
+          </td>
+        </tr>
+        <tr>
+          <td bgcolor="#f9fafb" style="background-color:#f9fafb !important;padding:14px 24px;color:#6b7280 !important;font-size:12px;border-top:1px solid #e5e7eb;">This is an automated NextContract notification.</td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</div>
+            </field>
+        </record>
+
+        <record id="mail_template_clm_intake_converted" model="mail.template">
+            <field name="name">NextContract: Intake Converted to Contract</field>
+            <field name="model_id" ref="model_clm_contract_request"/>
+            <field name="subject">NextContract Contract Created from {{ object.request_ref }}: {{ object.contract_id.display_name }}</field>
+            <field name="description">Sent when an accepted request is converted into a contract.</field>
+            <field name="body_html" type="html">
+<div style="margin:0;padding:0;background:#f3f4f6;">
+  <style>:root { color-scheme: light only; supported-color-schemes: light; }</style>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f3f4f6" style="background-color:#f3f4f6 !important;padding:24px 12px;font-family:Arial,Helvetica,sans-serif;">
+    <tr><td align="center">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="max-width:600px;width:100%;background-color:#ffffff !important;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;">
+        <tr>
+          <td bgcolor="#4f46e5" style="background-color:#4f46e5 !important;padding:18px 24px;color:#ffffff !important;">
+            <div style="font-size:13px;letter-spacing:0.04em;color:#ffffff !important;">CONTRACT LIFECYCLE MANAGEMENT</div>
+            <div style="font-size:20px;font-weight:bold;margin-top:4px;color:#ffffff !important;">Request Converted to Contract</div>
+          </td>
+        </tr>
+        <tr>
+          <td bgcolor="#ffffff" style="background-color:#ffffff !important;padding:24px;color:#1f2937 !important;font-size:14px;line-height:1.5;">
+            <p style="margin:0 0 16px 0;color:#1f2937 !important;">Your accepted request has been converted into a formal contract.</p>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:0 0 20px 0;">
+              <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;width:40%;">Request ID</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;font-weight:bold;color:#111827 !important;"><t t-out="object.request_ref or ''"/></td></tr>
+              <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;">Contract</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#111827 !important;"><t t-out="object.contract_id.display_name or ''"/></td></tr>
+              <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;">Counterparty</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#111827 !important;"><t t-out="object.partner_id.name or 'Not set'"/></td></tr>
+              <tr><td style="padding:8px 0;color:#6b7280 !important;">Type</td><td style="padding:8px 0;color:#111827 !important;"><t t-out="object.contract_type_id.name or 'Not set'"/></td></tr>
+            </table>
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+              <td bgcolor="#4f46e5" style="background-color:#4f46e5 !important;border-radius:6px;">
+                <a t-attf-href="{{ object.get_base_url() }}/web#id={{ object.contract_id.id }}&amp;model=clm.contract&amp;view_type=form"
+                   style="display:inline-block;padding:12px 18px;font-weight:bold;color:#ffffff !important;text-decoration:none;">Open Contract in NextContract</a>
+              </td>
+            </tr></table>
+          </td>
+        </tr>
+        <tr>
+          <td bgcolor="#f9fafb" style="background-color:#f9fafb !important;padding:14px 24px;color:#6b7280 !important;font-size:12px;border-top:1px solid #e5e7eb;">This is an automated NextContract notification.</td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</div>
+            </field>
+        </record>
+    </data>
+</odoo>

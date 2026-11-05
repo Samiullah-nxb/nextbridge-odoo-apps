@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ─── Final Contract tab on the Contract form ──────────────────────── -->
+    <record id="view_clm_contract_form_final" model="ir.ui.view">
+        <field name="name">clm.contract.form.final</field>
+        <field name="model">clm.contract</field>
+        <field name="inherit_id" ref="clm.view_clm_contract_form"/>
+        <!--
+            Priority 5: the lowest of the contributing views, so Final Contract
+            is the first tab after Details. See clm.view_clm_contract_form.
+        -->
+        <field name="priority">5</field>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='field_values']" position="before">
+                <page string="Final Contract" name="final_contract">
+                    <field name="final_contract_available" invisible="1"/>
+                    <field name="final_contract_kind" invisible="1"/>
+                    <field name="signed_artifact_available" invisible="1"/>
+                    <field name="signed_artifact_is_pdf" invisible="1"/>
+
+                    <div class="o_clm_empty" invisible="final_contract_available">
+                        <i class="fa fa-file-text-o" role="img" aria-label="Not available"/>
+                        <div class="o_clm_empty_title">No final contract yet</div>
+                        <div class="o_clm_empty_text">
+                            The final contract becomes available once an approved
+                            version is prepared for signature, or once the contract
+                            has been executed.
+                        </div>
+                    </div>
+
+                    <div invisible="not final_contract_available">
+                        <group>
+                            <group string="Final Contract">
+                                <field name="final_contract_label" string="Document"/>
+                                <field name="final_version_label" string="Final Version"/>
+                                <field name="final_contract_status" string="Status"/>
+                            </group>
+                            <group string="Execution">
+                                <field name="execution_date" readonly="1"
+                                       invisible="not execution_date"/>
+                                <field name="final_version_id" string="Version Record" readonly="1"/>
+                                <field name="final_contract_document_id" string="Stored Document"
+                                       readonly="1" invisible="not final_contract_document_id"/>
+                                <field name="signed_artifact_label" string="Signed Document"
+                                       readonly="1" invisible="not signed_artifact_available"/>
+                            </group>
+                        </group>
+
+                        <!--
+                            Signed: the generated Final Contract PDF is what
+                            "View" opens; the uploaded / e-signed file is offered
+                            as a download so the two are never confused.
+                        -->
+                        <div invisible="final_contract_kind != 'signed'">
+                            <div class="o_clm_actions">
+                                <button name="action_view_final_pdf" type="object"
+                                        string="View Final Contract" class="btn-primary"
+                                        icon="fa-eye"/>
+                                <button name="action_download_final_pdf" type="object"
+                                        string="Download PDF" class="btn-secondary"
+                                        icon="fa-file-pdf-o"/>
+                                <button name="action_download_final_docx" type="object"
+                                        string="Download DOCX" class="btn-secondary"
+                                        icon="fa-file-word-o"/>
+                                <button name="action_download_signed_document" type="object"
+                                        string="Download Signed PDF (Odoo Sign)"
+                                        class="btn-secondary" icon="fa-pencil-square-o"
+                                        invisible="not signed_artifact_available"/>
+                            </div>
+                            <div class="o_clm_hint">
+                                View Final Contract opens the generated NextContract PDF.
+                                Download PDF carries each party's signature image; Download
+                                Signed PDF is the original Odoo Sign file, with the signatures
+                                on the document pages themselves.
+                            </div>
+                            <div class="alert alert-warning mt-3" role="alert"
+                                 invisible="signed_artifact_available">
+                                <strong>No signed document on file.</strong>
+                                This contract is marked executed, but the PDF and DOCX
+                                above are generated from the final approved content and
+                                are not signed artifacts.
+                            </div>
+                        </div>
+
+                        <!-- Approved but not yet signed -->
+                        <div invisible="final_contract_kind != 'approved'">
+                            <div class="o_clm_actions">
+                                <button name="action_view_final_pdf" type="object"
+                                        string="View Contract PDF" class="btn-primary"
+                                        icon="fa-eye"/>
+                                <button name="action_download_final_pdf" type="object"
+                                        string="Download PDF" class="btn-secondary"
+                                        icon="fa-file-pdf-o"/>
+                                <button name="action_download_final_docx" type="object"
+                                        string="Download DOCX" class="btn-secondary"
+                                        icon="fa-file-word-o"/>
+                            </div>
+                            <div class="o_clm_hint">
+                                This is the final approved contract. It has not been signed
+                                yet. View Contract PDF opens it without downloading.
+                            </div>
+                        </div>
+
+                        <div class="o_clm_hint">
+                            Earlier versions stay available on the Document Versions tab.
+                        </div>
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ─── Final contract access from the Contracts list ────────────────── -->
+    <record id="view_clm_contract_list_final" model="ir.ui.view">
+        <field name="name">clm.contract.list.final</field>
+        <field name="model">clm.contract</field>
+        <field name="inherit_id" ref="clm.view_clm_contract_list"/>
+        <field name="arch" type="xml">
+            <!--
+                Clicking the row opens the Contract form, as it always has. The
+                button here is deliberately a separate document action rather
+                than a second "View", so it cannot be mistaken for it.
+            -->
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="final_contract_available" column_invisible="1"/>
+                <field name="final_contract_status" string="Final Contract" optional="hide"/>
+                <button name="action_open_final_contract_wizard" type="object"
+                        string="Final Contract" icon="fa-file-text-o"
+                        invisible="not final_contract_available"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_clm_migration_record_form" model="ir.ui.view">
+        <field name="name">clm.migration.record.form</field>
+        <field name="model">clm.migration.record</field>
+        <field name="arch" type="xml">
+            <form class="o_clm_form">
+                <header>
+                    <button name="action_force_import" type="object"
+                            string="Force Import (Not a Duplicate)" class="btn-primary"
+                            icon="fa-download"
+                            invisible="state not in ('potential_duplicate', 'high_confidence_duplicate')"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="Parsed Data">
+                            <field name="vendor_name" readonly="1"/>
+                            <field name="contract_title" readonly="1"/>
+                            <field name="contract_number" readonly="1"/>
+                            <field name="effective_date" readonly="1"/>
+                            <field name="expiry_date" readonly="1"/>
+                            <field name="contract_value" readonly="1"/>
+                            <field name="document_path" readonly="1"/>
+                        </group>
+                        <group string="Validation &amp; Status">
+                            <field name="partner_id" readonly="state in ('imported', 'error')"/>
+                            <field name="imported_contract_id" invisible="not imported_contract_id"/>
+                        </group>
+                    </group>
+                    <div invisible="not validation_notes">
+                        <separator string="Validation Notes"/>
+                        <field name="validation_notes" readonly="1" nolabel="1" class="o_clm_longtext"/>
+                    </div>
+                    <div invisible="not force_import_reason">
+                        <separator string="Force Import Reason"/>
+                        <field name="force_import_reason" readonly="1" nolabel="1" class="o_clm_longtext"/>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

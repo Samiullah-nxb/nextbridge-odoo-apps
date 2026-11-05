@@ -1,0 +1,12 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_clm_ai_job_user,clm.ai.job.user,model_clm_ai_job,clm.group_clm_user,1,0,0,0
+access_clm_ai_field_suggestion_user,clm.ai.field.suggestion.user,model_clm_ai_field_suggestion,clm.group_clm_user,1,0,0,0
+access_clm_clause_deviation_user,clm.clause.deviation.user,model_clm_clause_deviation,clm.group_clm_user,1,0,0,0
+access_clm_ai_job_legal,clm.ai.job.legal,model_clm_ai_job,clm.group_clm_legal,1,1,1,1
+access_clm_ai_field_suggestion_legal,clm.ai.field.suggestion.legal,model_clm_ai_field_suggestion,clm.group_clm_legal,1,1,1,1
+access_clm_clause_deviation_legal,clm.clause.deviation.legal,model_clm_clause_deviation,clm.group_clm_legal,1,1,1,1
+access_clm_ai_mapping_wizard_user,clm.ai.mapping.wizard.user,model_clm_ai_mapping_wizard,clm.group_clm_user,1,0,0,0
+access_clm_ai_mapping_wizard_legal,clm.ai.mapping.wizard.legal,model_clm_ai_mapping_wizard,clm.group_clm_legal,1,1,1,1
+access_clm_ai_job_wizard,access_clm_ai_job_wizard,model_clm_ai_job_wizard,base.group_user,1,1,1,1
+access_clm_ai_job_field_snapshot_user,clm.ai.job.field.snapshot.user,model_clm_ai_job_field_snapshot,clm.group_clm_user,1,0,0,0
+access_clm_ai_job_field_snapshot_legal,clm.ai.job.field.snapshot.legal,model_clm_ai_job_field_snapshot,clm.group_clm_legal,1,1,1,1

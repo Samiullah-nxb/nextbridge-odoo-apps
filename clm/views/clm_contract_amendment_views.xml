@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- A signed contract is changed through an amendment, never edited in place. -->
+    <record id="view_clm_contract_form_amendment" model="ir.ui.view">
+        <field name="name">clm.contract.form.amendment</field>
+        <field name="model">clm.contract</field>
+        <field name="inherit_id" ref="clm.view_clm_contract_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_create_amendment" type="object" string="Create Amendment"
+                        icon="fa-files-o"
+                        invisible="state not in ('executed', 'active', 'expiring_soon')"
+                        groups="clm.group_clm_legal"
+                        confirm="Start an amendment? The signed version stays locked. The contract returns to Draft so the amendment can be edited, reviewed, approved and signed."/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_clm_contract_version_form_amendment" model="ir.ui.view">
+        <field name="name">clm.contract.version.form.amendment</field>
+        <field name="model">clm.contract.version</field>
+        <field name="inherit_id" ref="clm.view_clm_contract_version_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="is_signed_version" invisible="1"/>
+                <button name="action_create_amendment" type="object" string="Create Amendment"
+                        icon="fa-files-o" invisible="not is_signed_version"
+                        groups="clm.group_clm_legal"
+                        confirm="Start an amendment? The signed version stays locked. The contract returns to Draft so the amendment can be edited, reviewed, approved and signed."/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

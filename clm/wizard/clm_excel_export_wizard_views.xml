@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_clm_excel_export_wizard_form" model="ir.ui.view">
+        <field name="name">clm.excel.export.wizard.form</field>
+        <field name="model">clm.excel.export.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Export Excel" class="o_clm_form o_clm_dialog">
+                <field name="state" invisible="1"/>
+                <group invisible="state != 'choose'">
+                    <group string="What to Export">
+                        <field name="export_type"/>
+                        <field name="state_filter"/>
+                    </group>
+                    <group string="Optional Filters">
+                        <field name="contract_type_id"/>
+                        <field name="partner_id"/>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                </group>
+                <group invisible="state != 'done'">
+                    <div class="alert alert-success" role="alert" colspan="2">
+                        Export ready — <field name="record_count" class="oe_inline"/> record(s).
+                    </div>
+                    <field name="file_name" readonly="1"/>
+                    <field name="file_data" filename="file_name" readonly="1"/>
+                </group>
+                <footer>
+                    <button name="action_export" type="object" string="Generate Excel"
+                            class="btn-primary" invisible="state != 'choose'"/>
+                    <button name="action_export_again" type="object" string="Export Another"
+                            invisible="state != 'done'"/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_clm_excel_export_wizard" model="ir.actions.act_window">
+        <field name="name">Export Excel</field>
+        <field name="res_model">clm.excel.export.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Quick export from Contracts list Action menu -->
+    <record id="action_clm_excel_export_contracts_binding" model="ir.actions.act_window">
+        <field name="name">Export Excel</field>
+        <field name="res_model">clm.excel.export.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_export_type': 'contracts'}</field>
+        <field name="binding_model_id" ref="clm.model_clm_contract"/>
+        <field name="binding_view_types">list</field>
+    </record>
+</odoo>

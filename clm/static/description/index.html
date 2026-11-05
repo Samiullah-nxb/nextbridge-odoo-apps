@@ -1,0 +1,113 @@
+<section class="container py-4">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h1 class="mb-2">NextContract</h1>
+            <p class="lead">Contract lifecycle management for Odoo 19 Enterprise, from the first request to renewal,
+                with a built-in Word editor for your contract templates.</p>
+        </div>
+    </div>
+
+    <div class="row align-items-center mt-5">
+        <div class="col-md-5">
+            <h3>Edit Word templates inside Odoo</h3>
+            <p>Open a template's Document Template in a full Word editor without leaving Odoo. Copy placeholders
+                from the Tags panel, check them before saving, and keep every change as a template version.
+                The original file is never overwritten.</p>
+        </div>
+        <div class="col-md-7"><img class="img-fluid border" src="editor_screenshot.png" alt="Word editor"/></div>
+    </div>
+
+    <div class="row align-items-center mt-5">
+        <div class="col-md-5">
+            <h3>Every contract in one place</h3>
+            <p>Counterparty, type, department, owners, value and key dates, with a status that follows the contract
+                from draft request through review, negotiation, signature and activation.</p>
+        </div>
+        <div class="col-md-7"><img class="img-fluid border" src="contracts_screenshot.png" alt="Contracts list"/></div>
+    </div>
+
+    <div class="row align-items-center mt-5">
+        <div class="col-md-5">
+            <h3>Templates, clauses and document versions</h3>
+            <p>Build contracts from approved templates and clause sets. Each template keeps its Word Document
+                Template versions, and only one is active for new contracts.</p>
+        </div>
+        <div class="col-md-7"><img class="img-fluid border" src="template_screenshot.png" alt="Template document versions"/></div>
+    </div>
+
+    <div class="row align-items-center mt-5">
+        <div class="col-md-5">
+            <h3>Signature to renewal</h3>
+            <p>Generate DOCX and PDF, send for signature with Odoo Sign, then manage the live contract: amendments,
+                renewal, termination and archiving. Signed versions are locked.</p>
+        </div>
+        <div class="col-md-7"><img class="img-fluid border" src="contract_screenshot.png" alt="An active contract with its obligations"/></div>
+    </div>
+
+    <div class="row align-items-center mt-5">
+        <div class="col-md-5">
+            <h3>See where each contract stands</h3>
+            <p>The lifecycle overview shows every phase and stage of a contract and how far it has progressed.</p>
+        </div>
+        <div class="col-md-7"><img class="img-fluid border" src="lifecycle_screenshot.png" alt="Contract lifecycle"/></div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3>What is included</h3>
+            <ul>
+                <li><b>Intake</b>: contract requests, converted into draft contracts</li>
+                <li><b>Workflow</b>: approval tasks, rules and escalation</li>
+                <li><b>Library</b>: templates, clauses and Word document templates</li>
+                <li><b>Drafting</b>: draft assembly, versioned content, DOCX and PDF</li>
+                <li><b>Word Editor</b>: edit document templates inside Odoo</li>
+                <li><b>Negotiation</b>: negotiation rounds, counterparty portal, redlining and version comparison</li>
+                <li><b>Execution</b>: Odoo Sign, activation checklist, risk and obligations</li>
+                <li><b>Lifecycle</b>, <b>Reporting</b> (dashboards and Excel export), <b>Purchase</b> link,
+                    <b>Migration</b> tools</li>
+                <li><b>AI</b> (optional): field extraction and clause analysis with Google Gemini</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <h3>Requirements</h3>
+            <ul>
+                <li>Odoo <b>19.0 Enterprise</b>, self-hosted, with Documents, Sign and Employees. Purchase is needed only
+                    for the purchase order link. Not available on Odoo Online, which does not allow custom modules.</li>
+                <li>Python packages listed in <code>clm/requirements.txt</code> (<code>pip install -r clm/requirements.txt</code>). On Odoo.sh, put them in the <code>requirements.txt</code> at the root of your repository.</li>
+                <li>LibreOffice on the Odoo server for DOCX to PDF with Word layout:
+                    <code>apt-get install libreoffice-writer-nogui</code></li>
+                <li>Chrome or Edge.</li>
+            </ul>
+
+            <h3 class="mt-4">Installation</h3>
+            <ol>
+                <li>Copy all folders into your addons path.</li>
+                <li>Run <code>pip install -r requirements.txt</code> and install LibreOffice.</li>
+                <li>Restart Odoo, then install <b>NextContract</b> from Apps.</li>
+            </ol>
+            <p>Behind a reverse proxy, serve <code>.wasm</code> files as <code>application/wasm</code>, allow
+                same-origin framing (<code>X-Frame-Options: SAMEORIGIN</code>) and, if you set a Content-Security-Policy,
+                allow <code>'wasm-unsafe-eval'</code>. Use HTTPS. The Tags panel's copy button needs it.</p>
+
+            <h3 class="mt-4">Upgrading</h3>
+            <p>Back up your database and filestore, replace the module folders, then upgrade with
+                <code>-u clm</code> (or Apps, then Upgrade on <b>NextContract</b>). Refresh the browser
+                once afterwards. If the older <b>Universal Docs</b> module is still installed, uninstall it after
+                this upgrade, never before.</p>
+
+            <h3 class="mt-4">Data and privacy</h3>
+            <p>Your contracts stay in your Odoo database. AI features are optional and use Google Gemini with your own
+                API key. Contract text and files are sent to Google only after an administrator enters the key and
+                gives cloud-processing consent in Settings. Consent can be revoked there.</p>
+            <p>The Word editor runs in the browser and saves to your Odoo server. Common fonts are bundled. Choosing
+                a font that is not bundled may load it from Google Fonts, which receives the font name, not
+                document content.</p>
+
+            <h3 class="mt-4">Support</h3>
+            <p>Contact us from your Odoo Apps order page.</p>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- ─── Module Category ──────────────────────────────────────── -->
+        <record id="module_category_clm" model="ir.module.category">
+            <field name="name">NextContract</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="res_groups_privilege_clm" model="res.groups.privilege">
+            <field name="name">NextContract</field>
+            <field name="category_id" ref="module_category_clm"/>
+        </record>
+
+        <!--
+          Client roles (CONTRACT MANAGEMENT SYSTEM § User Categories):
+          h. Read-Only User
+          c. Business Requester
+          d. Procurement User
+          e. Finance User
+          f. Approver / Management
+          b. Legal Reviewer
+          a. Legal Admin
+          g. External Reviewer / Counterparty → portal access (not an internal group)
+        -->
+
+        <!-- h. Read-Only User -->
+        <record id="group_clm_read_only" model="res.groups">
+            <field name="name">NextContract: Read-Only User</field>
+            <field name="privilege_id" ref="res_groups_privilege_clm"/>
+            <field name="comment">Client role (h): view permitted contracts/reports; no edit, approve, or unrestricted download.</field>
+        </record>
+
+        <!-- c. Business Requester (xml id kept as group_clm_user for compatibility) -->
+        <record id="group_clm_user" model="res.groups">
+            <field name="name">NextContract: Business Requester</field>
+            <field name="privilege_id" ref="res_groups_privilege_clm"/>
+            <field name="implied_ids" eval="[(6, 0, [ref('group_clm_read_only')])]"/>
+            <field name="comment">Client role (c): initiate requests, upload supporting docs, track own requests, respond to Legal.</field>
+        </record>
+
+        <!-- d. Procurement User -->
+        <record id="group_clm_procurement" model="res.groups">
+            <field name="name">NextContract: Procurement User</field>
+            <field name="privilege_id" ref="res_groups_privilege_clm"/>
+            <field name="implied_ids" eval="[(6, 0, [ref('group_clm_read_only')])]"/>
+            <field name="comment">Client role (d): procurement contracts, RFP/PO/BOQ docs, vendor coordination with Legal.</field>
+        </record>
+
+        <!-- e. Finance User -->
+        <record id="group_clm_finance" model="res.groups">
+            <field name="name">NextContract: Finance User</field>
+            <field name="privilege_id" ref="res_groups_privilege_clm"/>
+            <field name="implied_ids" eval="[(6, 0, [ref('group_clm_read_only')])]"/>
+            <field name="comment">Client role (e): commercial terms, value, tax, milestones, guarantees, financial exposure.</field>
+        </record>
+
+        <!-- f. Approver / Management (xml id kept as group_clm_manager) -->
+        <record id="group_clm_manager" model="res.groups">
+            <field name="name">NextContract: Approver / Management</field>
+            <field name="privilege_id" ref="res_groups_privilege_clm"/>
+            <field name="implied_ids" eval="[(6, 0, [ref('group_clm_read_only')])]"/>
+            <field name="comment">Client role (f): view assigned contracts, approve/reject, comment, authority dashboards. Does not inherit Legal rights.</field>
+        </record>
+
+        <!-- b. Legal Reviewer -->
+        <record id="group_clm_legal" model="res.groups">
+            <field name="name">NextContract: Legal Reviewer</field>
+            <field name="privilege_id" ref="res_groups_privilege_clm"/>
+            <field name="implied_ids" eval="[(6, 0, [ref('group_clm_read_only')])]"/>
+            <field name="comment">Client role (b): review, comment, approve/reject drafts, versions, risks, advance workflow.</field>
+        </record>
+
+        <!-- a. Legal Admin — full internal NextContract rights -->
+        <record id="group_clm_legal_admin" model="res.groups">
+            <field name="name">NextContract: Legal Admin</field>
+            <field name="privilege_id" ref="res_groups_privilege_clm"/>
+            <field name="implied_ids" eval="[(6, 0, [
+                ref('group_clm_legal'),
+                ref('group_clm_user'),
+                ref('group_clm_procurement'),
+                ref('group_clm_finance'),
+                ref('group_clm_manager'),
+            ])]"/>
+            <field name="comment">Client role (a): full Legal administration — templates, clauses, workflow config, users, reporting, audit.</field>
+        </record>
+    </data>
+</odoo>

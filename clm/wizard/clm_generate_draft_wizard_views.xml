@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_clm_generate_draft_wizard_form" model="ir.ui.view">
+        <field name="name">clm.generate.draft.wizard.form</field>
+        <field name="model">clm.generate.draft.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generate Draft" class="o_clm_form o_clm_dialog">
+                <group>
+                    <field name="contract_id" readonly="1"/>
+                    <field name="renderer"/>
+                </group>
+                <footer>
+                    <button name="action_generate" type="object" string="Generate" class="btn-primary"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

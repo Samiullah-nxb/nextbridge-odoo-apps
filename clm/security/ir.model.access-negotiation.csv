@@ -1,0 +1,12 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_clm_negotiation_round_user,clm.negotiation.round.user,model_clm_negotiation_round,clm.group_clm_user,1,0,0,0
+access_clm_negotiation_round_admin,clm.negotiation.round.admin,model_clm_negotiation_round,clm.group_clm_legal_admin,1,1,1,1
+access_clm_contract_portal_access_admin,clm.contract.portal.access.admin,model_clm_contract_portal_access,clm.group_clm_legal_admin,1,1,1,1
+access_clm_document_comparison_admin,clm.document.comparison.admin,model_clm_document_comparison,clm.group_clm_legal_admin,1,1,1,1
+access_clm_document_comparison_user,clm.document.comparison.user,model_clm_document_comparison,clm.group_clm_user,1,1,1,0
+access_clm_document_comparison_legal,clm.document.comparison.legal,model_clm_document_comparison,clm.group_clm_legal,1,1,1,0
+access_clm_contract_portal,clm.contract.portal,clm.model_clm_contract,base.group_portal,1,0,0,0
+access_clm_send_negotiation_wizard_admin,clm.send.negotiation.wizard.admin,model_clm_send_negotiation_wizard,clm.group_clm_legal_admin,1,1,1,1
+access_clm_send_negotiation_wizard_user,clm.send.negotiation.wizard.user,model_clm_send_negotiation_wizard,clm.group_clm_user,1,1,1,1
+access_clm_negotiation_round_portal,clm.negotiation.round.portal,model_clm_negotiation_round,base.group_portal,1,0,0,0
+access_clm_contract_portal_access_portal,clm.contract.portal.access.portal,model_clm_contract_portal_access,base.group_portal,1,0,0,0

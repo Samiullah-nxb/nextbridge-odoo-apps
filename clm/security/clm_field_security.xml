@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="rule_clm_field_value_user" model="ir.rule">
+            <field name="name">Contract Field Value: Business Requester</field>
+            <field name="model_id" ref="model_clm_contract_field_value"/>
+            <field name="groups" eval="[(4, ref('clm.group_clm_user'))]"/>
+            <field name="domain_force">[
+                '&amp;',
+                ('is_confidential', '=', False),
+                '&amp;',
+                ('contract_id.company_id', 'in', company_ids),
+                '|', '|', '|',
+                ('contract_id.user_id', '=', user.id),
+                ('contract_id.legal_owner_id', '=', user.id),
+                '&amp;', ('contract_id.department_id', '!=', False), ('contract_id.department_id', '=', user.employee_id.department_id.id),
+                ('contract_id.confidentiality_level', '!=', 'restricted')
+            ]</field>
+        </record>
+
+        <record id="rule_clm_field_value_procurement" model="ir.rule">
+            <field name="name">Contract Field Value: Procurement</field>
+            <field name="model_id" ref="model_clm_contract_field_value"/>
+            <field name="groups" eval="[(4, ref('clm.group_clm_procurement'))]"/>
+            <field name="domain_force">[
+                '&amp;',
+                ('is_confidential', '=', False),
+                ('contract_id.company_id', 'in', company_ids),
+                '|', '|',
+                ('contract_id.procurement_owner_id', '=', user.id),
+                ('contract_id.user_id', '=', user.id),
+                ('contract_id.confidentiality_level', '!=', 'restricted')
+            ]</field>
+        </record>
+
+        <record id="rule_clm_field_value_finance" model="ir.rule">
+            <field name="name">Contract Field Value: Finance</field>
+            <field name="model_id" ref="model_clm_contract_field_value"/>
+            <field name="groups" eval="[(4, ref('clm.group_clm_finance'))]"/>
+            <field name="domain_force">[
+                '&amp;',
+                ('contract_id.company_id', 'in', company_ids),
+                '|', '|',
+                ('contract_id.finance_owner_id', '=', user.id),
+                ('contract_id.user_id', '=', user.id),
+                ('contract_id.confidentiality_level', '!=', 'restricted')
+            ]</field>
+        </record>
+
+        <record id="rule_clm_field_value_approver" model="ir.rule">
+            <field name="name">Contract Field Value: Approver</field>
+            <field name="model_id" ref="model_clm_contract_field_value"/>
+            <field name="groups" eval="[(4, ref('clm.group_clm_manager'))]"/>
+            <field name="domain_force">[
+                '&amp;',
+                ('is_confidential', '=', False),
+                ('contract_id.company_id', 'in', company_ids),
+                ('contract_id.confidentiality_level', '!=', 'restricted')
+            ]</field>
+        </record>
+
+        <record id="rule_clm_field_value_legal" model="ir.rule">
+            <field name="name">Contract Field Value: Legal</field>
+            <field name="model_id" ref="model_clm_contract_field_value"/>
+            <field name="groups" eval="[(4, ref('clm.group_clm_legal'))]"/>
+            <field name="domain_force">[('contract_id.company_id', 'in', company_ids)]</field>
+        </record>
+    </data>
+</odoo>

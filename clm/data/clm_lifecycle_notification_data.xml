@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="notif_rule_contract_renewed" model="clm.notification.rule">
+            <field name="name">Contract Renewed</field>
+            <field name="event_code">contract_renewed</field>
+            <field name="template_xmlid">clm.mail_template_clm_contract_renewed</field>
+            <field name="enabled" eval="True"/>
+            <field name="sequence">130</field>
+            <field name="description">Email owners when a contract is renewed.</field>
+        </record>
+        <record id="notif_rule_contract_terminated" model="clm.notification.rule">
+            <field name="name">Contract Terminated</field>
+            <field name="event_code">contract_terminated</field>
+            <field name="template_xmlid">clm.mail_template_clm_contract_terminated</field>
+            <field name="enabled" eval="True"/>
+            <field name="sequence">140</field>
+            <field name="description">Email owners when a contract is terminated.</field>
+        </record>
+        <record id="notif_rule_contract_archived" model="clm.notification.rule">
+            <field name="name">Contract Archived</field>
+            <field name="event_code">contract_archived</field>
+            <field name="template_xmlid">clm.mail_template_clm_contract_archived</field>
+            <field name="enabled" eval="True"/>
+            <field name="sequence">150</field>
+            <field name="description">Email owners when a contract is archived.</field>
+        </record>
+        <record id="notif_rule_contract_expired" model="clm.notification.rule">
+            <field name="name">Contract Expired</field>
+            <field name="event_code">contract_expired</field>
+            <field name="template_xmlid">clm.mail_template_clm_contract_expired</field>
+            <field name="enabled" eval="True"/>
+            <field name="sequence">160</field>
+            <field name="description">Email owners when a contract is marked expired.</field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Intake: Business / Procurement create & track; Legal screens; Admin converts -->
+        <record id="rule_clm_request_business" model="ir.rule">
+            <field name="name">NextContract Request: Business Requester (own)</field>
+            <field name="model_id" ref="model_clm_contract_request"/>
+            <field name="domain_force">['|', ('requester_id', '=', user.id), ('business_owner_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('clm.group_clm_user'))]"/>
+        </record>
+
+        <record id="rule_clm_request_procurement" model="ir.rule">
+            <field name="name">NextContract Request: Procurement User</field>
+            <field name="model_id" ref="model_clm_contract_request"/>
+            <field name="domain_force">[
+                '|', '|',
+                ('requester_id', '=', user.id),
+                ('business_owner_id', '=', user.id),
+                ('procurement_owner_id', '=', user.id)
+            ]</field>
+            <field name="groups" eval="[(4, ref('clm.group_clm_procurement'))]"/>
+        </record>
+
+        <record id="rule_clm_request_finance" model="ir.rule">
+            <field name="name">NextContract Request: Finance User (read commercial requests)</field>
+            <field name="model_id" ref="model_clm_contract_request"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('clm.group_clm_finance'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <record id="rule_clm_request_legal" model="ir.rule">
+            <field name="name">NextContract Request: Legal Reviewer (all)</field>
+            <field name="model_id" ref="model_clm_contract_request"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('clm.group_clm_legal'))]"/>
+        </record>
+
+        <record id="rule_clm_request_admin" model="ir.rule">
+            <field name="name">NextContract Request: Legal Admin (all)</field>
+            <field name="model_id" ref="model_clm_contract_request"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('clm.group_clm_legal_admin'))]"/>
+        </record>
+
+        <!-- Keep legacy personal rule for generic internal users without NextContract role -->
+        <record id="rule_clm_request_personal" model="ir.rule">
+            <field name="name">Personal Contract Requests (base user)</field>
+            <field name="model_id" ref="model_clm_contract_request"/>
+            <field name="domain_force">[('requester_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+    </data>
+</odoo>

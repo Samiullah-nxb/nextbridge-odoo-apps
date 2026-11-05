@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="activation_check_partner" model="clm.activation.checklist.item">
+            <field name="name">Counterparty</field>
+            <field name="code">partner_id</field>
+            <field name="sequence">10</field>
+            <field name="check_type">field</field>
+            <field name="field_name">partner_id</field>
+            <field name="help_text">Set the counterparty on the contract.</field>
+        </record>
+        <record id="activation_check_contract_type" model="clm.activation.checklist.item">
+            <field name="name">Contract Type</field>
+            <field name="code">contract_type_id</field>
+            <field name="sequence">20</field>
+            <field name="check_type">field</field>
+            <field name="field_name">contract_type_id</field>
+            <field name="help_text">Contract type must be set.</field>
+        </record>
+        <record id="activation_check_business_owner" model="clm.activation.checklist.item">
+            <field name="name">Business Owner</field>
+            <field name="code">user_id</field>
+            <field name="sequence">30</field>
+            <field name="check_type">field</field>
+            <field name="field_name">user_id</field>
+            <field name="help_text">Assign a business owner.</field>
+        </record>
+        <record id="activation_check_legal_owner" model="clm.activation.checklist.item">
+            <field name="name">Legal Owner</field>
+            <field name="code">legal_owner_id</field>
+            <field name="sequence">40</field>
+            <field name="check_type">field</field>
+            <field name="field_name">legal_owner_id</field>
+            <field name="help_text">Assign a legal owner.</field>
+        </record>
+        <record id="activation_check_currency" model="clm.activation.checklist.item">
+            <field name="name">Currency</field>
+            <field name="code">currency_id</field>
+            <field name="sequence">50</field>
+            <field name="check_type">field</field>
+            <field name="field_name">currency_id</field>
+            <field name="help_text">Currency must be set.</field>
+        </record>
+        <record id="activation_check_effective_date" model="clm.activation.checklist.item">
+            <field name="name">Effective Date</field>
+            <field name="code">effective_date</field>
+            <field name="sequence">60</field>
+            <field name="check_type">field</field>
+            <field name="field_name">effective_date</field>
+            <field name="help_text">Set the contract effective date.</field>
+        </record>
+        <record id="activation_check_expiry_or_renewal" model="clm.activation.checklist.item">
+            <field name="name">Expiry Date or Auto-Renewal</field>
+            <field name="code">expiry_or_auto_renewal</field>
+            <field name="sequence">70</field>
+            <field name="check_type">field_or</field>
+            <field name="field_names">expiry_date,auto_renewal</field>
+            <field name="help_text">Provide an expiry date, or enable auto-renewal.</field>
+        </record>
+        <record id="activation_check_signing_date" model="clm.activation.checklist.item">
+            <field name="name">Signing Date</field>
+            <field name="code">signing_date</field>
+            <field name="sequence">80</field>
+            <field name="check_type">field</field>
+            <field name="field_name">signing_date</field>
+            <field name="help_text">Set the signing / execution date.</field>
+        </record>
+        <record id="activation_check_notice_period" model="clm.activation.checklist.item">
+            <field name="name">Notice Period (Days)</field>
+            <field name="code">notice_period_days</field>
+            <field name="sequence">90</field>
+            <field name="check_type">positive_int</field>
+            <field name="field_name">notice_period_days</field>
+            <field name="help_text">Enter notice period in days (greater than 0).</field>
+        </record>
+        <record id="activation_check_confidentiality" model="clm.activation.checklist.item">
+            <field name="name">Confidentiality Level</field>
+            <field name="code">confidentiality_level</field>
+            <field name="sequence">100</field>
+            <field name="check_type">field</field>
+            <field name="field_name">confidentiality_level</field>
+            <field name="help_text">Set confidentiality classification.</field>
+        </record>
+        <record id="activation_check_risk_rating" model="clm.activation.checklist.item">
+            <field name="name">Risk Rating</field>
+            <field name="code">risk_rating</field>
+            <field name="sequence">110</field>
+            <field name="check_type">field</field>
+            <field name="field_name">risk_rating</field>
+            <field name="help_text">Set contract risk rating.</field>
+        </record>
+        <record id="activation_check_signed_copy" model="clm.activation.checklist.item">
+            <field name="name">Signed Copy Uploaded</field>
+            <field name="code">signed_copy_uploaded</field>
+            <field name="sequence">120</field>
+            <field name="check_type">boolean_true</field>
+            <field name="field_name">signed_copy_uploaded</field>
+            <field name="help_text">Contract must be fully signed / executed copy uploaded.</field>
+        </record>
+        <record id="activation_check_executed_version" model="clm.activation.checklist.item">
+            <field name="name">Executed Document Version</field>
+            <field name="code">executed_version</field>
+            <field name="sequence">130</field>
+            <field name="check_type">executed_version</field>
+            <field name="help_text">An executed document version must exist.</field>
+        </record>
+        <record id="activation_check_company" model="clm.activation.checklist.item">
+            <field name="name">Company</field>
+            <field name="code">company_id</field>
+            <field name="sequence">140</field>
+            <field name="check_type">field</field>
+            <field name="field_name">company_id</field>
+            <field name="help_text">Company must be set.</field>
+        </record>
+    </data>
+</odoo>

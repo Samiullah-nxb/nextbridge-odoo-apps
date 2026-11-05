@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_clm_request_admin,clm.contract.request.admin,model_clm_contract_request,clm.group_clm_legal_admin,1,1,1,1
+access_clm_request_legal,clm.contract.request.legal,model_clm_contract_request,clm.group_clm_legal,1,1,1,0
+access_clm_request_business,clm.contract.request.business,model_clm_contract_request,clm.group_clm_user,1,1,1,0
+access_clm_request_procurement,clm.contract.request.procurement,model_clm_contract_request,clm.group_clm_procurement,1,1,1,0
+access_clm_request_finance,clm.contract.request.finance,model_clm_contract_request,clm.group_clm_finance,1,0,0,0
+access_clm_request_approver,clm.contract.request.approver,model_clm_contract_request,clm.group_clm_manager,1,0,0,0
+access_clm_request_readonly,clm.contract.request.readonly,model_clm_contract_request,clm.group_clm_read_only,1,0,0,0
+access_clm_request_base_user,clm.contract.request.base.user,model_clm_contract_request,base.group_user,1,1,1,0
+access_clm_wizard_convert_admin,clm.request.convert.wizard.admin,model_clm_request_convert_wizard,clm.group_clm_legal_admin,1,1,1,1

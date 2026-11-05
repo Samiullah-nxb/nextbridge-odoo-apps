@@ -1,0 +1,409 @@
+// Part of NextContract. See LICENSE file for full copyright and licensing details.
+//
+// ─── NextContract shared components ──────────────────────────────────────────
+//
+// The building blocks every NextContract screen is made of. A module that
+// needs a page header, a facts strip, a section, an action row, an empty state
+// or a status badge uses the markup documented here instead of inventing its
+// own. All of them are declarative class names, usable from an Odoo form view
+// or from a QWeb template.
+//
+//   Page header   div.o_clm_page_header  > .o_clm_kicker / h1.o_clm_title / .o_clm_subtitle
+//   Facts strip   div.o_clm_facts        > .o_clm_fact > .o_clm_fact_label + .o_clm_fact_value
+//   Section       div.o_clm_section      > h2.o_clm_section_title + content
+//   Action row    div.o_clm_actions      > button…
+//   Empty state   div.o_clm_empty        > i + .o_clm_empty_title + .o_clm_empty_text
+//   Hint          div.o_clm_hint
+//
+// Colour comes from Bootstrap utility classes or from the tokens, never from a
+// literal, so every component follows the active Odoo theme including dark.
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Page header
+// ─────────────────────────────────────────────────────────────────────────────
+
+.o_clm_page_header {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: var(--clm-space-4);
+    padding-bottom: var(--clm-space-4);
+    border-bottom: 1px solid var(--clm-border-subtle);
+
+    // Odoo constrains .oe_title so the editable title does not run the whole
+    // sheet. A contract header carries a reference, a title and a subtitle,
+    // and needs the width back.
+    &.oe_title {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .o_clm_kicker {
+        display: block;
+        margin-bottom: var(--clm-space-1);
+        font-size: var(--clm-font-kicker);
+        font-weight: 600;
+        letter-spacing: var(--clm-tracking-kicker);
+        text-transform: uppercase;
+        color: inherit;
+        color: color-mix(in srgb, currentColor var(--clm-text-muted), transparent);
+
+        // A reference rendered in the kicker line (CNT-2026-00772).
+        .o_field_widget {
+            display: inline;
+            font-variant-numeric: tabular-nums;
+        }
+    }
+
+    h1,
+    .o_clm_title {
+        margin: 0;
+        font-size: var(--clm-font-page-title);
+        font-weight: var(--clm-weight-title);
+        line-height: 1.25;
+        letter-spacing: -0.01em;
+
+        // The editable title input must not look like a heading-sized box.
+        input {
+            font-size: inherit;
+            font-weight: inherit;
+        }
+    }
+
+    .o_clm_subtitle {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: var(--clm-space-1) var(--clm-space-4);
+        margin-top: var(--clm-space-2);
+        font-size: var(--clm-font-subtitle);
+        color: inherit;
+        color: color-mix(in srgb, currentColor var(--clm-text-muted), transparent);
+
+        > span {
+            display: inline-flex;
+            align-items: baseline;
+            gap: var(--clm-icon-gap);
+        }
+
+        .o_field_widget {
+            font-size: inherit;
+        }
+    }
+}
+
+@media (max-width: 767.98px) {
+    .o_clm_page_header h1,
+    .o_clm_page_header .o_clm_title {
+        font-size: var(--clm-font-page-title-sm);
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Facts strip — the at-a-glance summary under a page header
+// ─────────────────────────────────────────────────────────────────────────────
+
+.o_clm_facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: var(--clm-space-3) var(--clm-space-5);
+    margin-bottom: var(--clm-space-5);
+    padding: var(--clm-space-3) var(--clm-space-4);
+    border: 1px solid var(--clm-border);
+    border-radius: var(--clm-radius-lg);
+    background-color: var(--clm-surface-section);
+}
+
+.o_clm_fact {
+    min-width: 0;
+}
+
+.o_clm_fact_label {
+    display: block;
+    margin-bottom: var(--clm-space-1);
+    font-size: var(--clm-font-label);
+    font-weight: var(--clm-weight-label);
+    letter-spacing: var(--clm-tracking-label);
+    text-transform: uppercase;
+    color: inherit;
+    color: color-mix(in srgb, currentColor var(--clm-text-label), transparent);
+}
+
+.o_clm_fact_value {
+    display: block;
+    font-size: var(--clm-font-value);
+    font-weight: var(--clm-weight-value);
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+
+    // A field dropped straight into the strip renders as plain text, not as a
+    // form control with its own box.
+    .o_field_widget {
+        font-size: inherit;
+        font-weight: inherit;
+    }
+
+    // "Not set" / "Not assigned": muted but readable, never disabled-looking.
+    &.o_clm_fact_empty {
+        font-weight: 400;
+        color: inherit;
+        color: color-mix(in srgb, currentColor var(--clm-text-placeholder), transparent);
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Section — the standard content block
+// ─────────────────────────────────────────────────────────────────────────────
+
+.o_clm_section,
+.o_clm_block {
+    margin-top: var(--clm-space-6);
+
+    &:first-child {
+        margin-top: 0;
+    }
+}
+
+.o_clm_section_title,
+.o_clm_block_title {
+    margin: 0 0 var(--clm-space-3);
+    padding-bottom: var(--clm-space-2);
+    border-bottom: 1px solid var(--clm-border-subtle);
+    font-size: var(--clm-font-section);
+    font-weight: var(--clm-weight-section);
+    line-height: 1.3;
+    letter-spacing: 0;
+    text-transform: none;
+
+    .o_clm_section_count {
+        margin-left: var(--clm-space-2);
+        font-size: var(--clm-font-support);
+        font-weight: 400;
+        color: inherit;
+        color: color-mix(in srgb, currentColor var(--clm-text-muted), transparent);
+    }
+}
+
+// A card-like section, for grouping that needs a visible boundary. Used
+// sparingly: most sections need a heading and a rule, not a box.
+.o_clm_card {
+    padding: var(--clm-space-4);
+    border: 1px solid var(--clm-border);
+    border-radius: var(--clm-radius-lg);
+    background-color: var(--clm-surface-section);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Action row
+// ─────────────────────────────────────────────────────────────────────────────
+
+.o_clm_actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--clm-space-2);
+    margin-top: var(--clm-space-4);
+
+    > .btn {
+        height: var(--clm-control-height);
+        padding: 0 var(--clm-button-padding-x);
+        border-radius: var(--clm-radius);
+        font-size: var(--clm-font-support);
+        font-weight: 500;
+        white-space: nowrap;
+        margin: 0;
+
+        .fa {
+            margin-right: var(--clm-icon-gap);
+            font-size: var(--clm-icon-size);
+        }
+
+        &:disabled,
+        &.disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+    }
+
+    // Destructive actions sit apart from the rest of the row.
+    > .o_clm_action_danger {
+        order: 9;
+        margin-left: auto;
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Badges and flag rows
+// ─────────────────────────────────────────────────────────────────────────────
+
+.o_clm_flags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--clm-space-2);
+    margin-bottom: var(--clm-space-4);
+}
+
+.o_clm_flags .badge,
+.o_clm_badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--clm-icon-gap);
+    padding: 0.25rem var(--clm-space-2);
+    border-radius: var(--clm-radius-pill);
+    font-size: var(--clm-font-label);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    line-height: 1.4;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Empty state
+//
+// Every list, tab and related-record block that can legitimately be empty says
+// so in the same way: an icon, one line of explanation, and — where the user
+// can do something about it — the action that fills it.
+// ─────────────────────────────────────────────────────────────────────────────
+
+.o_clm_empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--clm-space-2);
+    padding: var(--clm-space-6) var(--clm-space-4);
+    border: 1px dashed var(--clm-border);
+    border-radius: var(--clm-radius-lg);
+    text-align: center;
+    color: inherit;
+    color: color-mix(in srgb, currentColor var(--clm-text-muted), transparent);
+
+    > .fa {
+        font-size: 1.5rem;
+        opacity: 0.55;
+    }
+
+    .o_clm_empty_title {
+        font-size: var(--clm-font-value);
+        font-weight: 600;
+        color: inherit;
+    }
+
+    .o_clm_empty_text {
+        max-width: 34rem;
+        font-size: var(--clm-font-support);
+        line-height: 1.5;
+    }
+
+    .o_clm_actions {
+        margin-top: var(--clm-space-1);
+        justify-content: center;
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Supporting text and callouts
+// ─────────────────────────────────────────────────────────────────────────────
+
+.o_clm_hint {
+    margin-top: var(--clm-space-2);
+    font-size: var(--clm-font-support);
+    line-height: 1.5;
+    color: inherit;
+    color: color-mix(in srgb, currentColor var(--clm-text-muted), transparent);
+}
+
+// Odoo's alerts are the notification surface NextContract uses; this only
+// settles their size so a one-line notice is not a block.
+.o_clm_form .alert,
+.o_clm_page .alert {
+    padding: var(--clm-space-3) var(--clm-space-4);
+    border-radius: var(--clm-radius);
+    font-size: var(--clm-font-support);
+    line-height: 1.5;
+
+    strong { font-weight: 600; }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Definition list — label above value, for read-only detail blocks
+// ─────────────────────────────────────────────────────────────────────────────
+
+.o_clm_detail_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: var(--clm-space-4) var(--clm-space-5);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Dialogs
+//
+// A NextContract wizard is the same design system in a smaller frame: same
+// label treatment, same button sizes, same full-width prose fields. Only the
+// sheet chrome is dropped, because a dialog is already a surface.
+// ─────────────────────────────────────────────────────────────────────────────
+
+.o_clm_dialog {
+    // A dialog is a fraction of the sheet's width, so the label track that
+    // lines a full form up leaves too little for the value beside it. Narrower
+    // here, but still ONE fixed track, so every field inside a given dialog
+    // starts at the same x — which is the property that matters.
+    --clm-label-column: 8.5rem;
+
+    // Drop the sheet's CARD — a dialog is already a surface, so a second border
+    // and shadow inside one reads as a box in a box.
+    .o_form_sheet,
+    &.o_form_view .o_form_sheet_bg {
+        max-width: 100%;
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    // …but keep its PADDING. Dropping that too was wrong twice over:
+    //
+    //   Bootstrap insets .modal-header and .modal-footer by $modal-inner-padding
+    //   (16px), so a body at 0 left the title and the buttons indented while
+    //   every heading and label in between sat flush against the dialog edge.
+    //
+    //   Worse, Odoo's outer <group> is a Bootstrap `.row`, which carries
+    //   NEGATIVE horizontal margins that a parent's padding is supposed to
+    //   cancel. With none, the groups hung 15px OUTSIDE the modal — measured at
+    //   x=295 against a modal edge of x=310 on the Convert to Contract wizard.
+    //
+    // One gutter, matching the header and footer, so the dialog reads as a
+    // single block of content.
+    // `&.o_form_view` is needed, not decoration: Odoo's
+    //   .o_form_view .o_form_sheet_bg:not(:has(.o_form_statusbar))
+    // adds a padding-top of 8px at specificity (0,3,0) — the :has() inside the
+    // :not() counts — which a bare .o_clm_dialog .o_form_sheet_bg at (0,2,0)
+    // loses to, leaving the top gutter 8px deeper than the sides. Both classes
+    // land on the controller root, so this ties at (0,3,0) and wins on order.
+    &.o_form_view .o_form_sheet_bg {
+        padding: 0;
+    }
+
+    .o_form_sheet {
+        padding: var(--clm-dialog-gutter);
+    }
+
+    .o_horizontal_separator {
+        margin-top: var(--clm-space-4);
+    }
+
+    .o_clm_longtext textarea {
+        min-height: 5rem;
+    }
+}
+
+.modal .o_clm_dialog + .modal-footer,
+.o_clm_dialog .modal-footer {
+    gap: var(--clm-space-2);
+
+    .btn {
+        height: var(--clm-control-height);
+        padding: 0 var(--clm-button-padding-x);
+        border-radius: var(--clm-radius);
+        font-size: var(--clm-font-support);
+        font-weight: 500;
+        margin: 0;
+    }
+}

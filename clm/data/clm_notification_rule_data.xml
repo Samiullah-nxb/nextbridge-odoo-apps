@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="notif_rule_intake_submitted" model="clm.notification.rule">
+            <field name="name">Intake Request Submitted</field>
+            <field name="event_code">intake_submitted</field>
+            <field name="template_xmlid">clm.mail_template_clm_intake_submitted</field>
+            <field name="enabled" eval="True"/>
+            <field name="sequence">10</field>
+            <field name="description">Email Legal when a contract request is submitted.</field>
+        </record>
+        <record id="notif_rule_intake_accepted" model="clm.notification.rule">
+            <field name="name">Intake Request Accepted</field>
+            <field name="event_code">intake_accepted</field>
+            <field name="template_xmlid">clm.mail_template_clm_intake_accepted</field>
+            <field name="enabled" eval="True"/>
+            <field name="sequence">20</field>
+            <field name="description">Email requester when Legal accepts the request.</field>
+        </record>
+        <record id="notif_rule_intake_rejected" model="clm.notification.rule">
+            <field name="name">Intake Request Rejected</field>
+            <field name="event_code">intake_rejected</field>
+            <field name="template_xmlid">clm.mail_template_clm_intake_rejected</field>
+            <field name="enabled" eval="True"/>
+            <field name="sequence">30</field>
+            <field name="description">Email requester when Legal rejects the request.</field>
+        </record>
+        <record id="notif_rule_intake_converted" model="clm.notification.rule">
+            <field name="name">Intake Converted to Contract</field>
+            <field name="event_code">intake_converted</field>
+            <field name="template_xmlid">clm.mail_template_clm_intake_converted</field>
+            <field name="enabled" eval="True"/>
+            <field name="sequence">40</field>
+            <field name="description">Email requester/business owner when request becomes a contract.</field>
+        </record>
+        <record id="notif_rule_task_assigned" model="clm.notification.rule">
+            <field name="name">Workflow Task Assigned</field>
+            <field name="event_code">task_assigned</field>
+            <field name="template_xmlid">clm.mail_template_clm_task_assigned</field>
+            <field name="enabled" eval="True"/>
+            <field name="sequence">50</field>
+            <field name="description">Email assignee when a workflow task is created or delegated.</field>
+        </record>
+        <record id="notif_rule_task_approved" model="clm.notification.rule">
+            <field name="name">Workflow Task Approved</field>
+            <field name="event_code">task_approved</field>
+            <field name="template_xmlid">clm.mail_template_clm_task_approved</field>
+            <field name="enabled" eval="True"/>
+            <field name="sequence">60</field>
+            <field name="description">Email owners when a workflow task is approved.</field>
+        </record>
+        <record id="notif_rule_task_rejected" model="clm.notification.rule">
+            <field name="name">Workflow Task Rejected</field>
+            <field name="event_code">task_rejected</field>
+            <field name="template_xmlid">clm.mail_template_clm_task_rejected</field>
+            <field name="enabled" eval="True"/>
+            <field name="sequence">70</field>
+            <field name="description">Email owners when a workflow task is rejected.</field>
+        </record>
+        <record id="notif_rule_negotiation_sent" model="clm.notification.rule">
+            <field name="name">Negotiation Round Sent</field>
+            <field name="event_code">negotiation_sent</field>
+            <field name="template_xmlid">clm.mail_template_clm_negotiation_sent</field>
+            <field name="enabled" eval="True"/>
+            <field name="sequence">80</field>
+            <field name="description">Email counterparty when a negotiation round is sent.</field>
+        </record>
+        <record id="notif_rule_signature_requested" model="clm.notification.rule">
+            <field name="name">Signature Requested</field>
+            <field name="event_code">signature_requested</field>
+            <field name="template_xmlid">clm.mail_template_clm_signature_request</field>
+            <field name="enabled" eval="True"/>
+            <field name="sequence">90</field>
+            <field name="description">Email signers when contract is sent for signature.</field>
+        </record>
+        <record id="notif_rule_contract_activated" model="clm.notification.rule">
+            <field name="name">Contract Activated</field>
+            <field name="event_code">contract_activated</field>
+            <field name="template_xmlid">clm.mail_template_clm_contract_activated</field>
+            <field name="enabled" eval="True"/>
+            <field name="sequence">100</field>
+            <field name="description">Email owners when a contract is activated.</field>
+        </record>
+        <record id="notif_rule_expiry_alert" model="clm.notification.rule">
+            <field name="name">Expiry / Renewal Alert</field>
+            <field name="event_code">expiry_alert</field>
+            <field name="template_xmlid">clm.mail_template_clm_expiry_alert</field>
+            <field name="enabled" eval="True"/>
+            <field name="sequence">110</field>
+            <field name="description">Email owners when expiry/renewal alert lead days are reached.</field>
+        </record>
+        <record id="notif_rule_obligation_overdue" model="clm.notification.rule">
+            <field name="name">Obligation Overdue</field>
+            <field name="event_code">obligation_overdue</field>
+            <field name="template_xmlid">clm.mail_template_clm_obligation_overdue</field>
+            <field name="enabled" eval="True"/>
+            <field name="sequence">120</field>
+            <field name="description">Email obligation owner when an obligation becomes overdue.</field>
+        </record>
+    </data>
+</odoo>

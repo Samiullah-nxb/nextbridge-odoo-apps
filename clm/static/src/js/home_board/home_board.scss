@@ -1,0 +1,328 @@
+// Part of NextContract. See LICENSE file for full copyright and licensing details.
+//
+// NextContract in-app home board (module icon grid + expand-in-place).
+// Fully responsive: phone → tablet → desktop.
+
+.o_clm_home_board {
+    --clm-home-brand: #0e88a3;
+    --clm-home-pad-x: clamp(0.75rem, 3vw, 1.5rem);
+    --clm-home-pad-y: clamp(1rem, 2.5vw, 2rem);
+    --clm-home-pad-bottom: clamp(3rem, 8vw, 5rem);
+    --clm-home-tile-min: 7.5rem;
+    --clm-home-icon: 3.5rem;
+    --clm-home-icon-font: 1.35rem;
+
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: var(--clm-home-pad-y) var(--clm-home-pad-x) var(--clm-home-pad-bottom);
+}
+
+// Odoo webclient uses overflow:hidden on .o_action_manager / .o_action, which
+// clips tall client actions. Let the action manager scroll the home board.
+.o_web_client > .o_action_manager:has(.o_clm_home_board) {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+}
+
+// Let the home-board action grow with its content so the manager can scroll.
+.o_web_client > .o_action_manager > .o_action:has(.o_clm_home_board),
+.o_web_client > .o_action_manager > .o_clm_home_board.o_action {
+    height: auto !important;
+    max-height: none !important;
+    min-height: 100%;
+    overflow: visible !important;
+    display: block !important;
+}
+
+.o_clm_home_board_header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: clamp(1rem, 2.5vw, 1.5rem);
+    padding-bottom: clamp(0.75rem, 2vw, 1rem);
+    border-bottom: 1px solid var(--clm-border-subtle, rgba(128, 128, 128, 0.2));
+}
+
+.o_clm_home_board_brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.o_clm_home_board_mark {
+    display: block;
+    width: clamp(1.85rem, 5vw, 2.25rem);
+    height: clamp(1.85rem, 5vw, 2.25rem);
+    flex-shrink: 0;
+    border-radius: 0.5rem;
+    object-fit: contain;
+}
+
+.o_clm_home_board_copy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+}
+
+.o_clm_home_board_name {
+    margin: 0;
+    font-size: clamp(1rem, 2.8vw, 1.125rem);
+    font-weight: 650;
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+    color: inherit;
+}
+
+.o_clm_home_board_tagline {
+    margin: 0;
+    font-size: clamp(0.6875rem, 2vw, 0.75rem);
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: 0.01em;
+    color: inherit;
+    opacity: 0.5;
+    overflow-wrap: anywhere;
+}
+
+.o_clm_home_board_status {
+    padding: var(--clm-space-5, 1.5rem) 0;
+    font-size: var(--clm-font-support, 0.8125rem);
+    color: rgba(128, 128, 128, 0.9);
+}
+
+.o_clm_home_board_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--clm-home-tile-min), 1fr));
+    gap: clamp(0.75rem, 2.5vw, 1.25rem) clamp(0.5rem, 2vw, 0.85rem);
+    align-items: start;
+    justify-items: stretch;
+    width: 100%;
+}
+
+.o_clm_home_tile_cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    border-radius: 0.85rem;
+    transition: background-color 0.15s ease;
+
+    &.o_clm_home_tile_cell_expanded {
+        background: rgba(14, 136, 163, 0.1);
+        padding-bottom: 0.35rem;
+        grid-column: span 1;
+    }
+}
+
+.o_clm_home_tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.45rem;
+    width: 100%;
+    min-height: 6.5rem;
+    padding: 0.55rem 0.4rem;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    color: inherit;
+    text-align: center;
+    border-radius: var(--clm-radius-lg, 0.5rem);
+    transition: background-color 0.12s ease, transform 0.12s ease;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+
+    &:focus-visible {
+        outline: 2px solid var(--clm-focus-ring, #2563eb);
+        outline-offset: 2px;
+    }
+
+    &.o_clm_home_tile_expanded {
+        transform: none;
+    }
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .o_clm_home_tile:hover {
+        background: rgba(128, 128, 128, 0.08);
+        transform: translateY(-1px);
+    }
+
+    .o_clm_home_tile.o_clm_home_tile_expanded:hover {
+        background: transparent;
+        transform: none;
+    }
+}
+
+.o_clm_home_tile_icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--clm-home-icon);
+    height: var(--clm-home-icon);
+    border-radius: 0.9rem;
+    color: #fff;
+    font-size: var(--clm-home-icon-font);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.16);
+}
+
+.o_clm_home_tile_name {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    max-width: 100%;
+    padding: 0 0.15rem;
+    font-size: clamp(0.75rem, 2.2vw, 0.8125rem);
+    font-weight: 600;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+}
+
+.o_clm_home_tile_caret {
+    font-size: 0.7rem;
+    opacity: 0.55;
+    transition: transform 0.15s ease;
+}
+
+.o_clm_home_tile_expanded .o_clm_home_tile_caret {
+    transform: rotate(180deg);
+    opacity: 0.85;
+    color: var(--clm-home-brand);
+}
+
+.o_clm_home_tile_hint {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    max-width: 100%;
+    padding: 0 0.2rem;
+    font-size: clamp(0.65rem, 1.9vw, 0.7rem);
+    line-height: 1.3;
+    color: rgba(128, 128, 128, 0.95);
+}
+
+.o_clm_home_tile_expanded .o_clm_home_tile_hint {
+    display: none;
+}
+
+.o_clm_home_tile_destinations {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    width: calc(100% - 0.5rem);
+    margin: 0.15rem 0.25rem 0.35rem;
+    padding: 0.2rem;
+}
+
+.o_clm_home_tile_destination {
+    display: block;
+    width: 100%;
+    min-height: 2.25rem;
+    padding: 0.5rem 0.55rem;
+    border: 0;
+    border-radius: 0.4rem;
+    background: rgba(128, 128, 128, 0.08);
+    color: inherit;
+    text-align: center;
+    font-size: clamp(0.7rem, 2vw, 0.75rem);
+    font-weight: 600;
+    line-height: 1.25;
+    cursor: pointer;
+    transition: background-color 0.12s ease, color 0.12s ease;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+
+    &:hover,
+    &:focus-visible {
+        background: rgba(14, 136, 163, 0.16);
+        color: var(--clm-home-brand);
+        outline: none;
+    }
+}
+
+// ── Breakpoints ──────────────────────────────────────────────────────────────
+
+// Small phones
+@media (max-width: 379.98px) {
+    .o_clm_home_board {
+        --clm-home-tile-min: 100%;
+        --clm-home-icon: 3.25rem;
+        --clm-home-icon-font: 1.25rem;
+    }
+
+    .o_clm_home_board_grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.65rem 0.45rem;
+    }
+
+    .o_clm_home_tile {
+        min-height: 6rem;
+        padding: 0.4rem 0.25rem;
+    }
+}
+
+// Phones
+@media (min-width: 380px) and (max-width: 575.98px) {
+    .o_clm_home_board {
+        --clm-home-tile-min: 8rem;
+        --clm-home-icon: 3.65rem;
+    }
+
+    .o_clm_home_board_grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+// Tablets
+@media (min-width: 576px) and (max-width: 991.98px) {
+    .o_clm_home_board {
+        --clm-home-tile-min: 8.5rem;
+        --clm-home-icon: 4rem;
+        --clm-home-icon-font: 1.5rem;
+    }
+
+    .o_clm_home_board_grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .o_clm_home_tile_cell_expanded {
+        grid-column: span 1;
+    }
+}
+
+// Desktop
+@media (min-width: 992px) {
+    .o_clm_home_board {
+        --clm-home-tile-min: 9rem;
+        --clm-home-icon: 4.25rem;
+        --clm-home-icon-font: 1.65rem;
+    }
+
+    .o_clm_home_board_grid {
+        grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+    }
+
+    .o_clm_home_tile_cell {
+        max-width: 11rem;
+        margin: 0 auto;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .o_clm_home_tile,
+    .o_clm_home_tile_caret,
+    .o_clm_home_tile_cell {
+        transition: none;
+    }
+}

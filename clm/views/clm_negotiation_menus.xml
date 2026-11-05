@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_clm_negotiation" name="Negotiation" parent="clm.menu_clm_root" sequence="40"/>
+    <menuitem id="menu_clm_negotiation_rounds" name="Negotiation Rounds" parent="menu_clm_negotiation" action="action_clm_negotiation_round" sequence="10"/>
+    <menuitem id="menu_clm_document_comparisons" name="Version Comparisons" parent="menu_clm_negotiation" action="action_clm_document_comparison" sequence="20"/>
+</odoo>

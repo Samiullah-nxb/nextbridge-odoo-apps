@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_clm_contract_form_documents" model="ir.ui.view">
+        <field name="name">clm.contract.form.documents</field>
+        <field name="model">clm.contract</field>
+        <field name="inherit_id" ref="clm.view_clm_contract_form"/>
+        <!--
+            Tab order on the contract form is decided by the priority of the
+            view that contributes the tab; see the comment on
+            clm.view_clm_contract_form. Document Versions sits after the
+            Final Contract (priority 5) and before Workflow Tasks (20).
+        -->
+        <field name="priority">10</field>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='clm_page_header']" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button name="%(clm.action_clm_contract_version)d" type="action"
+                            class="oe_stat_button" icon="fa-file-text-o"
+                            context="{'default_contract_id': id, 'search_default_contract_id': id}">
+                        <field name="version_count" widget="statinfo" string="Versions"/>
+                    </button>
+                </div>
+            </xpath>
+            <xpath expr="//page[@name='field_values']" position="before">
+                <page string="Document Versions" name="document_versions">
+                    <div class="o_clm_empty" invisible="version_ids">
+                        <i class="fa fa-clone" role="img" aria-label="No versions"/>
+                        <div class="o_clm_empty_title">No document versions yet</div>
+                        <div class="o_clm_empty_text">
+                            A version is created every time the contract text is
+                            frozen — when a draft is generated, when it is sent to
+                            the counterparty, and when it is signed. Use
+                            <strong>Create New Version</strong> in the action bar
+                            to capture the current wording.
+                        </div>
+                    </div>
+                    <field name="version_ids" nolabel="1" context="{'default_contract_id': id}"
+                           invisible="not version_ids">
+                        <list decoration-muted="status == 'superseded'"
+                              decoration-bf="version_type == 'executed'">
+                            <field name="version_number" string="Version"/>
+                            <field name="version_type"/>
+                            <field name="status" widget="badge"
+                                   decoration-info="status == 'draft'"
+                                   decoration-success="status == 'active'"
+                                   decoration-muted="status == 'superseded'"/>
+                            <field name="change_classification"/>
+                            <field name="change_summary" optional="show"/>
+                            <field name="parent_version_id" string="Parent" optional="hide"/>
+                            <field name="document_id" optional="hide"/>
+                            <field name="created_by_id" optional="show"/>
+                            <field name="create_date" string="Created On"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_clm_contract_version_form_documents_patch" model="ir.ui.view">
+        <field name="name">clm.contract.version.form.documents.patch</field>
+        <field name="model">clm.contract.version</field>
+        <field name="inherit_id" ref="clm.view_clm_contract_version_form"/>
+        <field name="arch" type="xml">
+            <!--
+                A version belongs to the contract it was created under, and it
+                never moves. `readonly="id"` made the field editable on any
+                UNSAVED record, which is every record in the "Create Document
+                Versions" dialog — so adding a version from a contract's own
+                Document Versions tab opened with a contract picker listing
+                every contract in the system.
+
+                That picker could not do what it appeared to do: version_ids is
+                a one2many with contract_id as its inverse, so the ORM writes
+                the parent contract back on save whatever was chosen. It
+                offered a choice it then silently discarded.
+
+                `readonly="contract_id"` locks the field as soon as a contract
+                is known. Opened from a contract, the tab passes
+                default_contract_id, so it is known immediately and the field
+                is never editable. Opened standalone from Configuration >
+                Contract Versions it starts empty and can still be picked once.
+            -->
+            <xpath expr="//div[hasclass('o_clm_kicker')]/field[@name='contract_id']"
+                   position="attributes">
+                <!-- The page header is a breadcrumb, not a control. -->
+                <attribute name="readonly">1</attribute>
+            </xpath>
+            <xpath expr="//group[@name='version_details']/field[@name='contract_id']"
+                   position="attributes">
+                <attribute name="readonly">contract_id</attribute>
+                <!-- Keep the value a standalone create picked, now that the
+                     field goes readonly the moment it is set. -->
+                <attribute name="force_save">1</attribute>
+            </xpath>
+            <field name="change_summary" position="before">
+                <field name="change_classification"/>
+            </field>
+        </field>
+    </record>
+</odoo>

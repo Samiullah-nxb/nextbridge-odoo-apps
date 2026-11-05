@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ─── Version form: frozen content, preview and generated files ───── -->
+    <record id="view_clm_contract_version_form_content" model="ir.ui.view">
+        <field name="name">clm.contract.version.form.content</field>
+        <field name="model">clm.contract.version</field>
+        <field name="inherit_id" ref="clm.view_clm_contract_version_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_preview_version" type="object" string="Preview" icon="fa-eye"/>
+                <button name="action_generate_docx" type="object" string="Generate DOCX" icon="fa-file-word-o"/>
+                <button name="action_generate_pdf" type="object" string="Generate PDF" icon="fa-file-pdf-o"/>
+            </xpath>
+            <xpath expr="//div[hasclass('oe_title')]" position="before">
+                <field name="is_signed_version" invisible="1"/>
+                <field name="has_content_snapshot" invisible="1"/>
+                <div class="alert alert-warning" role="alert" invisible="not is_signed_version">
+                    <i class="fa fa-lock me-1" role="img" aria-label="Locked"/>
+                    This version is signed. Its content and documents are locked; to change
+                    the contract, create an amendment.
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='parent_version_id']" position="attributes">
+                <attribute name="readonly">has_content_snapshot</attribute>
+            </xpath>
+            <xpath expr="//sheet/group[1]" position="after">
+                <group>
+                    <group string="Contract Content">
+                        <field name="has_content_snapshot" string="Content Frozen" readonly="1"/>
+                        <field name="generated_docx_id" options="{'no_open': True}"
+                               invisible="not generated_docx_id"/>
+                        <field name="generated_pdf_id" options="{'no_open': True}"
+                               invisible="not generated_pdf_id"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_clm_contract_version_list_content" model="ir.ui.view">
+        <field name="name">clm.contract.version.list.content</field>
+        <field name="model">clm.contract.version</field>
+        <field name="inherit_id" ref="clm.view_clm_contract_version_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='status']" position="before">
+                <field name="has_content_snapshot" string="Content Frozen" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ─── Version preview dialog ──────────────────────────────────────── -->
+    <record id="view_clm_contract_version_preview_form" model="ir.ui.view">
+        <field name="name">clm.contract.version.preview.form</field>
+        <field name="model">clm.contract.version</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <form string="Version Preview" class="o_clm_form o_clm_preview_dialog"
+                  create="false" delete="false" edit="false">
+                <div class="oe_title o_clm_page_header">
+                    <div class="o_clm_kicker">Version Preview</div>
+                    <h1 class="d-flex align-items-center gap-2 flex-wrap">
+                        <span>v</span>
+                        <field name="version_number" class="w-auto" readonly="1"/>
+                        <field name="version_type" widget="badge" readonly="1"/>
+                    </h1>
+                </div>
+                <field name="content_preview_html" nolabel="1" readonly="1"/>
+                <footer>
+                    <button name="action_generate_docx" type="object" string="Download DOCX"
+                            class="btn-primary" icon="fa-file-word-o"/>
+                    <button name="action_generate_pdf" type="object" string="Download PDF"
+                            class="btn-secondary" icon="fa-file-pdf-o"/>
+                    <button string="Close" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

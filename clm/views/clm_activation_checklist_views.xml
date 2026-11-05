@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_clm_activation_checklist_item_list" model="ir.ui.view">
+        <field name="name">clm.activation.checklist.item.list</field>
+        <field name="model">clm.activation.checklist.item</field>
+        <field name="arch" type="xml">
+            <list string="Activation Checklist Items" class="o_clm_list" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="check_type"/>
+                <field name="field_name"/>
+                <field name="field_names"/>
+                <field name="required" widget="boolean_toggle"/>
+                <field name="active" widget="boolean_toggle"/>
+                <field name="help_text" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_clm_activation_checklist_item_form" model="ir.ui.view">
+        <field name="name">clm.activation.checklist.item.form</field>
+        <field name="model">clm.activation.checklist.item</field>
+        <field name="arch" type="xml">
+            <form string="Activation Checklist Item" class="o_clm_form">
+                <sheet>
+                    <div class="oe_title o_clm_page_header" name="clm_page_header">
+                        <div class="o_clm_kicker">Activation Checklist Item</div>
+                        <h1><field name="name" placeholder="e.g. Signed copy uploaded"/></h1>
+                    </div>
+                    <group>
+                        <group string="Item">
+                            <field name="code"/>
+                            <field name="sequence"/>
+                            <field name="required"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Check">
+                            <field name="check_type"/>
+                            <field name="field_name" invisible="check_type not in ('field', 'boolean_true', 'positive_int')"/>
+                            <field name="field_names" invisible="check_type != 'field_or'"/>
+                        </group>
+                    </group>
+                    <separator string="Help Text"/>
+                    <field name="help_text" nolabel="1" class="o_clm_longtext"
+                           placeholder="What the user has to do to satisfy this item."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_clm_activation_checklist_item" model="ir.actions.act_window">
+        <field name="name">Activation Checklist</field>
+        <field name="res_model">clm.activation.checklist.item</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Define an activation check</p>
+            <p>Every required item here must pass before a contract can be
+               activated into the live repository.</p>
+        </field>
+    </record>
+</odoo>

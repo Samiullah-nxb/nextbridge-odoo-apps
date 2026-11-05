@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_clm_workflow" name="Workflow" parent="clm.menu_clm_root" sequence="30"/>
+    <menuitem id="menu_clm_workflow_tasks" name="My Tasks" parent="menu_clm_workflow" action="action_clm_workflow_task" sequence="10"/>
+    <menuitem id="menu_clm_workflow_rules" name="Workflow Rules" parent="clm.menu_clm_configuration" action="action_clm_workflow_rule" sequence="30" groups="clm.group_clm_legal_admin"/>
+</odoo>

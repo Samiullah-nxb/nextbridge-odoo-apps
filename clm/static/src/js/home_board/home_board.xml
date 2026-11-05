@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="clm.HomeBoard">
+        <div class="o_clm_home_board" t-ref="root">
+            <header class="o_clm_home_board_header">
+                <div class="o_clm_home_board_brand">
+                    <img class="o_clm_home_board_mark"
+                         src="/clm/static/description/icon.png"
+                         alt=""/>
+                    <div class="o_clm_home_board_copy">
+                        <h1 class="o_clm_home_board_name">NextContract</h1>
+                        <p class="o_clm_home_board_tagline">Contract Lifecycle Management</p>
+                    </div>
+                </div>
+            </header>
+
+            <div t-if="state.loading" class="o_clm_home_board_status">
+                Loading…
+            </div>
+            <div t-elif="state.error" class="o_clm_home_board_status text-danger">
+                <t t-esc="state.error"/>
+            </div>
+            <div t-elif="!state.tiles.length" class="o_clm_home_board_status">
+                No modules available for your user.
+            </div>
+            <div t-else="" class="o_clm_home_board_grid">
+                <div t-foreach="state.tiles" t-as="tile" t-key="tile.id"
+                     class="o_clm_home_tile_cell"
+                     t-att-class="{ 'o_clm_home_tile_cell_expanded': isExpanded(tile) }">
+                    <button type="button"
+                            class="o_clm_home_tile"
+                            t-att-class="{
+                                'o_clm_home_tile_expandable': isExpandable(tile),
+                                'o_clm_home_tile_expanded': isExpanded(tile),
+                            }"
+                            t-att-aria-expanded="isExpandable(tile) ? (isExpanded(tile) ? 'true' : 'false') : undefined"
+                            t-on-click="() => this.onTileClick(tile)">
+                        <span class="o_clm_home_tile_icon"
+                              t-att-style="'background:' + tile.color">
+                            <i t-att-class="'fa ' + tile.icon" aria-hidden="true"/>
+                        </span>
+                        <span class="o_clm_home_tile_name">
+                            <t t-esc="tile.name"/>
+                            <i t-if="isExpandable(tile)"
+                               class="fa fa-angle-down o_clm_home_tile_caret"
+                               aria-hidden="true"/>
+                        </span>
+                        <span class="o_clm_home_tile_hint" t-esc="tile.hint"/>
+                    </button>
+
+                    <div t-if="isExpanded(tile)"
+                         class="o_clm_home_tile_destinations"
+                         role="group"
+                         t-att-aria-label="tile.name">
+                        <button t-foreach="tile.children" t-as="option" t-key="option.action_id"
+                                type="button"
+                                class="o_clm_home_tile_destination"
+                                t-on-click="(ev) => this.onDestinationClick(ev, option)">
+                            <t t-esc="option.name"/>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

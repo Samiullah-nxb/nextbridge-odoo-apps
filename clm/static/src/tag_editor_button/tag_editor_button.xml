@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+
+    <t t-name="clm.DocxTagEditorWordButton"
+       t-inherit="clm.DocxTagEditor"
+       t-inherit-mode="extension">
+        <xpath expr="//button[@aria-label='Reload Document Template']" position="before">
+            <button type="button" class="btn btn-link btn-sm"
+                    t-on-click="onOpenWordEditor"
+                    t-att-disabled="state.busy"
+                    title="Open this Document Template in the Word editor"
+                    aria-label="Open this Document Template in the Word editor">Word Editor</button>
+        </xpath>
+    </t>
+
+</templates>

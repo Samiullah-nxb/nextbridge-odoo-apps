@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="risk_factor_ai_deviation" model="clm.risk.factor">
+            <field name="name">AI Clause Deviation</field>
+            <field name="source_type">ai_deviation</field>
+            <field name="weight">20</field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+
+    <t t-name="clm.NavBarAppsMenuSidebar"
+       t-inherit="web.NavBar.AppsMenu.Sidebar"
+       t-inherit-mode="extension">
+        <xpath expr="//i[hasclass('fa-bars')]" position="after">
+            <span t-if="currentApp"
+                  class="o_clm_navbar_current_app ms-2 text-truncate"
+                  t-esc="currentApp.name"/>
+        </xpath>
+    </t>
+
+</templates>

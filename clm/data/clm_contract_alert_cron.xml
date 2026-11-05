@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ir_cron_clm_contract_alerts" model="ir.cron">
+        <field name="name">NextContract: Process Contract Alerts</field>
+        <field name="model_id" ref="clm.model_clm_contract"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_process_contract_alerts()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active" eval="True"/>
+    </record>
+
+    <record id="action_clm_process_all_alerts" model="ir.actions.server">
+        <field name="name">Process All Contract Alerts</field>
+        <field name="model_id" ref="clm.model_clm_contract"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_cron_process_all_alerts()</field>
+    </record>
+</odoo>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Prevent accidental line-open dialogs from being useful; list uses no_open. -->
+    <record id="view_clm_template_base_docx_version_form" model="ir.ui.view">
+        <field name="name">clm.template.base.docx.version.form</field>
+        <field name="model">clm.template.base.docx.version</field>
+        <field name="arch" type="xml">
+            <form string="Template Version" create="0" edit="0" delete="0">
+                <sheet>
+                    <group>
+                        <field name="name" readonly="1"/>
+                        <field name="version_number" readonly="1"/>
+                        <field name="document_id" readonly="1"/>
+                        <field name="status_label" readonly="1"/>
+                        <field name="is_active" readonly="1"/>
+                        <field name="source" readonly="1"/>
+                    </group>
+                    <footer>
+                        <button name="action_set_active" type="object"
+                                string="Activate Version" class="btn-primary"
+                                invisible="is_active"/>
+                        <button string="Close" special="cancel" class="btn-secondary"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,17 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_clm_workflow_task_admin,clm.workflow.task.admin,model_clm_workflow_task,clm.group_clm_legal_admin,1,1,1,1
+access_clm_workflow_task_legal,clm.workflow.task.legal,model_clm_workflow_task,clm.group_clm_legal,1,1,0,0
+access_clm_workflow_task_approver,clm.workflow.task.approver,model_clm_workflow_task,clm.group_clm_manager,1,1,0,0
+access_clm_workflow_task_user,clm.workflow.task.user,model_clm_workflow_task,clm.group_clm_user,1,1,0,0
+access_clm_workflow_task_procurement,clm.workflow.task.procurement,model_clm_workflow_task,clm.group_clm_procurement,1,1,0,0
+access_clm_workflow_task_finance,clm.workflow.task.finance,model_clm_workflow_task,clm.group_clm_finance,1,1,0,0
+access_clm_workflow_delegation_admin,clm.workflow.delegation.admin,model_clm_workflow_delegation,clm.group_clm_legal_admin,1,1,1,1
+access_clm_workflow_rule_admin,clm.workflow.rule.admin,model_clm_workflow_rule,clm.group_clm_legal_admin,1,1,1,1
+access_clm_escalation_rule_user,clm.escalation.rule.user,model_clm_escalation_rule,clm.group_clm_user,1,0,0,0
+access_clm_escalation_rule_admin,clm.escalation.rule.admin,model_clm_escalation_rule,clm.group_clm_legal_admin,1,1,1,1
+access_clm_force_approve_wizard_admin,clm.force.approve.wizard.admin,model_clm_force_approve_wizard,clm.group_clm_legal_admin,1,1,1,1
+access_clm_delegate_wizard_admin,clm.delegate.wizard.admin,model_clm_delegate_wizard,clm.group_clm_legal_admin,1,1,1,1
+access_clm_delegate_wizard_user,clm.delegate.wizard.user,model_clm_delegate_wizard,clm.group_clm_user,1,1,1,1
+access_clm_delegate_wizard_approver,clm.delegate.wizard.approver,model_clm_delegate_wizard,clm.group_clm_manager,1,1,1,1
+access_clm_workflow_rule_user,clm.workflow.rule.user,model_clm_workflow_rule,clm.group_clm_user,1,0,0,0
+access_clm_workflow_delegation_user,clm.workflow.delegation.user,model_clm_workflow_delegation,clm.group_clm_user,1,0,1,0

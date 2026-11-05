@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_clm_ai_mapping_wizard_form" model="ir.ui.view">
+        <field name="name">clm.ai.mapping.wizard.form</field>
+        <field name="model">clm.ai.mapping.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Resolve AI Mapping" class="o_clm_form o_clm_dialog">
+                <sheet>
+                    <div class="text-muted mb-3">
+                        <field name="instruction_text" readonly="1" nolabel="1"/>
+                    </div>
+                    <group>
+                        <field name="field_name" readonly="1"/>
+                        <field name="suggested_value" readonly="1"/>
+                    </group>
+                    <group string="Select Matching Record">
+                        <!-- Conditionally show the correct lookup based on field_name -->
+                        <field name="partner_id" invisible="field_name not in ['partner', 'partner_id']"/>
+                        <field name="contract_type_id" invisible="field_name not in ['contract_type', 'contract_type_id']"/>
+                        <field name="currency_id" invisible="field_name not in ['currency', 'currency_id']"/>
+                    </group>
+                    <footer>
+                        <button name="action_confirm_mapping" type="object" string="Confirm &amp; Approve" class="btn-primary"/>
+                        <button special="cancel" data-hotkey="z" string="Cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Add Migration menu under Configuration -->
+    <menuitem id="clm_migration_menu_root"
+              name="Migration"
+              parent="clm.menu_clm_configuration"
+              sequence="100"/>
+
+    <menuitem id="clm_migration_menu_batches"
+              name="Migration Batches"
+              parent="clm_migration_menu_root"
+              action="action_clm_migration_batch"
+              sequence="10"/>
+</odoo>

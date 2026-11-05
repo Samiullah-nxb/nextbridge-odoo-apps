@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_clm_migration_batch_legal,clm.migration.batch.legal,model_clm_migration_batch,clm.group_clm_legal,1,1,1,1
+access_clm_migration_record_legal,clm.migration.record.legal,model_clm_migration_record,clm.group_clm_legal,1,1,1,1
+access_clm_migration_force_import_wizard_legal,clm.migration.force.import.wizard.legal,model_clm_migration_force_import_wizard,clm.group_clm_legal,1,1,1,1
+access_clm_migration_ai_wizard_legal,clm.migration.ai.wizard.legal,model_clm_migration_ai_wizard,clm.group_clm_legal,1,1,1,1

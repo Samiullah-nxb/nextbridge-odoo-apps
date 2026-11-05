@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_clm_contract_version_wizard_form" model="ir.ui.view">
+        <field name="name">clm.contract.version.wizard.form</field>
+        <field name="model">clm.contract.version.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Create New Version" class="o_clm_form o_clm_dialog">
+                <field name="has_changes" invisible="1"/>
+                <div class="alert alert-warning" role="alert" invisible="has_changes">
+                    Nothing has changed since the version this one would be derived from.
+                    Edit the contract first, then create the new version.
+                </div>
+                <p class="text-muted">
+                    The contract's current terms and clause wording are frozen into a new
+                    version. Existing versions are never changed.
+                </p>
+                <group>
+                    <group>
+                        <field name="contract_id"/>
+                        <field name="parent_version_id" options="{'no_create': True}"/>
+                        <field name="version_type"/>
+                    </group>
+                    <group>
+                        <field name="change_classification"/>
+                    </group>
+                </group>
+                <group string="Change Summary">
+                    <field name="change_summary" nolabel="1"
+                           placeholder="e.g. Notice period changed from 20 to 30 days."/>
+                </group>
+                <footer>
+                    <button name="action_create_version" type="object" string="Create Version"
+                            class="btn-primary"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

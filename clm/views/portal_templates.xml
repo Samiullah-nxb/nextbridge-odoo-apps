@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        ─── Counterparty portal ──────────────────────────────────────────────
+
+        The portal follows Odoo's portal theme rather than the backend design
+        system: it is the same product seen by someone outside the company, and
+        it has to look like the rest of the portal they already use.
+
+        What it does share with the backend is the status vocabulary. The
+        badge template below is the single place a contract status is coloured
+        for external readers, and it uses the same five meanings as the backend
+        (see the status table in views/clm_base_views.xml).
+    -->
+
+    <!-- One status badge, reused wherever a contract status is shown. -->
+    <template id="portal_contract_status_badge" name="Contract Status Badge">
+        <t t-set="clm_status_class" t-value="{
+            'draft': 'text-bg-info',
+            'in_review': 'text-bg-warning',
+            'awaiting_business': 'text-bg-warning',
+            'awaiting_finance': 'text-bg-warning',
+            'awaiting_procurement': 'text-bg-warning',
+            'awaiting_compliance': 'text-bg-warning',
+            'internal_review_done': 'text-bg-warning',
+            'sent_to_counterparty': 'text-bg-warning',
+            'in_negotiation': 'text-bg-warning',
+            'pending_signature': 'text-bg-warning',
+            'expiring_soon': 'text-bg-warning',
+            'approved': 'text-bg-success',
+            'executed': 'text-bg-success',
+            'active': 'text-bg-success',
+            'renewed': 'text-bg-success',
+            'cancelled': 'text-bg-danger',
+            'terminated': 'text-bg-danger',
+        }.get(contract.state, 'text-bg-secondary')"/>
+        <span t-attf-class="badge #{clm_status_class}">
+            <!-- t-field renders the translated label, never the technical key. -->
+            <span t-field="contract.state"/>
+        </span>
+    </template>
+
+    <template id="portal_my_home_menu_clm" name="Portal layout : clm menu entries" inherit_id="portal.portal_breadcrumbs" priority="20">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li t-if="page_name == 'contract'" t-attf-class="breadcrumb-item #{'active ' if not contract else ''}">
+                <a t-if="contract" t-attf-href="/my/contracts?{{ keep_query() }}">Contracts</a>
+                <t t-else="">Contracts</t>
+            </li>
+            <li t-if="contract" class="breadcrumb-item active">
+                <t t-esc="contract.name"/>
+            </li>
+        </xpath>
+    </template>
+
+    <template id="portal_my_home_clm" name="Show Contracts" inherit_id="portal.portal_my_home" customize_show="True" priority="20">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="before">
+            <t t-set="portal_client_category_enable" t-value="True"/>
+        </xpath>
+        <div id="portal_client_category" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="icon" t-value="'/clm/static/src/img/portal-contracts.svg'"/>
+                <t t-set="title">Your Contracts</t>
+                <t t-set="url" t-value="'/my/contracts'"/>
+                <t t-set="text">Review, download or upload contract revisions</t>
+                <t t-set="placeholder_count" t-value="'contract_count'"/>
+            </t>
+        </div>
+    </template>
+
+    <template id="portal_my_contracts" name="My Contracts">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Contracts</t>
+            </t>
+
+            <div t-if="not contracts" class="text-center text-muted py-5">
+                <i class="fa fa-file-text-o fa-2x mb-3 d-block" role="img" aria-label="No contracts"/>
+                <p class="mb-0">No contracts have been shared with you yet.</p>
+                <p class="small mb-0">
+                    You will see a contract here as soon as the other party sends
+                    you a draft to review.
+                </p>
+            </div>
+
+            <t t-if="contracts" t-call="portal.portal_table">
+                <thead>
+                    <tr class="active">
+                        <th>Contract</th>
+                        <th>Title</th>
+                        <th>Type</th>
+                        <th>Expiry</th>
+                        <th class="text-end">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr t-foreach="contracts" t-as="contract">
+                        <td>
+                            <a t-attf-href="/my/contracts/#{contract.id}">
+                                <span t-field="contract.contract_ref"/>
+                            </a>
+                        </td>
+                        <td><span t-field="contract.name"/></td>
+                        <td><span t-field="contract.contract_type_id"/></td>
+                        <td><span t-field="contract.expiry_date"/></td>
+                        <td class="text-end">
+                            <t t-call="clm.portal_contract_status_badge"/>
+                        </td>
+                    </tr>
+                </tbody>
+            </t>
+        </t>
+    </template>
+
+    <template id="portal_contract_page" name="Contract Detail">
+        <t t-call="portal.portal_layout">
+            <div id="optional_layout">
+                <div class="container mb-5">
+                    <div class="card mt-4">
+                        <div class="card-header bg-white">
+                            <div class="small text-muted text-uppercase">
+                                <span t-field="contract.contract_ref"/>
+                            </div>
+                            <h3 class="mb-0"><span t-field="contract.name"/></h3>
+                        </div>
+                        <div class="card-body">
+                            <div t-if="error" class="alert alert-danger" role="alert">
+                                <t t-esc="error"/>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="small text-muted text-uppercase">Status</div>
+                                    <t t-call="clm.portal_contract_status_badge"/>
+                                </div>
+                                <div class="col-md-6" t-if="contract.contract_type_id">
+                                    <div class="small text-muted text-uppercase">Contract Type</div>
+                                    <span t-field="contract.contract_type_id"/>
+                                </div>
+                            </div>
+
+                            <hr/>
+
+                            <h4>Negotiation</h4>
+
+                            <t t-if="active_round">
+                                <div class="alert alert-info">
+                                    <h5>Action required: your revision is awaited</h5>
+                                    <p>
+                                        Review the latest draft and upload your revisions with
+                                        Track Changes enabled.
+                                    </p>
+
+                                    <div class="mt-3">
+                                        <a t-if="access.can_download"
+                                           t-attf-href="/my/contracts/download/#{active_round.outbound_version_id.id}"
+                                           class="btn btn-primary">
+                                            <i class="fa fa-download me-1" role="img" aria-label="Download"/>
+                                            Download Draft (.docx)
+                                        </a>
+                                    </div>
+
+                                    <hr t-if="access.can_upload"/>
+
+                                    <div t-if="access.can_upload" class="mt-3">
+                                        <h6>Upload your revised document</h6>
+                                        <form t-attf-action="/my/contracts/#{contract.id}/upload" method="POST" enctype="multipart/form-data">
+                                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                            <div class="mb-3">
+                                                <label class="form-label" for="upload_file">Revised document (.docx only)</label>
+                                                <input type="file" class="form-control" id="upload_file" name="upload_file"
+                                                       accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                                                       required="required"/>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label" for="notes">Notes / comments</label>
+                                                <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fa fa-upload me-1" role="img" aria-label="Upload"/>
+                                                Upload Revision
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <div class="alert alert-success mb-0">
+                                    <p class="mb-0">
+                                        Nothing is waiting on you. There are no open negotiation
+                                        rounds for this contract.
+                                    </p>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

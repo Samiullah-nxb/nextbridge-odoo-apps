@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_clm_contract_form_workflow" model="ir.ui.view">
+        <field name="name">clm.contract.form.workflow</field>
+        <field name="model">clm.contract</field>
+        <field name="inherit_id" ref="clm.view_clm_contract_form"/>
+        <!--
+            Tab order on the contract form is set by view priority; see the
+            comment on clm.view_clm_contract_form. 20 puts Workflow Tasks
+            after Document Versions (10) and before the execution tabs (30).
+        -->
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <!--
+                    Exactly one action may be primary in any one state:
+                      draft                     → Submit for Review
+                      in_review / awaiting_*    → Approve
+                      internal_review_done      → Approve
+                      in_negotiation            → Approve
+                    Everything else is a secondary route through the same
+                    review, and Cancel is destructive.
+                -->
+                <button name="action_submit_for_review" type="object"
+                        string="Submit for Review" class="btn-primary"
+                        icon="fa-paper-plane-o" invisible="state != 'draft'"/>
+                <button name="action_approve" type="object" string="Approve"
+                        class="btn-primary" icon="fa-check"
+                        invisible="state not in ('in_review', 'in_negotiation', 'internal_review_done')"/>
+                <button name="action_request_business_input" type="object"
+                        string="Request Business Input" invisible="state != 'in_review'"/>
+                <button name="action_request_finance_input" type="object"
+                        string="Request Finance Input" invisible="state != 'in_review'"/>
+                <button name="action_request_procurement_input" type="object"
+                        string="Request Procurement Input" invisible="state != 'in_review'"/>
+                <button name="action_request_compliance_input" type="object"
+                        string="Request Compliance Review" invisible="state != 'in_review'"/>
+                <button name="action_complete_internal_review" type="object"
+                        string="Complete Internal Review"
+                        invisible="state not in ('in_review', 'awaiting_business', 'awaiting_finance', 'awaiting_procurement', 'awaiting_compliance')"/>
+                <button name="action_send_to_counterparty" type="object"
+                        string="Send to Counterparty" invisible="state != 'internal_review_done'"/>
+                <button name="action_send_to_negotiation" type="object"
+                        string="Start Negotiation"
+                        invisible="state not in ('internal_review_done', 'sent_to_counterparty', 'in_review')"/>
+                <button name="action_return_for_clarification" type="object"
+                        string="Return for Clarification" icon="fa-reply"
+                        invisible="state not in ('in_review', 'in_negotiation', 'awaiting_business', 'awaiting_finance', 'awaiting_procurement', 'awaiting_compliance')"/>
+                <button name="action_reopen" type="object" string="Reopen"
+                        icon="fa-undo" invisible="state != 'cancelled'"/>
+                <button name="action_cancel" type="object" string="Cancel Contract"
+                        class="o_clm_action_danger" icon="fa-ban"
+                        confirm="Cancel this contract? It can be reopened afterwards."
+                        invisible="state in ('executed', 'active', 'expired', 'terminated', 'archived', 'cancelled')"/>
+            </xpath>
+            <xpath expr="//page[@name='field_values']" position="before">
+                <page string="Workflow Tasks" name="workflow_tasks">
+                    <div class="o_clm_empty" invisible="workflow_task_ids">
+                        <i class="fa fa-tasks" role="img" aria-label="No tasks"/>
+                        <div class="o_clm_empty_title">No workflow tasks yet</div>
+                        <div class="o_clm_empty_text">
+                            Tasks are raised automatically by the workflow rules when
+                            the contract enters review. Nothing is waiting on anyone at
+                            the moment.
+                        </div>
+                    </div>
+                    <field name="workflow_task_ids" nolabel="1" invisible="not workflow_task_ids">
+                        <list decoration-danger="is_overdue"
+                              decoration-muted="status in ('completed', 'cancelled')">
+                            <field name="name"/>
+                            <field name="task_type"/>
+                            <field name="assigned_user_id"/>
+                            <field name="due_date"/>
+                            <field name="is_required" optional="show"/>
+                            <field name="is_overdue" column_invisible="1"/>
+                            <field name="status" widget="badge"
+                                   decoration-info="status == 'pending'"
+                                   decoration-warning="status == 'in_progress'"
+                                   decoration-success="status == 'completed'"
+                                   decoration-danger="status == 'rejected'"
+                                   decoration-muted="status == 'cancelled'"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

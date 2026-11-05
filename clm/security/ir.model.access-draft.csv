@@ -1,0 +1,14 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_clm_template_variable_admin,clm.template.variable.admin,model_clm_template_variable,clm.group_clm_legal_admin,1,1,1,1
+access_clm_template_variable_user,clm.template.variable.user,model_clm_template_variable,base.group_user,1,0,0,0
+access_clm_assembly_request_admin,clm.assembly.request.admin,model_clm_assembly_request,clm.group_clm_legal_admin,1,1,1,1
+access_clm_assembly_request_user,clm.assembly.request.user,model_clm_assembly_request,base.group_user,1,1,1,0
+access_clm_clause_deviation_admin,clm.clause.deviation.admin,model_clm_clause_deviation,clm.group_clm_legal_admin,1,1,1,1
+access_clm_clause_deviation_user,clm.clause.deviation.user,model_clm_clause_deviation,base.group_user,1,0,0,0
+access_clm_generate_draft_wizard_user,clm.generate.draft.wizard.user,model_clm_generate_draft_wizard,clm.group_clm_user,1,1,1,1
+access_clm_contract_clause_user,clm.contract.clause.user,model_clm_contract_clause,clm.group_clm_user,1,1,1,1
+access_clm_contract_clause_legal,clm.contract.clause.legal,model_clm_contract_clause,clm.group_clm_legal,1,1,1,1
+access_clm_contract_clause_admin,clm.contract.clause.admin,model_clm_contract_clause,clm.group_clm_legal_admin,1,1,1,1
+access_clm_contract_version_wizard_user,clm.contract.version.wizard.user,model_clm_contract_version_wizard,clm.group_clm_user,1,1,1,1
+access_clm_contract_version_wizard_legal,clm.contract.version.wizard.legal,model_clm_contract_version_wizard,clm.group_clm_legal,1,1,1,1
+access_clm_pdf_preview_wizard_user,clm.pdf.preview.wizard.user,model_clm_pdf_preview_wizard,base.group_user,1,1,1,1

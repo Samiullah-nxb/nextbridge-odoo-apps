@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Business Requesters only see tasks assigned to them (or originally). -->
+        <record id="rule_clm_workflow_task_user" model="ir.rule">
+            <field name="name">Workflow Task User Rule</field>
+            <field name="model_id" ref="clm.model_clm_workflow_task"/>
+            <field name="domain_force">['|', ('assigned_user_id', '=', user.id), ('original_assigned_user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('clm.group_clm_user'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <!--
+          Legal Admin implies Business Requester, so without a wider rule the
+          assignee-only rule above would also apply to Legal Admin and block
+          View Lifecycle (computed lifecycle_open_task_ids) when open tasks
+          are assigned to someone else. Group rules OR together, so this
+          restores full task visibility for Legal Admin.
+        -->
+        <record id="rule_clm_workflow_task_legal_admin" model="ir.rule">
+            <field name="name">Workflow Task Legal Admin Rule</field>
+            <field name="model_id" ref="clm.model_clm_workflow_task"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('clm.group_clm_legal_admin'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+        </record>
+
+        <!-- Legal Reviewers need all open tasks on the lifecycle overview. -->
+        <record id="rule_clm_workflow_task_legal" model="ir.rule">
+            <field name="name">Workflow Task Legal Reviewer Rule</field>
+            <field name="model_id" ref="clm.model_clm_workflow_task"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('clm.group_clm_legal'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+    </data>
+</odoo>

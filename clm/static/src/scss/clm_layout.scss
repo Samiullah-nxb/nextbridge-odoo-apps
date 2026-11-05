@@ -1,0 +1,1178 @@
+// Part of NextContract. See LICENSE file for full copyright and licensing details.
+//
+// ─── NextContract layout ─────────────────────────────────────────────────────
+//
+// Adjustments to Odoo's own form, list and notebook chrome. Every rule is
+// scoped to a NextContract class (o_clm_form, o_clm_list, o_clm_dialog) that
+// the NextContract views declare themselves, so nothing here can reach another
+// Odoo app that happens to be open in the same session.
+//
+// ── The one rule that matters ────────────────────────────────────────────────
+//
+//   NORMAL must never look like DISABLED.
+//
+// A field, tab or button that is available must be readable at a glance,
+// without hovering. Hover *enhances* an element; it never reveals it. Only a
+// genuinely unavailable control may use --clm-text-disabled.
+//
+// Colours come from the text-role tokens, always written as a pair with
+// `inherit` first so a browser without color-mix fails towards full contrast.
+// See the Text roles block in clm_design_tokens.scss.
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Form sheet
+// ─────────────────────────────────────────────────────────────────────────────
+
+.o_clm_form {
+    .o_form_sheet {
+        max-width: var(--clm-sheet-width);
+        padding: var(--clm-space-5) var(--clm-space-5) var(--clm-space-6);
+    }
+
+    // A contract carries several columns of structured data. Give it more of
+    // a wide screen rather than leaving a third of it empty, but keep a cap so
+    // a line of prose never runs the full width of a 4K display.
+    @media (min-width: 1400px) {
+        .o_form_sheet { max-width: var(--clm-sheet-width-wide); }
+    }
+
+    @media (min-width: 1800px) {
+        .o_form_sheet { max-width: var(--clm-sheet-width-xwide); }
+    }
+
+    // Nothing may push the page sideways.
+    .o_form_sheet_bg,
+    .o_form_sheet {
+        overflow-x: clip;
+    }
+
+    // Long values (references, file names, counterparty names) wrap instead of
+    // stretching their column.
+    // `break-word`, not `anywhere`: `anywhere` also shrinks the element's
+    // min-content size, which lets a grid track or table column collapse
+    // around a broken-up word. `break-word` wraps the same long values
+    // without changing how the column is measured.
+    .o_field_widget {
+        min-width: 0;
+        overflow-wrap: break-word;
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Field labels and values
+//
+// The hierarchy is carried by SIZE, WEIGHT, CASE and TRACKING first, and only
+// then by a small step in colour. That is what lets a label read as secondary
+// while staying comfortably readable — dimming alone makes it look disabled.
+// ─────────────────────────────────────────────────────────────────────────────
+
+.o_clm_form .o_inner_group {
+    .o_wrap_label > label,
+    .o_form_label {
+        font-size: var(--clm-font-label);
+        font-weight: var(--clm-weight-label);
+        // Unitless, and stated here rather than inherited, because
+        // --clm-label-offset below is computed from it. An inherited
+        // line-height would make the offset a guess.
+        line-height: var(--clm-label-line-height);
+        letter-spacing: var(--clm-tracking-label);
+        text-transform: uppercase;
+        white-space: normal;
+        margin: 0;
+        color: inherit;
+        color: color-mix(in srgb, currentColor var(--clm-text-label), transparent);
+    }
+
+    // ── Label / control alignment ────────────────────────────────────────────
+    //
+    // A label and its control are two separate grid items. Left alone they
+    // stretch to the row height and each lays its text out from its own top
+    // edge — a --clm-font-label line and a --clm-control-height box start at
+    // the same y, so the label rides high above the value beside it.
+    //
+    // Both cells are pinned to the top of the row, and the label is pushed down
+    // by exactly half the difference between the two heights. That puts the
+    // label's FIRST line on the control's centre line.
+    //
+    // Offsetting the label rather than centring it is what makes a wrapped
+    // label ("Termination For Convenience") still start level with its control:
+    // centring would push the first line down by half the second line too.
+    //
+    // Descendant selector, not `>`: a boolean row nests its cells one level
+    // deeper, inside .o_wrap_field_boolean.
+    .o_cell.o_wrap_label,
+    .o_cell.o_wrap_input {
+        align-self: start;
+    }
+
+    .o_cell.o_wrap_label {
+        padding-top: var(--clm-label-offset);
+        // Odoo gives this cell `line-height: 21px` and the <label> inside it is
+        // display: inline-block. An inline-block sits on its parent's line box,
+        // so the cell's 21px strut pushed every label ~4px below the value it
+        // belongs to — on every field, on every form. Taking the label out of
+        // the inline flow removes the strut from the calculation entirely, and
+        // matching the line-height keeps the offset above exact.
+        line-height: var(--clm-label-line-height);
+
+        > label,
+        > .o_form_label {
+            display: block;
+        }
+    }
+
+    // The value is the primary content of the row: full contrast.
+    .o_field_widget {
+        font-size: var(--clm-font-value);
+        color: inherit;
+    }
+}
+
+// ── The label column ─────────────────────────────────────────────────────────
+//
+// Size the GRID TRACK, never the label cell.
+//
+// .o_inner_group is a CSS grid (web.Form.InnerGroup renders `o_inner_group
+// grid`, and form_controller.scss sets
+//
+//     grid-template-columns: fit-content(150px) minmax(0, 1fr);
+//
+// at sm and up). Its direct children are .o_cell.o_wrap_label and
+// .o_cell.o_wrap_input — there is no table, so `width` / `max-width` /
+// `vertical-align` on the label are not the tools they look like.
+//
+// A percentage `width` on a grid ITEM is resolved against a track whose size
+// depends on that item, so the browser falls back to the item's intrinsic
+// contribution and the cell lands far narrower than its text. Odoo puts
+// `text-break` (word-break: break-word) on that same cell, so the label then
+// breaks mid-word — which is how "COUNTERPARTY" became "COUN / TERPA / RTY".
+//
+// The track is FIXED, not fit-content(). fit-content sizes every group to its
+// own longest label, so two groups side by side, or one above another, start
+// their value columns at different x — measured at 111 / 112 / 136 / 145 /
+// 147 / 171px across the six groups of one intake screen. Nothing else can
+// make those line up, and a form whose value columns wander is the thing that
+// reads as "every form has some issues".
+//
+// The cost is that a label longer than the track wraps. That is handled: the
+// offset below aligns a label's FIRST line, however many lines it has.
+.o_clm_form .o_inner_group:not(.o_form_fw_labels) {
+    @media (min-width: 576px) {
+        grid-template-columns: var(--clm-label-column) minmax(0, 1fr);
+    }
+}
+
+// Below sm Odoo drops the two-column template entirely and the grid stacks to
+// one column on its own, which is what we want — nothing to override.
+
+// ── A prose field inside a group spans the group ─────────────────────────────
+//
+//   <group string="Change Summary">
+//       <field name="change_summary" nolabel="1"/>
+//   </group>
+//
+// is a shape these views use in several places — Change Summary on the version
+// wizard, Previous/New Value on an audit event, the two wordings on a clause
+// deviation. web.Form.InnerGroup renders a nolabel field as a plain
+// `.o_cell.o_cell_custom`, and form_controller.scss gives that
+// `grid-column: span var(--o-grid-column-span, 1)` — a single column.
+//
+// A single column is the LABEL track, so a paragraph field renders in a
+// --clm-label-column-wide gutter. (fit-content() used to hide this by letting
+// the track stretch; a fixed track cannot.)
+//
+// Odoo's escape hatch is `colspan="2"` on each such field. Doing it here fixes
+// every one of them at once, including any added later — a field that holds
+// prose always takes the whole group.
+//
+// `.o_cell_custom` and not `.o_wrap_input`: a LABELLED text field keeps its
+// value cell, or its label would be pushed onto the line above.
+.o_clm_form .o_inner_group > .o_cell.o_cell_custom:has(> .o_field_text),
+.o_clm_form .o_inner_group > .o_cell.o_cell_custom:has(> .o_field_html),
+.o_clm_form .o_inner_group > .o_cell.o_cell_custom:has(> .o_clm_longtext) {
+    grid-column: 1 / -1;
+}
+
+// Section headings inside a group (group string="…").
+.o_clm_form .o_horizontal_separator {
+    margin-top: var(--clm-space-5);
+    margin-bottom: var(--clm-space-2);
+    padding-bottom: var(--clm-space-1);
+    border-bottom: 1px solid var(--clm-border-subtle);
+    font-size: var(--clm-font-section);
+    font-weight: var(--clm-weight-section);
+    letter-spacing: 0;
+    text-transform: none;
+    color: inherit;
+}
+
+// The first heading in a block does not need to be pushed away from it.
+.o_clm_form .o_clm_section > .o_horizontal_separator:first-child {
+    margin-top: 0;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// The field layout system
+//
+// Every editable field on a NextContract form is built from the same three
+// parts, with the same measurements, whichever widget renders it:
+//
+//   LABEL    one --clm-font-label line, offset by --clm-label-offset so its
+//            FIRST line sits on the same centre line as the control's first
+//            line — a label that wraps still starts level with its field.
+//   CONTROL  a box exactly --clm-control-height tall, no horizontal padding,
+//            filling its grid cell.
+//   RULE     one underline, --clm-underline-width thick, on the bottom edge of
+//            that box.
+//
+// ── One rule per field, and only one ─────────────────────────────────────────
+//
+// The rule is drawn on the FIELD ROOT — the <div class="o_field_widget
+// o_field_*"> that web.Field renders (field.xml) — and on nothing else.
+//
+// Painting .o_input directly, which is the obvious thing to do, draws some
+// fields TWICE, because a widget may contain more than one .o_input:
+//
+//   Many2ManyTagsField   its widget root is itself an .o_input
+//                        (`o_tags_input o_input`) and it wraps a second
+//                        input.o_input inside .o_input_dropdown.
+//   MonetaryField        renders span.o_input — the currency overlay,
+//                        position: absolute — as a SIBLING of the real
+//                        input.o_input.
+//
+// Those were the doubled underlines. Odoo patches each case where it arises
+// (many2many_tags_field.scss:24 sets `border: none` on the inner one); copying
+// that approach means a new patch for every widget that nests inputs.
+//
+// Hosting the rule one level up — on the wrapper every field has, and no field
+// has twice — removes the whole class of bug instead of the two known cases.
+// A widget added later, with whatever internals, gets exactly one rule:
+//
+//   <div class="o_field_widget o_field_*">   ← the rule lives here, always
+//     …widget markup, however deep, draws no chrome of its own…
+//
+// Everything below is a consequence of that one decision.
+// ─────────────────────────────────────────────────────────────────────────────
+
+.o_clm_form .o_form_editable {
+
+    // ── 1. The control box ───────────────────────────────────────────────────
+    //
+    // position: relative makes the field root the containing block the dropdown
+    // caret is placed against, so every caret lands at the same x. See 7.
+    .o_field_widget {
+        position: relative;
+        min-height: var(--clm-control-height);
+        border: 0;
+        border-bottom: var(--clm-underline-width) solid;
+        border-bottom-color: color-mix(in srgb, currentColor var(--clm-field-border), transparent);
+        border-radius: 0;
+        background-color: transparent;
+        color: inherit;
+        transition: border-bottom-color 0.12s ease-in-out, box-shadow 0.12s ease-in-out;
+    }
+
+    // ── 2. What is not a single-line control ─────────────────────────────────
+    //
+    // Listed once, here, rather than guarded against with a :not() chain on the
+    // host — the chain would push every rule in this block to specificity
+    // (0,9,0) and make the file impossible to override later.
+    //
+    // Each of these is (0,2,0) against the host's (0,1,0), so they win.
+    .o_field_widget.o_field_boolean,
+    // A radio is a set of options, not a single-line control.
+    .o_field_widget.o_field_radio,
+    .o_field_widget.o_field_html,
+    .o_field_widget.o_field_x2many,
+    .o_field_widget.o_field_one2many,
+    .o_field_widget.o_field_many2many,
+    .o_field_widget.o_field_properties,
+    .o_field_widget.o_field_image,
+    .o_field_widget.o_field_binary,
+    // A readonly field inside an editable form is data, not a control — the
+    // reference lines in the page-header subtitle are the common case.
+    .o_field_widget.o_readonly_modifier,
+    // A field nested inside another field is a cell of that field's own
+    // layout, never a form row: an embedded kanban's fields, a properties
+    // definition. Only the outermost field root hosts a rule.
+    .o_field_widget .o_field_widget,
+    // A list row is a table; a column of underlines fights the row borders.
+    .o_list_table .o_field_widget,
+    // The statusbar is chrome, not a form row.
+    .o_form_statusbar .o_field_widget {
+        min-height: 0;
+        border-bottom: 0;
+        box-shadow: none;
+    }
+
+    // ── 3. Nothing inside a field draws chrome ───────────────────────────────
+    //
+    // The widget internals are stripped flat: no borders, no fills, no radii,
+    // no padding. The field root drew the rule; these only carry the value.
+    //
+    // Checkboxes and radios are excluded by type — they are the one control
+    // whose box IS its meaning. See 6.
+    .o_field_widget {
+        .o_input,
+        input:not([type="checkbox"]):not([type="radio"]),
+        textarea,
+        select,
+        button.o_input {
+            border: 0;
+            border-radius: 0;
+            background-color: transparent;
+            box-shadow: none;
+            outline: none;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            color: inherit;
+            // Fill the box the field root defined, less the rule itself, so
+            // the value sits on the same baseline in every field.
+            min-height: calc(var(--clm-control-height) - var(--clm-underline-width));
+        }
+
+        // An <input> centres its own text in an over-tall box; a <button>
+        // (a date that already has a value) and a <select> do not.
+        //
+        // `select.o_input` as well as `select`, for the specificity reason
+        // spelled out at the textarea rule below.
+        button.o_input,
+        select,
+        select.o_input {
+            display: flex;
+            align-items: center;
+            text-align: left;
+        }
+
+        // Odoo's autocomplete input ships Bootstrap's `pe-3` utility, which is
+        // `padding-right: 1rem !important`. Nothing but !important can answer
+        // !important, and leaving it in place makes a many2one the one field
+        // whose text stops 1rem short of every other field's.
+        .o-autocomplete--input {
+            padding-right: 0 !important;
+        }
+
+        // A placeholder is guidance, not content: quieter than a real value,
+        // still legible.
+        ::placeholder {
+            color: inherit;
+            color: color-mix(in srgb, currentColor var(--clm-text-placeholder), transparent);
+            opacity: 1; // Firefox dims placeholders by default.
+        }
+    }
+
+    // A multi-line field is the one place the rule alone says too little: there
+    // is nothing to tell you how tall the writing area is until you reach the
+    // line at the bottom. A faint fill marks the box without a border.
+    //
+    // Both selectors are needed, and the duplication is not redundant. The
+    // block above reaches a textarea through TWO of its branches —
+    // `.o_field_widget .o_input` at (0,4,0) and `.o_field_widget textarea` at
+    // (0,3,1) — and a selector list takes the specificity of its strongest
+    // MATCHING branch, not of the branch you had in mind. Odoo puts class
+    // `o_input` on its textareas, so a bare `textarea` rule here loses to
+    // (0,4,0) and the box collapses to the one-line control height. Measured in
+    // Chromium: min-height resolved to 31px, not 6rem. Naming the class ties it
+    // at (0,4,0), which source order then settles in this rule's favour.
+    .o_field_widget textarea,
+    .o_field_widget textarea.o_input {
+        min-height: 6rem;
+        padding: var(--clm-space-2);
+        background-color: var(--clm-surface-section);
+    }
+
+    // Inline editing inside an embedded list keeps Odoo's compact cell sizing:
+    // a 2rem control in every cell would make a ten-row table scroll.
+    .o_list_table .o_field_widget {
+        .o_input,
+        input,
+        textarea,
+        select {
+            min-height: 0;
+        }
+
+        textarea {
+            background-color: transparent;
+            padding: 0;
+        }
+    }
+
+    // The page title is a field too, and its rule should span the sheet rather
+    // than stopping at the end of the typed text.
+    .oe_title .o_field_widget {
+        width: 100%;
+    }
+
+    // ── Nothing escapes its field ────────────────────────────────────────────
+    //
+    // A readonly many2one renders `<div class="o_many2one"><a class="o_form_uri
+    // text-truncate w-100">`. The truncation never fires, because .o_many2one
+    // is a flex item with the default `min-width: auto` — it refuses to shrink
+    // below its content, so `w-100` on the link resolves against a box already
+    // as wide as the text. Measured on the Contract Version dialog: the
+    // contract name ran 7.3px past its own field and straight over the DOCUMENT
+    // heading in the next column.
+    //
+    // min-width: 0 lets the flex item shrink, which is what lets text-truncate
+    // do its job. Applied to every wrapper a field puts around its value, not
+    // just the many2one, so any long value truncates instead of colliding with
+    // the column beside it.
+    .o_field_widget > *,
+    .o_field_widget .o_many2one,
+    .o_field_widget .o_field_many2one_selection {
+        min-width: 0;
+    }
+
+    .o_field_widget.o_readonly_modifier .o_form_uri,
+    .o_form_readonly .o_field_widget .o_form_uri {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    // ── Controls that are a button, not a value ──────────────────────────────
+    //
+    // A binary/file field is an upload button. It takes no underline — the
+    // button IS the control, exactly like a checkbox — but it must still stand
+    // in a box of the shared height, or its row is shorter than every row
+    // around it. Measured: 25px against everything else's 32px.
+    .o_field_widget.o_field_binary,
+    .o_field_widget.o_field_image {
+        display: flex;
+        align-items: center;
+        min-height: var(--clm-control-height);
+    }
+
+    // A readonly field inside a group is still a row of the same form. Left as
+    // 2 excludes it — no height, no rule — it collapses to a bare line of text
+    // between rows that have both, and reads as the one broken row on the form
+    // (Requester on the intake screen is the usual case).
+    //
+    // It keeps the box, so the grid stays even, and takes a LIGHTER rule than
+    // an editable field: present, clearly not something you can type into.
+    //
+    // Only inside a group. The reference lines under a page title are readonly
+    // too, and those are prose, not rows.
+    .o_inner_group .o_field_widget.o_readonly_modifier:not(.o_field_boolean):not(.o_field_html):not(.o_field_x2many) {
+        display: flex;
+        // flex-direction MUST be stated. Odoo sets `flex-direction: column` on
+        // .o_field_many2one, and in a column flex container `align-items`
+        // controls the HORIZONTAL axis — so `align-items: center` centred the
+        // value instead of centring it vertically. Measured: the readonly
+        // Requester value started 132px right of its own field box while every
+        // editable field beside it started at 0.
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        min-height: var(--clm-control-height);
+        border-bottom: var(--clm-underline-width) solid;
+        border-bottom-color: color-mix(in srgb, currentColor var(--clm-text-disabled), transparent);
+    }
+
+    // ── Monetary ─────────────────────────────────────────────────────────────
+    //
+    // MonetaryField draws the currency symbol in an absolutely positioned
+    // OVERLAY (span.o_input) stacked over the real input, with an opacity-0
+    // spacer reserving the symbol's width in the flow.
+    //
+    // Both halves have to sit on the same line, and neither did:
+    //
+    //   the inner row is `align-items: baseline`, which is right at the input's
+    //     natural height and wrong once it is --clm-control-height tall;
+    //   the overlay is `d-flex` with the default `align-items: normal`, so the
+    //     symbol stretched to the full 31px box and rendered at its TOP —
+    //     measured 4px above the value it labels.
+    //
+    // Both are centred, so the symbol and the number share a centre line.
+    .o_field_widget.o_field_monetary > div {
+        align-items: center;
+    }
+
+    .o_field_widget.o_field_monetary span.o_input {
+        align-items: center;
+    }
+
+    // ── 4. States ────────────────────────────────────────────────────────────
+    //
+    // All on the host, all (0,2,0), so SOURCE ORDER decides between them.
+    // The order below is the priority, weakest first:
+    //
+    //   required → hover → focus → invalid → disabled
+    //
+    // invalid after focus, because a field with bad data must stay red while
+    // you are correcting it; it keeps the doubled weight so focus is still
+    // legible. disabled last, because nothing outranks "you cannot use this".
+
+    // Required: a heavier rule, so a mandatory field is distinguishable from an
+    // optional one without reading the label.
+    .o_field_widget.o_required_modifier {
+        border-bottom-color: color-mix(in srgb, currentColor var(--clm-field-border-hover), transparent);
+    }
+
+    .o_field_widget:hover {
+        border-bottom-color: color-mix(in srgb, currentColor var(--clm-field-border-hover), transparent);
+    }
+
+    // FOCUS: the rule doubles and takes the accent. Drawn as border + inset
+    // shadow rather than border-width: 2px, so the control does not shift by a
+    // pixel as you tab through the form.
+    //
+    // The inner controls set `outline: none` in 3; this rule IS their focus
+    // indicator, which is why it is the strongest state a usable field has.
+    .o_field_widget:focus-within {
+        border-bottom-color: var(--clm-focus-ring);
+        box-shadow: inset 0 calc(-1 * var(--clm-underline-width)) 0 0 var(--clm-focus-ring);
+    }
+
+    .o_field_widget.o_field_invalid {
+        border-bottom-color: var(--clm-status-negative);
+        box-shadow: inset 0 calc(-1 * var(--clm-underline-width)) 0 0 var(--clm-status-negative);
+    }
+
+    // Disabled: the rule dims with the text it belongs to, but stays drawn. A
+    // field with no rule at all reads as "not a field", which is a different
+    // message from "not available".
+    .o_field_widget:has(:disabled) {
+        border-bottom-color: color-mix(in srgb, currentColor var(--clm-text-disabled), transparent);
+        box-shadow: none;
+    }
+
+    .o_field_widget :disabled,
+    .o_form_label.o_field_disabled {
+        color: inherit;
+        color: color-mix(in srgb, currentColor var(--clm-text-disabled), transparent);
+        cursor: not-allowed;
+    }
+
+    // ── 5. Cells ─────────────────────────────────────────────────────────────
+    //
+    // The value cell fills its column so every control, and therefore every
+    // rule, ends on the same vertical line.
+    //
+    // Deliberately not `.o_cell`, which would also catch .o_wrap_label: a
+    // percentage width on the label grid item is what collapsed the label
+    // column (see The label column above).
+    .o_inner_group .o_wrap_input,
+    .o_inner_group .o_field_widget {
+        width: 100%;
+    }
+
+    // ── 6. Checkboxes ────────────────────────────────────────────────────────
+    //
+    // Bootstrap gives .form-check-input `appearance: none` and then sizes it
+    // explicitly — `width: 1em; height: 1em` (_form-check.scss:33). With no
+    // intrinsic box left, any width other than an explicit one collapses it:
+    // `width: auto` computes to zero and all that remains is its left and
+    // right border, a 1px vertical tick. That is why the checkboxes were
+    // missing rather than merely mis-sized.
+    //
+    // So the size is stated, not inherited, and the control is centred in a box
+    // of exactly --clm-control-height — the same box every other control
+    // occupies, so a checkbox row is the same height as a text row.
+    .o_field_widget.o_field_boolean {
+        display: flex;
+        align-items: center;
+        min-height: var(--clm-control-height);
+        width: auto;
+    }
+
+    // web.CheckBox always renders `o-checkbox form-check`, and Bootstrap's
+    // .form-check indents by 1.5em and floats the input back out with a
+    // negative margin — machinery for a checkbox that has a label beside it.
+    // A boolean FIELD has its label in the grid cell to the left, so the slot
+    // is empty and the indent is just an offset that puts the control out of
+    // line with every other one.
+    .o_field_widget.o_field_boolean .o-checkbox {
+        padding-left: 0;
+        margin: 0;
+        // .form-check also carries a min-height of one line-height and a
+        // bottom margin, both sized for a checkbox that has text beside it.
+        // Left in, they push the control off the centre line of its row.
+        min-height: 0;
+        line-height: 1;
+    }
+
+    .o_field_widget .form-check-input {
+        flex: 0 0 auto;
+        float: none;
+        width: var(--clm-checkbox-size);
+        height: var(--clm-checkbox-size);
+        min-height: 0;
+        margin: 0;
+        border: var(--clm-underline-width) solid;
+        border-color: color-mix(in srgb, currentColor var(--clm-field-border-hover), transparent);
+        border-radius: var(--clm-radius-sm);
+        background-color: transparent;
+
+        &:checked {
+            background-color: var(--clm-focus-ring);
+            border-color: var(--clm-focus-ring);
+        }
+
+        // A checkbox has no underline, so it needs a ring of its own.
+        &:focus-visible {
+            outline: 2px solid var(--clm-focus-ring);
+            outline-offset: 2px;
+            box-shadow: none;
+        }
+
+        &:disabled {
+            border-color: color-mix(in srgb, currentColor var(--clm-text-disabled), transparent);
+        }
+    }
+
+    .o_field_widget.o_field_radio .form-check-input {
+        border-radius: 50%;
+    }
+
+    // ── 7. The dropdown caret ────────────────────────────────────────────────
+    //
+    // A field that opens a list must say so before you touch it. Odoo hides the
+    // caret until hover or focus, in three separate places:
+    //
+    //   many2one_field.scss:2         .o_field_many2one_selection
+    //   many2many_tags_field.scss:72  .o_field_many2many_selection
+    //   select_menu.scss:22           .o_select_menu
+    //
+    // With the control reduced to a rule, a hidden caret leaves a dropdown and
+    // a plain text field looking identical at rest — you cannot tell which
+    // fields will offer you a list.
+    //
+    // ── Why the caret is REDRAWN and not repositioned ────────────────────────
+    //
+    // Odoo's caret is position: absolute, so it lands against whatever happens
+    // to be the nearest POSITIONED ancestor — and every widget nests a
+    // different set of them. Measured in Chromium on one intake screen, a
+    // selection field's caret is anchored four levels below where we want it:
+    //
+    //   span.o_select_menu_caret        absolute
+    //   div.position-relative.d-flex    the toggler row
+    //   div.o-dropdown.dropdown         Bootstrap .dropdown { position: relative }
+    //   div.o_select_menu               .position-relative utility (!important)
+    //   div.o_field_widget              <- where it actually belongs
+    //
+    // A many2one nests a different chain again. Releasing them one at a time is
+    // whack-a-mole: each release needs its own !important to beat a utility
+    // class, and one wrapper missed anywhere puts that single field's caret
+    // 20px off everyone else's. That is exactly what kept coming back on Legal
+    // Action Needed and Urgency after two rounds of "fixing" it.
+    //
+    // So the caret is not repositioned at all. Odoo's is taken out of the
+    // layout and ONE is drawn on the field root — which rule 1 already made
+    // position: relative. The containing block is then ours by construction,
+    // no wrapper can move it, and the whole !important fight disappears.
+    //
+    // The glyph is Odoo's own, reproduced exactly rather than substituted:
+    // o-caret-down (utils.scss:120) is a CSS triangle of $caret-width, which
+    // bootstrap_overridden.scss:106 sets to 4px, filled with --o-caret-color.
+    // Same shape, same size, same colour variable as every other dropdown in
+    // the application.
+    .o_field_widget:has(.o_dropdown_button),
+    .o_field_widget:has(.o_select_menu_caret) {
+        padding-right: var(--clm-caret-gutter);
+
+        &::after {
+            content: "";
+            position: absolute;
+            right: 0;
+            // Centred on the control's FIRST line, not on the field box, so a
+            // tags field grown to three rows keeps its caret level with every
+            // other field on the form.
+            top: calc(var(--clm-control-height) / 2);
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-left: var(--clm-caret-size) solid transparent;
+            border-right: var(--clm-caret-size) solid transparent;
+            border-top: var(--clm-caret-size) solid var(--o-caret-color, currentColor);
+            pointer-events: none;
+        }
+    }
+
+    // Removed from the layout, not just hidden: `visibility` would leave the
+    // old caret reserving space beside the new one.
+    .o_dropdown_button,
+    .o_select_menu_caret {
+        display: none;
+    }
+
+    // The dropdown input still has to stop before the gutter.
+    .o_input_dropdown {
+        width: 100%;
+    }
+
+    // o-caret-down paints from var(--o-caret-color), which :root sets to a
+    // compiled literal ($input-color) — a dark value that disappears against
+    // the dark sheet. Mix it from currentColor instead, like every other colour
+    // in this design system, so it follows the active theme.
+    .o_field_widget {
+        --o-caret-color: color-mix(in srgb, currentColor var(--clm-text-label), transparent);
+    }
+
+    // Odoo's own focus accent, kept, in our accent colour. Must come after the
+    // rule above: both are (0,2,0), so source order decides.
+    .o_field_widget:focus-within {
+        --o-caret-color: var(--clm-focus-ring);
+    }
+
+    // ── 8. Embedded lists are Odoo's layout, not ours ────────────────────────
+    //
+    // An editable list row is a table, and list_renderer.scss already lays its
+    // cells out: compact heights, no control chrome, and the caret pinned to
+    // the cell. Every rule in 1–7 is written for a form ROW and would reach
+    // into list CELLS too, where each one does damage — a 2rem control in every
+    // cell, an accent rule across a cell that reads as a misaligned underline,
+    // a caret gutter padding a cell with no room to spare.
+    //
+    // So the system is handed back at the list boundary. This block is LAST on
+    // purpose: most of the rules above are also (0,4,0), and on a tie the later
+    // rule wins — which is what makes this a boundary rather than a race.
+    //
+    // Note there is no !important here any more. Rule 7 no longer touches the
+    // caret's position, so Odoo's own placement inside a list is simply left
+    // alone; all this does is drop our pseudo-element and show theirs.
+    .o_list_table {
+        .o_field_widget {
+            position: static;
+            min-height: 0;
+            padding-right: 0;
+            border-bottom: 0;
+            box-shadow: none;
+
+            &::after {
+                content: none;
+            }
+        }
+
+        .o_dropdown_button,
+        .o_select_menu_caret {
+            display: inline;
+            visibility: visible;
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Readonly
+//
+// Data, not a control: no rule, no fill, full contrast — readonly does not mean
+// unavailable. The box height is kept, so a readonly row and an editable row
+// are the same height and the form does not reflow when you save it.
+// ─────────────────────────────────────────────────────────────────────────────
+
+.o_clm_form .o_form_readonly .o_inner_group .o_field_widget {
+    min-height: var(--clm-control-height);
+    display: flex;
+    // Same trap as the readonly field inside an editable form: Odoo sets
+    // `flex-direction: column` on .o_field_many2one, and in a column flex
+    // container `align-items` is the HORIZONTAL axis. Left unstated it centred
+    // the value sideways AND left it at the top of the box. Measured on the
+    // audit-event screen: Company +167px right of its field and its label 3.9px
+    // off the value line.
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    color: inherit;
+}
+
+.o_clm_form .o_form_readonly .o_field_widget {
+    .o_input,
+    input.o_input,
+    textarea.o_input {
+        border-color: transparent;
+        background-color: transparent;
+        color: inherit;
+    }
+}
+
+// An empty readonly field still has to be visible as a field, otherwise it
+// reads as "this does not exist". "Not set" says "exists, nothing in it", at
+// placeholder contrast — muted, but never the disabled treatment.
+//
+// Odoo puts o_field_empty on the widget itself; the text is generated so it is
+// not selectable and does not end up in a copied value.
+.o_clm_form .o_form_readonly .o_field_widget.o_field_empty:not(.o_field_boolean)::after {
+    content: "Not set";
+    font-style: italic;
+    user-select: none;
+    color: inherit;
+    color: color-mix(in srgb, currentColor var(--clm-text-placeholder), transparent);
+}
+
+// A few fields read better with their own wording.
+.o_clm_form .o_form_readonly .o_field_widget.o_field_empty.o_clm_empty_unassigned::after {
+    content: "Not assigned";
+}
+
+.o_clm_form .o_form_readonly .o_field_widget.o_field_empty.o_clm_empty_unselected::after {
+    content: "Not selected";
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Long-form text
+//
+// The cause of the narrow "Purpose" column: a textarea inside a two-cell
+// group gets roughly a third of the sheet. NextContract views take such
+// fields out of the group and mark them with o_clm_longtext.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// The `.o_clm_form.o_clm_form` repetition is deliberate: it lifts these rules
+// to specificity (0,4,0) so they outrank the shared control rules above, whose
+// min-height would otherwise flatten every long-text field to a single line.
+.o_clm_form.o_clm_form .o_clm_longtext {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+
+    textarea,
+    .o_input,
+    > div {
+        width: 100%;
+    }
+
+    textarea {
+        min-height: 6rem;
+        line-height: 1.55;
+        padding: var(--clm-space-2);
+    }
+
+    &.o_clm_longtext_tall textarea {
+        min-height: 11rem;
+    }
+
+    // Readonly long text still needs the full measure, and must wrap.
+    &.o_field_text {
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+}
+
+// Rich-text (html) fields on contract screens: full width, sensible height.
+.o_clm_form .o_field_html {
+    width: 100%;
+
+    .odoo-editor-editable {
+        min-height: 8rem;
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Action bar (the buttons in the form header)
+//
+// Hierarchy without reordering the views: primary first, destructive last,
+// everything else in declaration order. o_statusbar_buttons is a flex row, so
+// `order` is enough; where it is not, these rules are inert.
+//
+// A secondary button is a REAL button. It gets a visible border and readable
+// text at rest — it is not a primary button waiting to be hovered.
+// ─────────────────────────────────────────────────────────────────────────────
+
+.o_clm_form .o_form_statusbar {
+    // Odoo stamps `d-flex justify-content-between` on the statusbar. When many
+    // header actions wrap, the second button row slides under the status pills
+    // (e.g. "Request Business Input" over "Under Legal Review"). Force a
+    // stacked layout so status and actions never share a horizontal band.
+    // `!important` is required to beat Bootstrap's `d-flex` utility.
+    display: flex !important;
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    gap: var(--clm-space-2);
+
+    .o_statusbar_buttons {
+        order: 2;
+        width: 100%;
+        flex-wrap: wrap;
+        gap: var(--clm-space-2);
+        align-items: center;
+        min-width: 0;
+        max-width: 100%;
+
+        > .btn {
+            order: 5;
+            height: var(--clm-control-height);
+            padding: 0 var(--clm-button-padding-x);
+            border-radius: var(--clm-radius);
+            font-size: var(--clm-font-support);
+            font-weight: 500;
+            white-space: nowrap;
+            // Odoo spaces these with utility margins in places; the gap above
+            // is the single source of spacing now.
+            margin: 0;
+            // NORMAL: readable without hover.
+            color: inherit;
+            border-color: var(--clm-border-strong);
+            transition: background-color 0.12s ease-in-out, border-color 0.12s ease-in-out;
+
+            &:hover:not(:disabled) {
+                background-color: var(--clm-surface-hover);
+                border-color: var(--clm-border-strong);
+                color: inherit;
+            }
+
+            &:active:not(:disabled) {
+                background-color: var(--clm-surface-sunken);
+            }
+
+            &:focus-visible {
+                outline: 2px solid var(--clm-focus-ring);
+                outline-offset: 1px;
+            }
+
+            // The only dimmed button state.
+            &:disabled,
+            &.disabled {
+                color: inherit;
+                color: color-mix(in srgb, currentColor var(--clm-text-disabled), transparent);
+                border-color: var(--clm-border-subtle);
+                background-color: transparent;
+                cursor: not-allowed;
+            }
+        }
+
+        // The single next step. Keeps Bootstrap's filled treatment.
+        > .btn-primary,
+        > .oe_highlight {
+            order: 1;
+            border-color: transparent;
+            // Beat the generic `color: inherit` above — primary fill needs
+            // light label/icon text in both light and dark themes.
+            color: #fff !important;
+
+            .fa {
+                color: inherit;
+            }
+
+            &:hover:not(:disabled) {
+                // Let Bootstrap's own primary hover win; do not grey it out.
+                background-color: var(--bs-primary, #714b67);
+                filter: brightness(1.12);
+                color: #fff !important;
+            }
+
+            &:disabled,
+            &.disabled {
+                color: #fff !important;
+                opacity: 0.65;
+            }
+        }
+
+        > .o_clm_action_danger {
+            order: 9;
+            color: var(--clm-status-negative);
+            border-color: var(--clm-border-strong);
+
+            &:hover:not(:disabled),
+            &:focus-visible {
+                color: #fff;
+                background-color: var(--clm-status-negative);
+                border-color: var(--clm-status-negative);
+            }
+        }
+
+        .fa {
+            margin-right: var(--clm-icon-gap);
+            font-size: var(--clm-icon-size);
+        }
+    }
+
+    .o_field_statusbar {
+        order: 1;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+
+        > .o_statusbar_status {
+            margin-left: 0 !important;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+            max-width: 100%;
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Notebook tabs
+//
+// An inactive tab is AVAILABLE, not disabled: it stays readable at rest and
+// carries a faint surface so it reads as a control. The active tab is marked
+// three ways over — full-contrast text, a filled surface and an accent
+// underline — so it is unmistakable even at a glance.
+// ─────────────────────────────────────────────────────────────────────────────
+
+.o_clm_form .o_notebook {
+    margin-top: var(--clm-space-5);
+
+    > .o_notebook_headers {
+        max-width: 100%;
+
+        .nav-tabs {
+            border-bottom: 1px solid var(--clm-border);
+            gap: var(--clm-space-1);
+
+            // Odoo disables a tab via its parent .nav-item; strip the
+            // inactive surface there too.
+            .nav-item.disabled .nav-link {
+                background-color: transparent;
+                cursor: not-allowed;
+            }
+
+            .nav-link {
+                padding: var(--clm-space-2) var(--clm-space-3);
+                border: 1px solid transparent;
+                border-bottom: 2px solid transparent;
+                border-radius: var(--clm-radius-sm) var(--clm-radius-sm) 0 0;
+                font-size: var(--clm-font-support);
+                font-weight: 500;
+                line-height: 1.4;
+                white-space: nowrap;
+                background-color: var(--clm-surface-section);
+                transition: background-color 0.12s ease-in-out, color 0.12s ease-in-out;
+                // INACTIVE: clearly readable on its own.
+                color: inherit;
+                color: color-mix(in srgb, currentColor var(--clm-text-label), transparent);
+
+                // HOVER: enhances an already-visible tab.
+                &:hover:not(.disabled) {
+                    background-color: var(--clm-surface-hover);
+                    color: inherit;
+                }
+
+                // ACTIVE: full contrast + surface + accent underline.
+                &.active {
+                    background-color: var(--clm-surface-hover);
+                    border-bottom-color: var(--bs-primary, #714b67);
+                    color: inherit;
+                    font-weight: 600;
+                }
+
+                &:focus-visible {
+                    outline: 2px solid var(--clm-focus-ring);
+                    outline-offset: -2px;
+                }
+
+                // A genuinely unavailable tab — visibly different from inactive.
+                // Odoo marks these on the PARENT (.nav-item.disabled) and
+                // already drops them to opacity .3; this only removes the
+                // inactive surface so a disabled tab does not read as a
+                // available control.
+                &.disabled,
+                &[disabled] {
+                    background-color: transparent;
+                    color: inherit;
+                    color: color-mix(in srgb, currentColor var(--clm-text-disabled), transparent);
+                    cursor: not-allowed;
+                }
+            }
+        }
+    }
+
+    > .tab-content {
+        padding-top: var(--clm-space-4);
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Tables — inside a form and as a list view
+// ─────────────────────────────────────────────────────────────────────────────
+
+.o_clm_form .o_field_x2many,
+.o_clm_list {
+    .o_list_table {
+        thead > tr > th {
+            height: var(--clm-row-height-header);
+            // Bootstrap's table sets vertical-align: top. Once a row is taller
+            // than its text — which these are, because of the row height above
+            // — "top" is visible as text stuck to the ceiling, and anything
+            // taller in the row (a status badge, a row button) sits lower
+            // still. Centre every cell so a row reads as one line.
+            vertical-align: middle;
+            font-size: var(--clm-font-label);
+            font-weight: var(--clm-weight-label);
+            letter-spacing: var(--clm-tracking-label);
+            text-transform: uppercase;
+            white-space: nowrap;
+            color: inherit;
+            color: color-mix(in srgb, currentColor var(--clm-text-label), transparent);
+        }
+
+        tbody > tr.o_data_row {
+            font-size: var(--clm-font-support);
+
+            > td {
+                vertical-align: middle;
+            }
+
+            > td.o_data_cell {
+                height: var(--clm-row-height);
+                padding-top: var(--clm-space-1);
+                padding-bottom: var(--clm-space-1);
+
+                // The cell is centred; its contents must be too, or a badge
+                // or button still rides its own baseline inside the cell.
+                > .o_field_widget,
+                > .o_field_widget > span,
+                .badge,
+                button.btn {
+                    vertical-align: middle;
+                }
+            }
+
+            &:hover > td {
+                background-color: var(--clm-surface-hover);
+            }
+        }
+    }
+}
+
+// A wide embedded table scrolls inside its own tab; it never widens the sheet.
+.o_clm_form .o_field_x2many .o_list_renderer {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+// Row buttons in a list: same size everywhere, icon and label aligned, and
+// readable at rest like every other button.
+.o_clm_form .o_field_x2many,
+.o_clm_list {
+    .o_list_table .o_data_cell button.btn {
+        height: 1.75rem;
+        padding: 0 var(--clm-space-2);
+        border-radius: var(--clm-radius-sm);
+        font-size: var(--clm-font-support);
+        color: inherit;
+
+        .fa { margin-right: var(--clm-icon-gap); }
+
+        &:hover:not(:disabled) {
+            background-color: var(--clm-surface-hover);
+        }
+
+        &:disabled {
+            color: inherit;
+            color: color-mix(in srgb, currentColor var(--clm-text-disabled), transparent);
+            cursor: not-allowed;
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Status bar
+// ─────────────────────────────────────────────────────────────────────────────
+
+.o_clm_form .o_form_statusbar .o_field_statusbar > .o_statusbar_status .o_arrow_button {
+    font-size: var(--clm-font-support);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Narrow viewports
+// ─────────────────────────────────────────────────────────────────────────────
+
+@media (max-width: 991.98px) {
+    .o_clm_form .o_form_sheet {
+        padding: var(--clm-space-4) var(--clm-space-4) var(--clm-space-5);
+    }
+}

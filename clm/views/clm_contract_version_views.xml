@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ─── Contract Version list ──────────────────────────────────────── -->
+    <record id="view_clm_contract_version_list" model="ir.ui.view">
+        <field name="name">clm.contract.version.list</field>
+        <field name="model">clm.contract.version</field>
+        <field name="arch" type="xml">
+            <list string="Contract Versions" class="o_clm_list"
+                  decoration-muted="status == 'superseded'"
+                  decoration-bf="version_type == 'executed'">
+                <field name="contract_id"/>
+                <field name="version_number" string="Version"/>
+                <field name="version_type"/>
+                <field name="change_classification" optional="show"/>
+                <field name="change_summary" optional="hide"/>
+                <field name="parent_version_id" string="Parent" optional="hide"/>
+                <field name="document_id" optional="hide"/>
+                <field name="created_by_id" optional="show"/>
+                <field name="create_date" string="Created On"/>
+                <field name="status" widget="badge"
+                       decoration-info="status == 'draft'"
+                       decoration-success="status == 'active'"
+                       decoration-muted="status == 'superseded'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_clm_contract_version_search" model="ir.ui.view">
+        <field name="name">clm.contract.version.search</field>
+        <field name="model">clm.contract.version</field>
+        <field name="arch" type="xml">
+            <search string="Contract Versions">
+                <field name="contract_id"/>
+                <field name="version_number"/>
+                <field name="created_by_id"/>
+                <filter string="Active Version" name="filter_active" domain="[('status', '=', 'active')]"/>
+                <filter string="Draft" name="filter_draft" domain="[('status', '=', 'draft')]"/>
+                <filter string="Superseded" name="filter_superseded" domain="[('status', '=', 'superseded')]"/>
+                <separator/>
+                <filter string="Executed" name="filter_executed" domain="[('version_type', '=', 'executed')]"/>
+                <filter string="From Counterparty" name="filter_counterparty" domain="[('is_counterparty', '=', True)]"/>
+                <group>
+                    <filter string="Contract" name="group_by_contract" context="{'group_by': 'contract_id'}"/>
+                    <filter string="Status" name="group_by_status" context="{'group_by': 'status'}"/>
+                    <filter string="Version Type" name="group_by_type" context="{'group_by': 'version_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ─── Contract Version form ──────────────────────────────────────── -->
+    <record id="view_clm_contract_version_form" model="ir.ui.view">
+        <field name="name">clm.contract.version.form</field>
+        <field name="model">clm.contract.version</field>
+        <field name="arch" type="xml">
+            <form string="Contract Version" class="o_clm_form">
+                <header>
+                    <button name="action_activate" type="object" string="Activate Version"
+                            class="btn-primary" invisible="status != 'draft'"/>
+                    <button name="action_supersede" type="object" string="Supersede"
+                            class="o_clm_action_danger"
+                            invisible="status == 'superseded' or version_type == 'executed'"/>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,active,superseded"/>
+                </header>
+                <sheet>
+                    <div class="oe_title o_clm_page_header" name="clm_page_header">
+                        <div class="o_clm_kicker">
+                            Contract Version · <field name="contract_id" readonly="1" class="oe_inline"
+                                                      options="{'no_open': True}"/>
+                        </div>
+                        <h1 class="o_clm_title">Version <field name="version_number" readonly="1" class="oe_inline"/></h1>
+                        <div class="o_clm_subtitle">
+                            <span>
+                                <i class="fa fa-tag" role="img" aria-label="Version type"/>
+                                <field name="version_type" readonly="1"/>
+                            </span>
+                            <span invisible="not created_by_id">
+                                <i class="fa fa-user-o" role="img" aria-label="Created by"/>
+                                <field name="created_by_id" readonly="1" options="{'no_open': True}"/>
+                            </span>
+                        </div>
+                    </div>
+                    <group>
+                        <group string="Version Details" name="version_details">
+                            <field name="contract_id" readonly="1"/>
+                            <field name="version_type"/>
+                            <field name="parent_version_id"
+                                   domain="[('contract_id', '=', contract_id), ('id', '!=', id)]"/>
+                            <field name="source"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Document">
+                            <field name="document_id"/>
+                            <field name="document_filename" invisible="1"/>
+                            <field name="document_file" filename="document_filename"
+                                   invisible="version_type == 'executed'"/>
+                            <field name="created_by_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Negotiation">
+                            <field name="is_counterparty"/>
+                            <field name="negotiation_round"/>
+                        </group>
+                    </group>
+                    <separator string="What Changed"/>
+                    <field name="change_summary" nolabel="1" class="o_clm_longtext"
+                           placeholder="What changed in this version, and why."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_clm_contract_version" model="ir.actions.act_window">
+        <field name="name">Contract Versions</field>
+        <field name="res_model">clm.contract.version</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_clm_contract_version_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No contract versions yet</p>
+            <p>Every frozen state of a contract's text is kept here — internal
+               drafts, versions exchanged with the counterparty, and the
+               executed version. Earlier versions are never changed.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_clm_contract_versions"
+              name="Contract Versions"
+              parent="clm.menu_clm_contracts_main"
+              action="action_clm_contract_version"
+              sequence="20"/>
+</odoo>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_clm_library" name="Library" parent="clm.menu_clm_root" sequence="60"/>
+    <menuitem id="menu_clm_templates" name="Templates" parent="menu_clm_library" action="action_clm_template" sequence="10"/>
+    <menuitem id="menu_clm_clauses" name="Clauses" parent="menu_clm_library" action="action_clm_clause" sequence="20"/>
+</odoo>

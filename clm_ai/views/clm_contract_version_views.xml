@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_clm_contract_version_form_ai" model="ir.ui.view">
+        <field name="name">clm.contract.version.form.ai</field>
+        <field name="model">clm.contract.version</field>
+        <field name="inherit_id" ref="clm.view_clm_contract_version_form"/>
+        <field name="arch" type="xml">
+            <!-- Add a button to trigger AI Extraction -->
+            <xpath expr="//header" position="inside">
+                <button name="action_run_ai_extraction" type="object" string="Extract via AI"
+                        groups="clm.group_clm_user" icon="fa-magic"/>
+            </xpath>
+            <!-- Show linked AI Jobs -->
+            <xpath expr="//sheet" position="inside">
+                <notebook>
+                    <page string="AI Analysis Jobs" name="ai_jobs">
+                        <div class="o_clm_empty" invisible="ai_job_ids">
+                            <i class="fa fa-magic" role="img" aria-label="No AI runs"/>
+                            <div class="o_clm_empty_title">No AI analysis run yet</div>
+                            <div class="o_clm_empty_text">
+                                Use <strong>Extract via AI</strong> to read this document and
+                                propose contract field values for review.
+                            </div>
+                        </div>
+                        <field name="ai_job_ids" nolabel="1" readonly="1" invisible="not ai_job_ids">
+                            <list>
+                                <field name="create_date" string="Run On"/>
+                                <field name="analysis_type"/>
+                                <field name="provider"/>
+                                <field name="status" widget="badge"
+                                       decoration-info="status == 'pending'"
+                                       decoration-warning="status == 'processing'"
+                                       decoration-success="status == 'completed'"
+                                       decoration-danger="status == 'failed'"/>
+                            </list>
+                        </field>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+</odoo>

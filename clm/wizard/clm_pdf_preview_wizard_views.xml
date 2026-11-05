@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_clm_pdf_preview_wizard_form" model="ir.ui.view">
+        <field name="name">clm.pdf.preview.wizard.form</field>
+        <field name="model">clm.pdf.preview.wizard</field>
+        <field name="arch" type="xml">
+            <form string="PDF Preview" class="o_clm_form o_clm_preview_dialog"
+                  create="false" delete="false" edit="false">
+                <field name="contract_id" invisible="1"/>
+                <field name="version_id" invisible="1"/>
+                <field name="attachment_id" invisible="1"/>
+                <field name="show_create_version" invisible="1"/>
+                <field name="content_locked" invisible="1"/>
+                <field name="preview_html" nolabel="1" readonly="1"/>
+                <footer>
+                    <button name="action_download_version_docx" type="object"
+                            string="Download DOCX" class="btn-primary" icon="fa-file-word-o"
+                            invisible="not version_id"/>
+                    <button name="action_download_version_pdf" type="object"
+                            string="Download PDF" class="btn-secondary" icon="fa-file-pdf-o"
+                            invisible="not version_id"/>
+                    <button name="action_open_new_version_wizard" type="object"
+                            string="Create New Version" class="btn-primary"
+                            invisible="not show_create_version or content_locked or version_id"
+                            groups="clm.group_clm_user,clm.group_clm_legal"/>
+                    <button string="Close" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

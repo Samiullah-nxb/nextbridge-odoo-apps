@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_clm_root" name="NextContract" sequence="40"
+              web_icon="clm,static/description/icon.png"
+              action="action_clm_home_board"
+              groups="clm.group_clm_read_only"/>
+    <!-- Return to the icon-tile home board from the navbar. -->
+    <menuitem id="menu_clm_home" name="Home" parent="menu_clm_root"
+              action="action_clm_home_board" sequence="1"
+              groups="clm.group_clm_read_only"/>
+    <menuitem id="menu_clm_contracts_main" name="Contracts" parent="menu_clm_root" sequence="10"/>
+    <menuitem id="menu_clm_contracts" name="All Contracts" parent="menu_clm_contracts_main" action="action_clm_contract" sequence="10"/>
+
+    <!--
+        Top-level order across the whole suite. Every NextContract module that
+        adds a root menu takes its sequence from this list, so the navigation
+        reads the same way regardless of which modules are installed:
+
+             1  Home                 (module icon board)
+            10  Contracts            (all contracts, contract versions)
+            20  Intake               (contract requests)
+            30  Workflow             (my tasks)
+            40  Negotiation          (rounds, version comparisons)
+            50  Extraction Reviews   (AI review queue)
+            60  Library              (templates, clauses)
+            70  Dashboards           (reporting)
+            80  Audit
+            90  Configuration
+    -->
+    <menuitem id="menu_clm_configuration" name="Configuration" parent="menu_clm_root" sequence="90" groups="clm.group_clm_legal_admin"/>
+    <menuitem id="menu_clm_contract_types" name="Contract Types" parent="menu_clm_configuration" action="action_clm_contract_type" sequence="10"/>
+    <menuitem id="menu_clm_contract_field_definition"
+              name="Contract Fields"
+              parent="menu_clm_configuration"
+              action="action_clm_contract_field_definition"
+              groups="clm.group_clm_legal_admin"
+              sequence="20"/>
+    <menuitem id="menu_clm_notification_rules"
+              name="Notifications"
+              parent="menu_clm_configuration"
+              action="action_clm_notification_rule"
+              sequence="50"
+              groups="clm.group_clm_legal_admin"/>
+
+    <menuitem id="menu_clm_audit" name="Audit" parent="menu_clm_root" sequence="80" groups="clm.group_clm_legal_admin"/>
+    <menuitem id="menu_clm_audit_events" name="Audit Events" parent="menu_clm_audit" action="action_clm_audit_event" sequence="10"/>
+</odoo>

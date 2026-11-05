@@ -1,0 +1,199 @@
+// Part of NextContract. See LICENSE file for full copyright and licensing details.
+//
+// ─── NextContract design tokens ──────────────────────────────────────────────
+//
+// One place for every measurement and colour NextContract uses. Nothing here
+// draws anything: it only declares custom properties, so loading this file in
+// web.assets_backend cannot affect any other Odoo app.
+//
+// Colours are expressed as Bootstrap semantic variables or as neutral-grey
+// alphas. A grey alpha darkens a light surface and lightens a dark one by the
+// same amount, so a single declaration is correct in both Odoo themes. That is
+// why nothing below is a literal hex value except the last-resort fallbacks.
+
+:root {
+    // ── Spacing scale ────────────────────────────────────────────────────────
+    // 4 / 8 / 12 / 16 / 24 / 32 / 40. Nothing in NextContract may use a margin
+    // or padding that is not on this scale.
+    --clm-space-1: 0.25rem;   //  4px
+    --clm-space-2: 0.5rem;    //  8px
+    --clm-space-3: 0.75rem;   // 12px
+    --clm-space-4: 1rem;      // 16px
+    --clm-space-5: 1.5rem;    // 24px
+    --clm-space-6: 2rem;      // 32px
+    --clm-space-7: 2.5rem;    // 40px
+
+    // ── Radii ────────────────────────────────────────────────────────────────
+    --clm-radius-sm: 0.25rem;
+    --clm-radius: 0.375rem;
+    --clm-radius-lg: 0.5rem;
+    --clm-radius-pill: 999px;
+
+    // ── Typography scale ─────────────────────────────────────────────────────
+    // Business fields stay at reading size; only page titles are large, and
+    // they are deliberately smaller than Odoo's default h1 so a contract title
+    // does not dominate the screen.
+    --clm-font-page-title: 1.75rem;    // 28px
+    --clm-font-page-title-sm: 1.375rem;// 22px — narrow viewports
+    --clm-font-kicker: 0.75rem;        // 12px — breadcrumb / module line
+    --clm-font-subtitle: 0.875rem;     // 14px
+    --clm-font-section: 1rem;          // 16px — section heading
+    --clm-font-label: 0.75rem;         // 12px — field label
+    --clm-font-value: 0.9375rem;       // 15px — field value
+    --clm-font-support: 0.8125rem;     // 13px — help / meta text
+
+    --clm-weight-title: 600;
+    --clm-weight-section: 600;
+    --clm-weight-label: 600;
+    --clm-weight-value: 500;
+
+    --clm-tracking-kicker: 0.08em;
+    --clm-tracking-label: 0.06em;
+
+    // ── Control metrics ──────────────────────────────────────────────────────
+    //
+    // These five values define the whole field layout system (see the block of
+    // that name in clm_layout.scss). Every editable control on a contract form
+    // is --clm-control-height tall and carries one --clm-underline-width rule
+    // on its bottom edge; every label's first line is centred on the first line
+    // of its control. Change a value here and every field type moves together.
+    --clm-control-height: 2rem;        // inputs, selects, buttons, checkbox rows
+    --clm-underline-width: 1px;        // the one rule under a control
+    --clm-label-line-height: 1.2;      // unitless, so the offset below is exact
+    --clm-checkbox-size: 1rem;
+    // The vertical offset that puts a label's FIRST line on the same centre
+    // line as its control's first line. Derived, never hand-tuned: a label that
+    // wraps to two lines still starts level with its control, which centring
+    // the whole label box would not do.
+    // Measured, not estimated: the control box is --clm-control-height tall but
+    // the VALUE inside it is one underline shorter, because the rule sits on
+    // the field root's bottom edge. Centring the label on the box rather than
+    // on the value left every label ~4px low on every form.
+    --clm-label-offset: calc(
+        (
+            var(--clm-control-height) - var(--clm-underline-width)
+            - var(--clm-font-label) * var(--clm-label-line-height)
+        ) / 2
+    );
+    // One fixed label column for every group on every form. `fit-content()`
+    // sizes each .o_inner_group independently, so six groups on one screen
+    // measured 111 / 112 / 136 / 145 / 147 / 171px and no two value columns
+    // started at the same x. A fixed track is the only thing that makes the
+    // whole page line up.
+    --clm-label-column: 11rem;
+    --clm-button-padding-x: 0.75rem;
+    --clm-row-height: 2.25rem;         // table rows
+    --clm-row-height-header: 2.25rem;
+    --clm-icon-size: 0.875rem;
+    --clm-icon-gap: 0.375rem;
+    // Room kept clear at the right of a dropdown input so the value never runs
+    // underneath the caret. Odoo's caret is roughly 8px wide; the rest is the
+    // gap that keeps the two from touching.
+    --clm-caret-gutter: 1.25rem;
+    // The inset a dialog's content keeps from its own edges. Matches Bootstrap's
+    // $modal-inner-padding, which .modal-header and .modal-footer already use,
+    // so the title, the body and the buttons all start on the same line.
+    --clm-dialog-gutter: 1rem;
+    // The caret triangle's half-width, matching Odoo's own $caret-width
+    // (bootstrap_overridden.scss:106) so the chevron NextContract draws is the
+    // same glyph the rest of the application draws.
+    --clm-caret-size: 4px;
+
+    // ── Page width ───────────────────────────────────────────────────────────
+    // Odoo's sheet stops at 1140px. Contract screens carry far more structured
+    // data than a typical record, so they are allowed more of the viewport —
+    // capped, because unlimited line length is worse than unused margin.
+    --clm-sheet-width: 1140px;
+    --clm-sheet-width-wide: 1320px;
+    --clm-sheet-width-xwide: 1480px;
+
+    // ── Surfaces ─────────────────────────────────────────────────────────────
+    // Four levels, each a small neutral step from the one above:
+    //   page → section → sunken (tables, wells) → input
+    // The last fallback is `transparent`, never a literal colour: it lets the
+    // surface inherit whatever the active theme painted behind it. A literal
+    // (#fff) would paint a light card in the dark theme while the text kept its
+    // dark-theme colours, leaving it unreadable.
+    --clm-surface-page: var(--o-view-background-color, var(--bs-body-bg, transparent));
+    --clm-surface-section: rgba(128, 128, 128, 0.035);
+    --clm-surface-sunken: rgba(128, 128, 128, 0.07);
+    --clm-surface-hover: rgba(128, 128, 128, 0.09);
+
+    --clm-border: var(--bs-border-color, rgba(128, 128, 128, 0.28));
+    --clm-border-subtle: rgba(128, 128, 128, 0.2);
+    --clm-border-strong: rgba(128, 128, 128, 0.45);
+
+    --clm-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+    --clm-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+
+    --clm-focus-ring: var(--bs-primary, #714b67);
+
+    // ── Text roles ───────────────────────────────────────────────────────────
+    //
+    // Odoo 19 does NOT expose --bs-body-color, --bs-body-color-rgb or
+    // --bs-secondary-color as runtime custom properties: Bootstrap's colours
+    // are compiled away at SCSS build time. Any `var(--bs-secondary-color, X)`
+    // therefore always resolves to X, which is how field labels ended up
+    // painted a fixed mid-grey that reads as "disabled" on the dark theme.
+    //
+    // These percentages are mixed against `currentColor` at the point of use
+    // instead, so they follow whatever text colour the active theme inherits —
+    // correct in light and dark, with no dependency on Odoo internals.
+    //
+    // Always write them as a PAIR, `inherit` first:
+    //
+    //     color: inherit;
+    //     color: color-mix(in srgb, currentColor var(--clm-text-label), transparent);
+    //
+    // A browser without color-mix keeps `inherit` and renders the text at full
+    // contrast. Too visible is the right way to fail; invisible is not.
+    // Measured contrast against the dark sheet (#2b2f3d) and the light sheet,
+    // so these are not guesses:
+    //   strong 100%  11.3:1 dark / 17.4:1 light   AA
+    //   label   80%   7.9:1 dark /  9.2:1 light   AA
+    //   muted   64%   5.7:1 dark /  5.2:1 light   AA
+    //   placeholder 60%  5.1:1 dark / 4.6:1 light AA
+    //   disabled 38%  3.0:1 dark /  2.4:1 light   deliberately below AA;
+    //                 WCAG 1.4.3 exempts disabled controls, and this is the
+    //                 only role allowed to fall short.
+    // For reference, the mid-grey this replaced scored 3.4:1 on dark, which is
+    // why every label looked disabled.
+    --clm-text-strong: 100%;      // field values, active tab, primary content
+    --clm-text-label: 80%;        // field labels, table headers, tabs
+    --clm-text-muted: 64%;        // hints, help text, subtitles, kicker
+    --clm-text-placeholder: 60%;  // empty values, input placeholders
+    --clm-text-disabled: 38%;     // ONLY genuinely disabled controls
+
+    // ── Field underline ──────────────────────────────────────────────────────
+    //
+    // NextContract draws an editable control as a single rule under the value,
+    // not as a box (see the Editable block in clm_layout.scss). These are the
+    // alphas for that rule at rest and on hover.
+    //
+    // Odoo blanks an input's border until it is hovered:
+    //
+    //   form_controller.scss:188
+    //   &:not(.o_field_highlight) .o_field_widget:not(...) .o_input:not(:hover):not(:focus)
+    //       { --o-input-border-color: transparent; }
+    //
+    // On a dense contract form that leaves the user unable to see where the
+    // fields are, so NextContract opts out and draws the control at rest.
+    //
+    // Mixed from currentColor, like the text roles, and measured against both
+    // sheet backgrounds. WCAG 1.4.11 wants 3:1 for a control boundary:
+    //   rest  50%   4.06:1 dark / 3.36:1 light   PASS
+    //   hover 70%   6.4:1  dark / 5.6:1  light
+    // The 0.28-alpha grey this replaced measured 1.41:1 — invisible.
+    --clm-field-border: 50%;
+    --clm-field-border-hover: 70%;
+
+    // ── Status palette ───────────────────────────────────────────────────────
+    // One meaning per colour, used by every module. See the status table in
+    // clm_components.scss for which contract / task / version states map here.
+    --clm-status-neutral: var(--bs-secondary, #6c757d);   // draft, new, not started
+    --clm-status-progress: var(--bs-warning, #f0ad4e);    // in review, in progress
+    --clm-status-info: var(--bs-info, #17a2b8);           // informational, queued
+    --clm-status-positive: var(--bs-success, #28a745);    // approved, active, done
+    --clm-status-negative: var(--bs-danger, #dc3545);     // rejected, cancelled, overdue
+    --clm-status-dormant: rgba(128, 128, 128, 0.75);      // expired, superseded, archived
+}

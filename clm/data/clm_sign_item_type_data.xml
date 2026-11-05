@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Autofills from the signer's Job Position (res.partner.function). -->
+    <record model="sign.item.type" id="sign_item_type_job_title">
+        <field name="name">Job Title</field>
+        <field name="placeholder">Title</field>
+        <field name="tip">Enter your job title</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="auto_field">function</field>
+        <field name="default_width" type="float">0.28</field>
+        <field name="default_height" type="float">0.018</field>
+        <field name="icon">fa-id-badge</field>
+    </record>
+</odoo>

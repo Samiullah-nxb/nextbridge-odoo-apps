@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        ─── NextContract status colours ──────────────────────────────────────
+
+        One meaning per colour, used by every NextContract list and badge:
+
+            info      work has started and nothing is pending on anyone
+                      (draft, new, queued)
+            warning   in flight, waiting on somebody
+                      (review, negotiation, pending signature, expiring soon)
+            success   settled favourably
+                      (approved, executed, active, published, completed)
+            danger    settled unfavourably, or late
+                      (rejected, cancelled, terminated, overdue, failed)
+            muted     no longer current
+                      (expired, superseded, archived, retired)
+
+        Any new status must be mapped onto one of these five. Do not invent a
+        sixth colour, and do not colour the same status differently in two
+        modules.
+    -->
+
+    <!-- ─── Contract Type ──────────────────────────────────────────────── -->
+    <record id="view_clm_contract_type_list" model="ir.ui.view">
+        <field name="name">clm.contract.type.list</field>
+        <field name="model">clm.contract.type</field>
+        <field name="arch" type="xml">
+            <list string="Contract Types" class="o_clm_list">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_clm_contract_type_form" model="ir.ui.view">
+        <field name="name">clm.contract.type.form</field>
+        <field name="model">clm.contract.type</field>
+        <field name="arch" type="xml">
+            <form string="Contract Type" class="o_clm_form">
+                <sheet>
+                    <div class="oe_title o_clm_page_header" name="clm_page_header">
+                        <div class="o_clm_kicker">Contract Type</div>
+                        <h1><field name="name" placeholder="e.g. Master Services Agreement"/></h1>
+                    </div>
+                    <group>
+                        <group string="Identification">
+                            <field name="code" placeholder="e.g. MSA"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group string="Availability">
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <separator string="Description"/>
+                    <field name="description" nolabel="1" class="o_clm_longtext"
+                           placeholder="When this contract type is used, and what distinguishes it from the others…"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_clm_contract_type" model="ir.actions.act_window">
+        <field name="name">Contract Types</field>
+        <field name="res_model">clm.contract.type</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Define a contract type</p>
+            <p>Contract types classify every contract and request, drive the
+               template library and decide which contract fields apply.</p>
+        </field>
+    </record>
+
+    <!-- ─── Audit Events ───────────────────────────────────────────────── -->
+    <record id="view_clm_audit_event_list" model="ir.ui.view">
+        <field name="name">clm.audit.event.list</field>
+        <field name="model">clm.audit.event</field>
+        <field name="arch" type="xml">
+            <list string="Audit Events" class="o_clm_list"
+                  create="false" edit="false" delete="false">
+                <field name="create_date" string="Date"/>
+                <field name="user_id"/>
+                <field name="event_type"/>
+                <field name="summary"/>
+                <field name="contract_id"/>
+                <field name="source" optional="show"/>
+                <field name="company_id" optional="hide" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_clm_audit_event_form" model="ir.ui.view">
+        <field name="name">clm.audit.event.form</field>
+        <field name="model">clm.audit.event</field>
+        <field name="arch" type="xml">
+            <form string="Audit Event" class="o_clm_form"
+                  create="false" edit="false" delete="false">
+                <sheet>
+                    <!--
+                        An audit summary is a sentence, not a name: it is shown
+                        at reading size rather than as a page-sized heading.
+                    -->
+                    <div class="oe_title o_clm_page_header" name="clm_page_header">
+                        <div class="o_clm_kicker">
+                            Audit Event · <field name="event_type" readonly="1" class="oe_inline"/>
+                        </div>
+                        <h1 class="o_clm_title"><field name="summary" readonly="1"/></h1>
+                        <div class="o_clm_subtitle">
+                            <span><field name="user_id" readonly="1"/></span>
+                            <span><field name="create_date" readonly="1"/></span>
+                        </div>
+                    </div>
+                    <group>
+                        <group string="Origin">
+                            <field name="source"/>
+                            <field name="contract_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Record">
+                            <field name="res_model"/>
+                            <field name="res_id"/>
+                        </group>
+                    </group>
+                    <div class="o_clm_section" invisible="not previous_value and not new_value">
+                        <h2 class="o_clm_section_title">Change</h2>
+                        <group>
+                            <group string="Previous Value">
+                                <field name="previous_value" nolabel="1" class="o_clm_longtext"/>
+                            </group>
+                            <group string="New Value">
+                                <field name="new_value" nolabel="1" class="o_clm_longtext"/>
+                            </group>
+                        </group>
+                    </div>
+                    <div class="o_clm_section" invisible="not details">
+                        <h2 class="o_clm_section_title">Details</h2>
+                        <field name="details" nolabel="1" class="o_clm_longtext o_clm_longtext_tall"/>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_clm_audit_event_search" model="ir.ui.view">
+        <field name="name">clm.audit.event.search</field>
+        <field name="model">clm.audit.event</field>
+        <field name="arch" type="xml">
+            <search string="Audit Events">
+                <field name="summary"/>
+                <field name="contract_id"/>
+                <field name="user_id"/>
+                <field name="event_type"/>
+                <filter string="My Events" name="my_events" domain="[('user_id','=',uid)]"/>
+                <group>
+                    <filter string="Contract" name="group_by_contract" context="{'group_by':'contract_id'}"/>
+                    <filter string="Event Type" name="group_by_type" context="{'group_by':'event_type'}"/>
+                    <filter string="User" name="group_by_user" context="{'group_by':'user_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_clm_audit_event" model="ir.actions.act_window">
+        <field name="name">Audit Events</field>
+        <field name="res_model">clm.audit.event</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_clm_audit_event_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No audit events recorded yet</p>
+            <p>Every state change, approval, signature and AI extraction is
+               recorded here automatically. Events cannot be edited or deleted.</p>
+        </field>
+    </record>
+
+    <!-- ─── Contracts ──────────────────────────────────────────────────── -->
+    <record id="view_clm_contract_list" model="ir.ui.view">
+        <field name="name">clm.contract.list</field>
+        <field name="model">clm.contract</field>
+        <field name="arch" type="xml">
+            <list string="Contracts" class="o_clm_list"
+                  decoration-muted="state in ('expired', 'archived')">
+                <field name="contract_ref"/>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="contract_type_id"/>
+                <field name="user_id" string="Owner" optional="show"/>
+                <field name="department_id" optional="hide"/>
+                <field name="effective_date" optional="hide"/>
+                <field name="expiry_date" optional="show"/>
+                <field name="currency_id" column_invisible="1"/>
+                <!--
+                    web/views/list/column_width_hook.js pins a monetary column
+                    to FIELD_WIDTHS.monetary = 105px as BOTH its min and its
+                    max, so it can never grow to fit its own header. 105px was
+                    chosen for a sentence-case "Contract Value"; NextContract
+                    renders list headers uppercase with letter-spacing (see
+                    clm_layout.scss), which needs more, so the label arrived
+                    clamped down to "CONTRACT VAL...". An explicit width is the
+                    only override the hook accepts.
+                -->
+                <field name="contract_value" optional="show" width="140px"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state in ('in_review', 'awaiting_business', 'awaiting_finance', 'awaiting_procurement', 'awaiting_compliance', 'internal_review_done', 'sent_to_counterparty', 'in_negotiation', 'pending_signature', 'expiring_soon')"
+                       decoration-success="state in ('approved', 'executed', 'active', 'renewed')"
+                       decoration-danger="state in ('cancelled', 'terminated')"
+                       decoration-muted="state in ('expired', 'archived')"/>
+                <field name="company_id" optional="hide" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_clm_contract_form" model="ir.ui.view">
+        <field name="name">clm.contract.form</field>
+        <field name="model">clm.contract</field>
+        <field name="arch" type="xml">
+            <!--
+                The contract form is the busiest screen in NextContract: six
+                modules add header buttons and tabs to it. The shape below is
+                what keeps that readable.
+
+                * The action bar is ordered by the design system, not by module
+                  load order: `btn-primary` floats to the front,
+                  `o_clm_action_danger` to the back (see clm_layout.scss).
+                  Exactly one action may be primary in any one state.
+                * Identity, ownership, value and term live above the notebook,
+                  because they answer "what is this contract?" without a click.
+                * Tabs are ordered by the `priority` of the view that adds them:
+                    5  Final Contract          (execution views)
+                    10 Document Versions       (documents views)
+                    20 Workflow Tasks          (workflow views)
+                    30 Signature, Checklist, Risk, Obligations, Alerts
+                                               (execution views)
+                    40 Purchase Orders         (clm_purchase)
+                  They all anchor on page[@name='field_values'], which is
+                  declared here, so no view has to know about another.
+            -->
+            <form string="Contract" class="o_clm_form">
+                <header>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,in_review,internal_review_done,in_negotiation,approved,pending_signature,executed,active"/>
+                </header>
+                <sheet>
+                    <div class="oe_title o_clm_page_header" name="clm_page_header">
+                        <div class="o_clm_kicker">
+                            <field name="contract_ref" readonly="1" class="oe_inline"
+                                   invisible="contract_ref == 'New'"/>
+                            <span invisible="contract_ref != 'New'">New Contract</span>
+                        </div>
+                        <h1><field name="name" placeholder="Contract title, e.g. Digital Marketing Services Agreement"/></h1>
+                        <div class="o_clm_subtitle">
+                            <span invisible="not partner_id">
+                                <i class="fa fa-building-o" role="img" aria-label="Counterparty"/>
+                                <field name="partner_id" readonly="1" options="{'no_open': True}"/>
+                            </span>
+                            <span invisible="not contract_type_id">
+                                <i class="fa fa-file-text-o" role="img" aria-label="Contract type"/>
+                                <field name="contract_type_id" readonly="1" options="{'no_open': True}"/>
+                            </span>
+                            <span invisible="not department_id">
+                                <i class="fa fa-sitemap" role="img" aria-label="Department"/>
+                                <field name="department_id" readonly="1" options="{'no_open': True}"/>
+                            </span>
+                        </div>
+                    </div>
+
+                    <group>
+                        <group string="Counterparty &amp; Classification">
+                            <field name="partner_id"/>
+                            <field name="partner_signatory_id"
+                                       invisible="not partner_id"
+                                       context="{'default_parent_id': partner_id, 'default_is_company': False}"/>
+                            <field name="contract_type_id"/>
+                            <field name="department_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Ownership &amp; Key Terms">
+                            <field name="user_id"/>
+                            <field name="legal_owner_id"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="contract_value"/>
+                            <field name="effective_date"/>
+                            <field name="expiry_date"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Details" name="details">
+                            <group>
+                                <group string="Dates">
+                                    <field name="signing_date"/>
+                                    <field name="renewal_date"/>
+                                    <field name="notice_period_days"/>
+                                </group>
+                                <group string="Terms">
+                                    <field name="auto_renewal"/>
+                                    <field name="termination_for_convenience"/>
+                                    <field name="confidentiality_level"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Risk &amp; Compliance">
+                                    <field name="risk_rating"/>
+                                    <field name="signed_copy_uploaded"/>
+                                    <field name="alerts_configured"/>
+                                </group>
+                                <group string="Additional Owners">
+                                    <field name="procurement_owner_id"/>
+                                    <field name="finance_owner_id"/>
+                                </group>
+                            </group>
+                            <!--
+                                `repository` is the anchor other modules add
+                                closure and origin blocks after. Keep the name.
+                            -->
+                            <group name="repository">
+                                <group string="Repository">
+                                    <field name="parent_contract_id"/>
+                                    <field name="folder_id"/>
+                                </group>
+                                <group string="Classification">
+                                    <field name="tag_ids" widget="many2many_tags"/>
+                                </group>
+                            </group>
+                            <separator string="Remarks"/>
+                            <field name="remarks" nolabel="1" class="o_clm_longtext"
+                                   placeholder="Internal notes about this contract. Not part of the contract document."/>
+                        </page>
+                        <page string="Additional Fields" name="field_values">
+                            <div class="o_clm_hint mb-2">
+                                Contract fields configured for this contract type.
+                                Manage the list under Configuration → Contract Fields.
+                            </div>
+                            <field name="field_value_ids" nolabel="1">
+                                <list editable="bottom">
+                                    <field name="definition_id" readonly="1"/>
+                                    <field name="display_value" readonly="1"/>
+                                    <field name="value_char" optional="show"/>
+                                    <field name="value_text" optional="hide"/>
+                                    <field name="value_date" optional="show"/>
+                                    <field name="value_float" optional="show" width="110px"/>
+                                    <field name="value_bool" optional="hide"/>
+                                    <field name="value_option_id" optional="show"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Related Contracts" name="related_contracts"
+                              invisible="not child_contract_ids">
+                            <field name="child_contract_ids" nolabel="1">
+                                <list>
+                                    <field name="contract_ref"/>
+                                    <field name="name"/>
+                                    <field name="partner_id" optional="show"/>
+                                    <field name="expiry_date" optional="hide"/>
+                                    <field name="state" widget="badge"
+                                           decoration-info="state == 'draft'"
+                                           decoration-warning="state in ('in_review', 'awaiting_business', 'awaiting_finance', 'awaiting_procurement', 'awaiting_compliance', 'internal_review_done', 'sent_to_counterparty', 'in_negotiation', 'pending_signature', 'expiring_soon')"
+                                           decoration-success="state in ('approved', 'executed', 'active', 'renewed')"
+                                           decoration-danger="state in ('cancelled', 'terminated')"
+                                           decoration-muted="state in ('expired', 'archived')"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_clm_contract_search" model="ir.ui.view">
+        <field name="name">clm.contract.search</field>
+        <field name="model">clm.contract</field>
+        <field name="arch" type="xml">
+            <search string="Contracts">
+                <field name="name" string="Contract"
+                       filter_domain="['|', ('name', 'ilike', self), ('contract_ref', 'ilike', self)]"/>
+                <field name="contract_ref"/>
+                <field name="partner_id"/>
+                <field name="user_id"/>
+                <field name="contract_type_id"/>
+                <filter string="My Contracts" name="my_contracts" domain="[('user_id','=',uid)]"/>
+                <separator/>
+                <filter string="Draft" name="draft" domain="[('state','=','draft')]"/>
+                <filter string="In Review" name="in_review"
+                        domain="[('state','in',('in_review','awaiting_business','awaiting_finance','awaiting_procurement','awaiting_compliance','internal_review_done'))]"/>
+                <filter string="In Negotiation" name="in_negotiation"
+                        domain="[('state','in',('sent_to_counterparty','in_negotiation'))]"/>
+                <filter string="Awaiting Signature" name="awaiting_signature"
+                        domain="[('state','in',('approved','pending_signature'))]"/>
+                <filter string="Active" name="active" domain="[('state','=','active')]"/>
+                <separator/>
+                <filter string="Closed" name="closed"
+                        domain="[('state','in',('expired','terminated','archived','cancelled'))]"/>
+                <group>
+                    <filter string="Status" name="group_by_state" context="{'group_by':'state'}"/>
+                    <filter string="Contract Type" name="group_by_type" context="{'group_by':'contract_type_id'}"/>
+                    <filter string="Counterparty" name="group_by_partner" context="{'group_by':'partner_id'}"/>
+                    <filter string="Owner" name="group_by_owner" context="{'group_by':'user_id'}"/>
+                    <filter string="Department" name="group_by_department" context="{'group_by':'department_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_clm_contract" model="ir.actions.act_window">
+        <field name="name">Contracts</field>
+        <field name="res_model">clm.contract</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_clm_contract_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first contract</p>
+            <p>Contracts can be created directly, or raised as a request under
+               Intake and converted once Legal accepts them.</p>
+        </field>
+    </record>
+
+</odoo>

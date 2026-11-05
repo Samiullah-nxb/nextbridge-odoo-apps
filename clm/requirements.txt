@@ -1,0 +1,8 @@
+# Python packages for NextContract (install with: pip install -r requirements.txt)
+python-docx      # Word documents (templates, drafting, editor)
+docxtpl          # Word template placeholders
+xlsxwriter       # Excel exports
+pypdfium2        # PDF preview, reading and version comparison (optional: a clear message is shown without it)
+# NextContract AI (clm_ai) and AI extraction during migration only:
+google-genai
+pydantic

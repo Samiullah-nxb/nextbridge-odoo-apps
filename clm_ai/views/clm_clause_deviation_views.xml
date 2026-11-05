@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_clm_clause_deviation_form" model="ir.ui.view">
+        <field name="name">clm.clause.deviation.form</field>
+        <field name="model">clm.clause.deviation</field>
+        <field name="arch" type="xml">
+            <form class="o_clm_form">
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm Classification"
+                            class="btn-primary" icon="fa-check" invisible="status != 'pending'"/>
+                    <field name="status" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="Clause Information">
+                            <field name="clause_id"/>
+                            <field name="version_id" readonly="1"/>
+                            <field name="job_id" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Text Comparison" name="text_comparison">
+                            <group>
+                                <group string="Library Standard Wording">
+                                    <field name="standard_text" readonly="1" nolabel="1"
+                                           class="o_clm_longtext o_clm_longtext_tall"/>
+                                </group>
+                                <group string="Wording in This Version">
+                                    <field name="matched_text" readonly="status != 'pending'" nolabel="1"
+                                           class="o_clm_longtext o_clm_longtext_tall"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Classification &amp; Risk">
+                            <group>
+                                <group string="AI Suggestion (Do Not Edit)">
+                                    <field name="ai_deviation_type" readonly="1"/>
+                                    <field name="ai_risk_level" readonly="1"/>
+                                    <field name="ai_confidence" readonly="1" widget="percentage"/>
+                                    <field name="explanation" readonly="1"/>
+                                </group>
+                                <group string="Legal Confirmation">
+                                    <field name="confirmed_deviation_type" readonly="status != 'pending'"/>
+                                    <field name="confirmed_risk_level" readonly="status != 'pending'"/>
+                                    <field name="rationale" readonly="status != 'pending'"/>
+                                    <field name="reviewed_by_id" readonly="1" invisible="status == 'pending'"/>
+                                    <field name="reviewed_at" readonly="1" invisible="status == 'pending'"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

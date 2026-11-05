@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_clm_obligation_list" model="ir.ui.view">
+        <field name="name">clm.obligation.list</field>
+        <field name="model">clm.obligation</field>
+        <field name="arch" type="xml">
+            <list class="o_clm_list"
+                  decoration-muted="status in ('completed', 'cancelled')"
+                  decoration-danger="status == 'overdue'">
+                <field name="name"/>
+                <field name="contract_id"/>
+                <field name="obligation_type"/>
+                <field name="owner_id"/>
+                <field name="due_date"/>
+                <field name="priority" optional="show"/>
+                <field name="status" widget="badge"
+                       decoration-info="status == 'pending'"
+                       decoration-warning="status == 'in_progress'"
+                       decoration-success="status == 'completed'"
+                       decoration-danger="status == 'overdue'"
+                       decoration-muted="status == 'cancelled'"/>
+                <button name="action_mark_completed" type="object" string="Complete"
+                        icon="fa-check" invisible="status == 'completed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_clm_obligation_form" model="ir.ui.view">
+        <field name="name">clm.obligation.form</field>
+        <field name="model">clm.obligation</field>
+        <field name="arch" type="xml">
+            <form class="o_clm_form">
+                <header>
+                    <button name="action_mark_completed" type="object" string="Mark as Completed"
+                            class="btn-primary" icon="fa-check" invisible="status == 'completed'"/>
+                    <field name="status" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title o_clm_page_header" name="clm_page_header">
+                        <div class="o_clm_kicker">Obligation</div>
+                        <h1><field name="name" placeholder="What has to be done"/></h1>
+                        <div class="o_clm_subtitle">
+                            <span invisible="not contract_id">
+                                <i class="fa fa-file-text-o" role="img" aria-label="Contract"/>
+                                <field name="contract_id" readonly="1" options="{'no_open': True}"/>
+                            </span>
+                            <span invisible="not owner_id">
+                                <i class="fa fa-user-o" role="img" aria-label="Owner"/>
+                                <field name="owner_id" readonly="1" options="{'no_open': True}"/>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="alert alert-danger" role="alert" invisible="status != 'overdue'">
+                        <i class="fa fa-exclamation-triangle me-1" role="img" aria-label="Overdue"/>
+                        <strong>This obligation is overdue.</strong>
+                    </div>
+                    <group>
+                        <group string="Obligation">
+                            <field name="contract_id"/>
+                            <field name="obligation_type"/>
+                            <field name="priority"/>
+                        </group>
+                        <group string="Ownership &amp; Timing">
+                            <field name="owner_id"/>
+                            <field name="due_date"/>
+                            <field name="evidence_required"/>
+                            <field name="completed_date" invisible="status != 'completed'"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_clm_obligation" model="ir.actions.act_window">
+        <field name="name">Obligations</field>
+        <field name="res_model">clm.obligation</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No obligations tracked yet</p>
+            <p>Record the deliverables, reports and payments a contract commits
+               either side to, so they can be chased before they fall due.</p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="mail_template_clm_negotiation_sent" model="mail.template">
+            <field name="name">NextContract: Negotiation Round Sent</field>
+            <field name="model_id" ref="model_clm_negotiation_round"/>
+            <field name="subject">NextContract Document for Review: {{ object.contract_id.display_name }} (Round {{ object.round_number }})</field>
+            <field name="description">Sent to counterparty when a negotiation round is started.</field>
+            <field name="body_html" type="html">
+<div style="margin:0;padding:0;background:#f3f4f6;">
+  <style>:root { color-scheme: light only; supported-color-schemes: light; }</style>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f3f4f6" style="background-color:#f3f4f6 !important;padding:24px 12px;font-family:Arial,Helvetica,sans-serif;">
+    <tr><td align="center">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="max-width:600px;width:100%;background-color:#ffffff !important;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;">
+        <tr><td bgcolor="#4f46e5" style="background-color:#4f46e5 !important;padding:18px 24px;color:#ffffff !important;">
+          <div style="font-size:13px;letter-spacing:0.04em;color:#ffffff !important;">CONTRACT LIFECYCLE MANAGEMENT</div>
+          <div style="font-size:20px;font-weight:bold;margin-top:4px;color:#ffffff !important;">Document Shared for Review</div>
+        </td></tr>
+        <tr><td bgcolor="#ffffff" style="background-color:#ffffff !important;padding:24px;color:#1f2937 !important;font-size:14px;line-height:1.5;">
+          <p style="margin:0 0 12px 0;color:#1f2937 !important;">Hello <t t-out="object.recipient_id.name or 'Counterparty'"/>,</p>
+          <p style="margin:0 0 16px 0;color:#1f2937 !important;">A contract document has been shared with you for review.</p>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:0 0 20px 0;">
+            <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;width:40%;">Contract</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;font-weight:bold;color:#111827 !important;"><t t-out="object.contract_id.display_name or ''"/></td></tr>
+            <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;">Round</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#111827 !important;"><t t-out="object.round_number or ''"/></td></tr>
+            <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;">Response Deadline</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#111827 !important;"><t t-out="object.response_deadline or 'Not set'"/></td></tr>
+            <tr><td style="padding:8px 0;color:#6b7280 !important;">Notes</td><td style="padding:8px 0;color:#111827 !important;"><t t-out="object.notes or 'None'"/></td></tr>
+          </table>
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+            <td bgcolor="#4f46e5" style="background-color:#4f46e5 !important;border-radius:6px;">
+              <a t-attf-href="{{ object.get_base_url() }}/web#id={{ object.contract_id.id }}&amp;model=clm.contract&amp;view_type=form" style="display:inline-block;padding:12px 18px;font-weight:bold;color:#ffffff !important;text-decoration:none;">Open Contract in NextContract</a>
+            </td>
+          </tr></table>
+          <p style="margin:16px 0 0 0;color:#6b7280 !important;font-size:12px;">If you are an external counterparty, use the portal link shared by Legal.</p>
+        </td></tr>
+        <tr><td bgcolor="#f9fafb" style="background-color:#f9fafb !important;padding:14px 24px;color:#6b7280 !important;font-size:12px;border-top:1px solid #e5e7eb;">This is an automated NextContract notification.</td></tr>
+      </table>
+    </td></tr>
+  </table>
+</div>
+            </field>
+        </record>
+    </data>
+</odoo>

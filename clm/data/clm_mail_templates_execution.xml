@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="mail_template_clm_signature_request" model="mail.template">
+            <field name="name">NextContract: Signature Requested</field>
+            <field name="model_id" ref="model_clm_contract"/>
+            <field name="subject">NextContract Signature Required: {{ object.display_name }}</field>
+            <field name="description">Sent when a contract is sent for signature.</field>
+            <field name="body_html" type="html">
+<div style="margin:0;padding:0;background:#f3f4f6;">
+  <style>:root { color-scheme: light only; supported-color-schemes: light; }</style>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f3f4f6" style="background-color:#f3f4f6 !important;padding:24px 12px;font-family:Arial,Helvetica,sans-serif;">
+    <tr><td align="center">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="max-width:600px;width:100%;background-color:#ffffff !important;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;">
+        <tr><td bgcolor="#4f46e5" style="background-color:#4f46e5 !important;padding:18px 24px;color:#ffffff !important;">
+          <div style="font-size:13px;letter-spacing:0.04em;color:#ffffff !important;">CONTRACT LIFECYCLE MANAGEMENT</div>
+          <div style="font-size:20px;font-weight:bold;margin-top:4px;color:#ffffff !important;">Signature Required</div>
+        </td></tr>
+        <tr><td bgcolor="#ffffff" style="background-color:#ffffff !important;padding:24px;color:#1f2937 !important;font-size:14px;line-height:1.5;">
+          <p style="margin:0 0 16px 0;color:#1f2937 !important;">A contract is ready for signature.</p>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:0 0 20px 0;">
+            <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;width:40%;">Contract</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;font-weight:bold;color:#111827 !important;"><t t-out="object.display_name or ''"/></td></tr>
+            <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;">Counterparty</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#111827 !important;"><t t-out="object.partner_id.name or ''"/></td></tr>
+            <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;">Business Owner</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#111827 !important;"><t t-out="object.user_id.name or ''"/></td></tr>
+            <tr><td style="padding:8px 0;color:#6b7280 !important;">Status</td><td style="padding:8px 0;font-weight:bold;color:#111827 !important;">Pending Signature</td></tr>
+          </table>
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+            <td bgcolor="#4f46e5" style="background-color:#4f46e5 !important;border-radius:6px;">
+              <a t-attf-href="{{ object.get_base_url() }}/web#id={{ object.id }}&amp;model=clm.contract&amp;view_type=form" style="display:inline-block;padding:12px 18px;font-weight:bold;color:#ffffff !important;text-decoration:none;">Open Contract in NextContract</a>
+            </td>
+          </tr></table>
+        </td></tr>
+        <tr><td bgcolor="#f9fafb" style="background-color:#f9fafb !important;padding:14px 24px;color:#6b7280 !important;font-size:12px;border-top:1px solid #e5e7eb;">This is an automated NextContract notification.</td></tr>
+      </table>
+    </td></tr>
+  </table>
+</div>
+            </field>
+        </record>
+
+        <record id="mail_template_clm_expiry_alert" model="mail.template">
+            <field name="name">NextContract: Contract Expiry / Renewal Alert</field>
+            <field name="model_id" ref="model_clm_contract"/>
+            <field name="subject">NextContract Alert: {{ object.display_name }} requires attention</field>
+            <field name="description">Sent when expiry/renewal alert lead days are reached.</field>
+            <field name="body_html" type="html">
+<div style="margin:0;padding:0;background:#f3f4f6;">
+  <style>:root { color-scheme: light only; supported-color-schemes: light; }</style>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f3f4f6" style="background-color:#f3f4f6 !important;padding:24px 12px;font-family:Arial,Helvetica,sans-serif;">
+    <tr><td align="center">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="max-width:600px;width:100%;background-color:#ffffff !important;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;">
+        <tr><td bgcolor="#d97706" style="background-color:#d97706 !important;padding:18px 24px;color:#ffffff !important;">
+          <div style="font-size:13px;letter-spacing:0.04em;color:#ffffff !important;">CONTRACT LIFECYCLE MANAGEMENT</div>
+          <div style="font-size:20px;font-weight:bold;margin-top:4px;color:#ffffff !important;">Expiry / Renewal Alert</div>
+        </td></tr>
+        <tr><td bgcolor="#ffffff" style="background-color:#ffffff !important;padding:24px;color:#1f2937 !important;font-size:14px;line-height:1.5;">
+          <p style="margin:0 0 16px 0;color:#1f2937 !important;">A contract alert requires your attention.</p>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:0 0 20px 0;">
+            <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;width:40%;">Contract</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;font-weight:bold;color:#111827 !important;"><t t-out="object.display_name or ''"/></td></tr>
+            <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;">Counterparty</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#111827 !important;"><t t-out="object.partner_id.name or ''"/></td></tr>
+            <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;">Effective Date</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#111827 !important;"><t t-out="object.effective_date or 'Not set'"/></td></tr>
+            <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;">Expiry Date</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#111827 !important;"><t t-out="object.expiry_date or 'Not set'"/></td></tr>
+            <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;">Renewal Date</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#111827 !important;"><t t-out="object.renewal_date or 'Not set'"/></td></tr>
+            <tr><td style="padding:8px 0;color:#6b7280 !important;">Status</td><td style="padding:8px 0;color:#111827 !important;"><t t-out="object.state or ''"/></td></tr>
+          </table>
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+            <td bgcolor="#d97706" style="background-color:#d97706 !important;border-radius:6px;">
+              <a t-attf-href="{{ object.get_base_url() }}/web#id={{ object.id }}&amp;model=clm.contract&amp;view_type=form" style="display:inline-block;padding:12px 18px;font-weight:bold;color:#ffffff !important;text-decoration:none;">Open Contract in NextContract</a>
+            </td>
+          </tr></table>
+        </td></tr>
+        <tr><td bgcolor="#f9fafb" style="background-color:#f9fafb !important;padding:14px 24px;color:#6b7280 !important;font-size:12px;border-top:1px solid #e5e7eb;">This is an automated NextContract notification.</td></tr>
+      </table>
+    </td></tr>
+  </table>
+</div>
+            </field>
+        </record>
+
+        <record id="mail_template_clm_contract_activated" model="mail.template">
+            <field name="name">NextContract: Contract Activated</field>
+            <field name="model_id" ref="model_clm_contract"/>
+            <field name="subject">NextContract Contract Activated: {{ object.display_name }}</field>
+            <field name="description">Sent when a contract is activated into the live repository.</field>
+            <field name="body_html" type="html">
+<div style="margin:0;padding:0;background:#f3f4f6;">
+  <style>:root { color-scheme: light only; supported-color-schemes: light; }</style>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f3f4f6" style="background-color:#f3f4f6 !important;padding:24px 12px;font-family:Arial,Helvetica,sans-serif;">
+    <tr><td align="center">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="max-width:600px;width:100%;background-color:#ffffff !important;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;">
+        <tr><td bgcolor="#059669" style="background-color:#059669 !important;padding:18px 24px;color:#ffffff !important;">
+          <div style="font-size:13px;letter-spacing:0.04em;color:#ffffff !important;">CONTRACT LIFECYCLE MANAGEMENT</div>
+          <div style="font-size:20px;font-weight:bold;margin-top:4px;color:#ffffff !important;">Contract Activated</div>
+        </td></tr>
+        <tr><td bgcolor="#ffffff" style="background-color:#ffffff !important;padding:24px;color:#1f2937 !important;font-size:14px;line-height:1.5;">
+          <p style="margin:0 0 16px 0;color:#1f2937 !important;">A contract has been <strong>activated</strong> and is now in the live repository.</p>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:0 0 20px 0;">
+            <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;width:40%;">Contract</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;font-weight:bold;color:#111827 !important;"><t t-out="object.display_name or ''"/></td></tr>
+            <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;">Counterparty</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#111827 !important;"><t t-out="object.partner_id.name or ''"/></td></tr>
+            <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;">Effective Date</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#111827 !important;"><t t-out="object.effective_date or 'Not set'"/></td></tr>
+            <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;">Expiry Date</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#111827 !important;"><t t-out="object.expiry_date or 'Not set'"/></td></tr>
+            <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;">Business Owner</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#111827 !important;"><t t-out="object.user_id.name or ''"/></td></tr>
+            <tr><td style="padding:8px 0;color:#6b7280 !important;">Legal Owner</td><td style="padding:8px 0;color:#111827 !important;"><t t-out="object.legal_owner_id.name or 'Not set'"/></td></tr>
+          </table>
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+            <td bgcolor="#059669" style="background-color:#059669 !important;border-radius:6px;">
+              <a t-attf-href="{{ object.get_base_url() }}/web#id={{ object.id }}&amp;model=clm.contract&amp;view_type=form" style="display:inline-block;padding:12px 18px;font-weight:bold;color:#ffffff !important;text-decoration:none;">Open Contract in NextContract</a>
+            </td>
+          </tr></table>
+        </td></tr>
+        <tr><td bgcolor="#f9fafb" style="background-color:#f9fafb !important;padding:14px 24px;color:#6b7280 !important;font-size:12px;border-top:1px solid #e5e7eb;">This is an automated NextContract notification.</td></tr>
+      </table>
+    </td></tr>
+  </table>
+</div>
+            </field>
+        </record>
+
+        <record id="mail_template_clm_contract_renewed" model="mail.template">
+            <field name="name">NextContract: Contract Renewed</field>
+            <field name="model_id" ref="model_clm_contract"/>
+            <field name="subject">NextContract Contract Renewed: {{ object.display_name }}</field>
+            <field name="description">Sent when a contract is renewed.</field>
+            <field name="body_html" type="html">
+<div style="margin:0;padding:0;background:#f3f4f6;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f3f4f6" style="background-color:#f3f4f6 !important;padding:24px 12px;font-family:Arial,Helvetica,sans-serif;">
+    <tr><td align="center">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="max-width:600px;width:100%;background-color:#ffffff !important;border:1px solid #e5e7eb;">
+        <tr><td bgcolor="#2563eb" style="background-color:#2563eb !important;padding:18px 24px;color:#ffffff !important;">
+          <div style="font-size:20px;font-weight:bold;color:#ffffff !important;">Contract Renewed</div>
+        </td></tr>
+        <tr><td bgcolor="#ffffff" style="background-color:#ffffff !important;padding:24px;color:#1f2937 !important;font-size:14px;">
+          <p style="color:#1f2937 !important;">Contract <strong t-out="object.display_name or ''"/> has been renewed.</p>
+          <p style="color:#1f2937 !important;">Status: <t t-out="object.state"/> | Effective: <t t-out="object.effective_date or 'N/A'"/> | Expiry: <t t-out="object.expiry_date or 'N/A'"/></p>
+          <a t-attf-href="{{ object.get_base_url() }}/web#id={{ object.id }}&amp;model=clm.contract&amp;view_type=form" style="display:inline-block;padding:12px 18px;background-color:#2563eb;color:#ffffff !important;text-decoration:none;border-radius:6px;font-weight:bold;">Open in NextContract</a>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</div>
+            </field>
+        </record>
+
+        <record id="mail_template_clm_contract_terminated" model="mail.template">
+            <field name="name">NextContract: Contract Terminated</field>
+            <field name="model_id" ref="model_clm_contract"/>
+            <field name="subject">NextContract Contract Terminated: {{ object.display_name }}</field>
+            <field name="description">Sent when a contract is terminated.</field>
+            <field name="body_html" type="html">
+<div style="margin:0;padding:0;background:#f3f4f6;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f3f4f6" style="background-color:#f3f4f6 !important;padding:24px 12px;font-family:Arial,Helvetica,sans-serif;">
+    <tr><td align="center">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="max-width:600px;width:100%;background-color:#ffffff !important;border:1px solid #e5e7eb;">
+        <tr><td bgcolor="#dc2626" style="background-color:#dc2626 !important;padding:18px 24px;color:#ffffff !important;">
+          <div style="font-size:20px;font-weight:bold;color:#ffffff !important;">Contract Terminated</div>
+        </td></tr>
+        <tr><td bgcolor="#ffffff" style="background-color:#ffffff !important;padding:24px;color:#1f2937 !important;font-size:14px;">
+          <p style="color:#1f2937 !important;">Contract <strong t-out="object.display_name or ''"/> has been terminated.</p>
+          <p style="color:#1f2937 !important;">Termination date: <t t-out="object.termination_date or 'N/A'"/></p>
+          <p style="color:#1f2937 !important;">Reason: <t t-out="object.termination_reason or 'N/A'"/></p>
+          <a t-attf-href="{{ object.get_base_url() }}/web#id={{ object.id }}&amp;model=clm.contract&amp;view_type=form" style="display:inline-block;padding:12px 18px;background-color:#dc2626;color:#ffffff !important;text-decoration:none;border-radius:6px;font-weight:bold;">Open in NextContract</a>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</div>
+            </field>
+        </record>
+
+        <record id="mail_template_clm_contract_archived" model="mail.template">
+            <field name="name">NextContract: Contract Archived</field>
+            <field name="model_id" ref="model_clm_contract"/>
+            <field name="subject">NextContract Contract Archived: {{ object.display_name }}</field>
+            <field name="description">Sent when a contract is archived.</field>
+            <field name="body_html" type="html">
+<div style="margin:0;padding:0;background:#f3f4f6;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f3f4f6" style="background-color:#f3f4f6 !important;padding:24px 12px;font-family:Arial,Helvetica,sans-serif;">
+    <tr><td align="center">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="max-width:600px;width:100%;background-color:#ffffff !important;border:1px solid #e5e7eb;">
+        <tr><td bgcolor="#6b7280" style="background-color:#6b7280 !important;padding:18px 24px;color:#ffffff !important;">
+          <div style="font-size:20px;font-weight:bold;color:#ffffff !important;">Contract Archived</div>
+        </td></tr>
+        <tr><td bgcolor="#ffffff" style="background-color:#ffffff !important;padding:24px;color:#1f2937 !important;font-size:14px;">
+          <p style="color:#1f2937 !important;">Contract <strong t-out="object.display_name or ''"/> has been archived.</p>
+          <a t-attf-href="{{ object.get_base_url() }}/web#id={{ object.id }}&amp;model=clm.contract&amp;view_type=form" style="display:inline-block;padding:12px 18px;background-color:#6b7280;color:#ffffff !important;text-decoration:none;border-radius:6px;font-weight:bold;">Open in NextContract</a>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</div>
+            </field>
+        </record>
+
+        <record id="mail_template_clm_contract_expired" model="mail.template">
+            <field name="name">NextContract: Contract Expired</field>
+            <field name="model_id" ref="model_clm_contract"/>
+            <field name="subject">NextContract Contract Expired: {{ object.display_name }}</field>
+            <field name="description">Sent when a contract is marked expired.</field>
+            <field name="body_html" type="html">
+<div style="margin:0;padding:0;background:#f3f4f6;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f3f4f6" style="background-color:#f3f4f6 !important;padding:24px 12px;font-family:Arial,Helvetica,sans-serif;">
+    <tr><td align="center">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="max-width:600px;width:100%;background-color:#ffffff !important;border:1px solid #e5e7eb;">
+        <tr><td bgcolor="#d97706" style="background-color:#d97706 !important;padding:18px 24px;color:#ffffff !important;">
+          <div style="font-size:20px;font-weight:bold;color:#ffffff !important;">Contract Expired</div>
+        </td></tr>
+        <tr><td bgcolor="#ffffff" style="background-color:#ffffff !important;padding:24px;color:#1f2937 !important;font-size:14px;">
+          <p style="color:#1f2937 !important;">Contract <strong t-out="object.display_name or ''"/> has been marked expired.</p>
+          <p style="color:#1f2937 !important;">Expiry date: <t t-out="object.expiry_date or 'N/A'"/></p>
+          <a t-attf-href="{{ object.get_base_url() }}/web#id={{ object.id }}&amp;model=clm.contract&amp;view_type=form" style="display:inline-block;padding:12px 18px;background-color:#d97706;color:#ffffff !important;text-decoration:none;border-radius:6px;font-weight:bold;">Open in NextContract</a>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</div>
+            </field>
+        </record>
+
+        <record id="mail_template_clm_obligation_overdue" model="mail.template">
+            <field name="name">NextContract: Obligation Overdue</field>
+            <field name="model_id" ref="model_clm_obligation"/>
+            <field name="subject">NextContract Overdue Obligation: {{ object.name }} — {{ object.contract_id.display_name }}</field>
+            <field name="description">Sent when a contract obligation becomes overdue.</field>
+            <field name="body_html" type="html">
+<div style="margin:0;padding:0;background:#f3f4f6;">
+  <style>:root { color-scheme: light only; supported-color-schemes: light; }</style>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f3f4f6" style="background-color:#f3f4f6 !important;padding:24px 12px;font-family:Arial,Helvetica,sans-serif;">
+    <tr><td align="center">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="max-width:600px;width:100%;background-color:#ffffff !important;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;">
+        <tr><td bgcolor="#dc2626" style="background-color:#dc2626 !important;padding:18px 24px;color:#ffffff !important;">
+          <div style="font-size:13px;letter-spacing:0.04em;color:#ffffff !important;">CONTRACT LIFECYCLE MANAGEMENT</div>
+          <div style="font-size:20px;font-weight:bold;margin-top:4px;color:#ffffff !important;">Obligation Overdue</div>
+        </td></tr>
+        <tr><td bgcolor="#ffffff" style="background-color:#ffffff !important;padding:24px;color:#1f2937 !important;font-size:14px;line-height:1.5;">
+          <p style="margin:0 0 12px 0;color:#1f2937 !important;">Hello <t t-out="object.owner_id.name or 'Owner'"/>,</p>
+          <p style="margin:0 0 16px 0;color:#1f2937 !important;">A contract obligation is now <strong>overdue</strong> and needs action.</p>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:0 0 20px 0;">
+            <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;width:40%;">Obligation</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;font-weight:bold;color:#111827 !important;"><t t-out="object.name or ''"/></td></tr>
+            <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;">Type</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;text-transform:capitalize;color:#111827 !important;"><t t-out="object.obligation_type or ''"/></td></tr>
+            <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;">Contract</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#111827 !important;"><t t-out="object.contract_id.display_name or ''"/></td></tr>
+            <tr><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#6b7280 !important;">Due Date</td><td style="padding:8px 0;border-bottom:1px solid #e5e7eb;color:#111827 !important;"><t t-out="object.due_date or ''"/></td></tr>
+            <tr><td style="padding:8px 0;color:#6b7280 !important;">Priority</td><td style="padding:8px 0;color:#111827 !important;"><t t-out="object.priority or ''"/></td></tr>
+          </table>
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+            <td bgcolor="#dc2626" style="background-color:#dc2626 !important;border-radius:6px;">
+              <a t-attf-href="{{ object.get_base_url() }}/web#id={{ object.contract_id.id }}&amp;model=clm.contract&amp;view_type=form" style="display:inline-block;padding:12px 18px;font-weight:bold;color:#ffffff !important;text-decoration:none;">Open Contract in NextContract</a>
+            </td>
+          </tr></table>
+        </td></tr>
+        <tr><td bgcolor="#f9fafb" style="background-color:#f9fafb !important;padding:14px 24px;color:#6b7280 !important;font-size:12px;border-top:1px solid #e5e7eb;">This is an automated NextContract notification.</td></tr>
+      </table>
+    </td></tr>
+  </table>
+</div>
+            </field>
+        </record>
+    </data>
+</odoo>

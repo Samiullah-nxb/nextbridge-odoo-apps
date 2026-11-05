@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_purchase_order_form_clm" model="ir.ui.view">
+        <field name="name">purchase.order.form.clm</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Contracts" name="clm_contracts">
+                    <field name="clm_contract_ids" nolabel="1" readonly="1">
+                        <list>
+                            <field name="contract_ref" optional="show"/>
+                            <field name="name"/>
+                            <field name="contract_type_id"/>
+                            <field name="risk_level" optional="show" widget="badge"
+                                   decoration-danger="risk_level in ('high', 'critical')"
+                                   decoration-warning="risk_level == 'medium'"
+                                   decoration-success="risk_level == 'low'"/>
+                            <field name="state" widget="badge"
+                                   decoration-info="state == 'draft'"
+                                   decoration-warning="state in ('in_review', 'awaiting_business', 'awaiting_finance', 'awaiting_procurement', 'awaiting_compliance', 'internal_review_done', 'sent_to_counterparty', 'in_negotiation', 'pending_signature', 'expiring_soon')"
+                                   decoration-success="state in ('approved', 'executed', 'active', 'renewed')"
+                                   decoration-danger="state in ('cancelled', 'terminated')"
+                                   decoration-muted="state in ('expired', 'archived')"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

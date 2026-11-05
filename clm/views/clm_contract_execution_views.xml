@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_clm_contract_form_execution" model="ir.ui.view">
+        <field name="name">clm.contract.form.execution</field>
+        <field name="model">clm.contract</field>
+        <field name="inherit_id" ref="clm.view_clm_contract_form"/>
+        <!--
+            Tab order on the contract form is set by view priority; see the
+            comment on clm.view_clm_contract_form. 30 places execution's
+            operational tabs after Workflow Tasks (20) and before Purchase
+            Orders (40).
+        -->
+        <field name="priority">30</field>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <!--
+                    Exactly one action may be primary in any one state:
+                      approved            → Send for Signature
+                      pending_signature   → Sign with Odoo Sign
+                      executed            → Activate Contract
+                      active/expiring     → none; renewing, terminating and
+                                            expiring are all deliberate choices,
+                                            so none of them is offered as the
+                                            obvious next step.
+                    Destructive actions carry o_clm_action_danger, which the
+                    design system styles and floats to the end of the bar.
+                -->
+                <button name="action_prepare_signature_draft" type="object"
+                        string="Prepare Signature Draft" invisible="state != 'approved'"/>
+                <button name="action_send_for_signature" type="object"
+                        string="Send for Signature" class="btn-primary"
+                        icon="fa-paper-plane-o" invisible="state != 'approved'"/>
+                <button name="action_open_odoo_sign" type="object"
+                        string="Sign with Odoo Sign" class="btn-primary"
+                        icon="fa-pencil" invisible="state != 'pending_signature'"/>
+                <button name="%(action_clm_manual_signature_wizard)d" type="action"
+                        string="Mark as Manually Signed"
+                        icon="fa-pencil-square-o" invisible="state != 'pending_signature'"/>
+                <button name="action_activate" type="object" string="Activate Contract"
+                        class="btn-primary" icon="fa-play"
+                        invisible="state != 'executed'"
+                        confirm="Activate this contract into the live repository? Activation Checklist must be complete."/>
+                <button name="action_open_renew_wizard" type="object" string="Renew"
+                        icon="fa-refresh"
+                        invisible="state not in ('active', 'expiring_soon')"
+                        groups="clm.group_clm_legal_admin"/>
+                <button name="action_open_archive_wizard" type="object" string="Archive"
+                        icon="fa-archive"
+                        invisible="state not in ('active', 'executed', 'expired', 'terminated')"
+                        groups="clm.group_clm_legal_admin"/>
+                <button name="action_mark_expired" type="object" string="Mark Expired"
+                        class="o_clm_action_danger"
+                        invisible="state not in ('active', 'expiring_soon')"
+                        confirm="Mark this contract as Expired?"
+                        groups="clm.group_clm_legal_admin"/>
+                <button name="action_open_terminate_wizard" type="object" string="Terminate"
+                        class="o_clm_action_danger"
+                        invisible="state not in ('active', 'expiring_soon')"
+                        groups="clm.group_clm_legal_admin"/>
+                <field name="activation_ready" invisible="1"/>
+                <field name="activation_missing_count" invisible="1"/>
+            </xpath>
+
+            <xpath expr="//group[@name='repository']" position="after">
+                <group name="lifecycle_closure"
+                       invisible="state not in ('terminated', 'archived', 'expired', 'renewed')">
+                    <group string="Termination">
+                        <field name="termination_date" invisible="not termination_date"/>
+                        <field name="termination_reason" invisible="not termination_reason"/>
+                    </group>
+                    <group string="Archiving">
+                        <field name="archived_date" invisible="not archived_date"/>
+                        <field name="archive_reason" invisible="not archive_reason"/>
+                    </group>
+                </group>
+            </xpath>
+
+            <xpath expr="//page[@name='field_values']" position="before">
+                <page string="Signature &amp; Execution" name="signature">
+                    <div class="alert alert-warning" role="alert"
+                         invisible="state != 'pending_signature' or signatures_complete">
+                        Both parties must sign before this contract can start.
+                        <field name="signature_progress" readonly="1" nolabel="1" class="d-block mt-1"/>
+                    </div>
+                    <div class="alert alert-success" role="alert"
+                         invisible="not signatures_complete or state not in ('pending_signature', 'executed', 'active')">
+                        All parties have signed — the contract can proceed to activation.
+                    </div>
+                    <group>
+                        <group string="Signature">
+                            <field name="signature_status" readonly="1"/>
+                            <field name="signatures_complete" readonly="1"/>
+                            <field name="execution_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <div class="o_clm_section">
+                        <h2 class="o_clm_section_title">Signature Requests</h2>
+                        <div class="o_clm_empty" invisible="sign_request_ids">
+                            <i class="fa fa-pencil-square-o" role="img" aria-label="No signature requests"/>
+                            <div class="o_clm_empty_title">No signature request sent yet</div>
+                            <div class="o_clm_empty_text">
+                                Once the contract is approved, use
+                                <strong>Send for Signature</strong> to raise an e-signature
+                                request, or <strong>Mark as Manually Signed</strong> to record
+                                a wet-ink signature.
+                            </div>
+                        </div>
+                        <field name="sign_request_ids" nolabel="1" readonly="1"
+                               invisible="not sign_request_ids">
+                            <list>
+                                <field name="reference"/>
+                                <field name="state"/>
+                            </list>
+                        </field>
+                    </div>
+                </page>
+
+                <page string="Activation Checklist" name="activation_checklist"
+                      invisible="state not in ('executed', 'pending_signature', 'approved', 'active')">
+                    <group>
+                        <group string="Readiness">
+                            <field name="activation_ready" readonly="1"/>
+                            <field name="activation_missing_count" readonly="1"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-warning" role="alert" invisible="activation_ready or state != 'executed'">
+                        <strong>Not ready to activate.</strong>
+                        Complete every required checklist item below before activating
+                        this contract.
+                    </div>
+                    <div class="alert alert-success" role="alert" invisible="not activation_ready or state != 'executed'">
+                        <strong>Checklist complete.</strong>
+                        You can now use <strong>Activate Contract</strong> in the action bar.
+                    </div>
+                    <field name="activation_checklist_html" nolabel="1" readonly="1"/>
+                </page>
+
+
+                
+                <page string="Risk Assessment" name="risk">
+                    <div class="o_clm_empty" invisible="risk_assessment_ids">
+                        <i class="fa fa-shield" role="img" aria-label="No risk assessment"/>
+                        <div class="o_clm_empty_title">No risk assessment yet</div>
+                        <div class="o_clm_empty_text">
+                            Add an assessment to score this contract against the
+                            configured risk factors. The score can be overridden, with
+                            a recorded reason.
+                        </div>
+                    </div>
+                    <field name="risk_assessment_ids" nolabel="1" context="{'default_contract_id': id}">
+                        <list>
+                            <field name="create_date" string="Assessed On"/>
+                            <field name="final_score" width="110px"/>
+                            <field name="final_rating" widget="badge"
+                                   decoration-danger="final_rating in ('high', 'critical')"
+                                   decoration-warning="final_rating == 'medium'"
+                                   decoration-success="final_rating == 'low'"/>
+                        </list>
+                        <form class="o_clm_form">
+                            <field name="contract_id" invisible="1"/>
+                            <header>
+                                <button name="action_recalculate" type="object"
+                                        string="Recalculate Risk" class="btn-primary"
+                                        icon="fa-refresh"/>
+                            </header>
+                            <group>
+                                <group string="Calculated Risk">
+                                    <field name="calculated_score"/>
+                                    <field name="calculated_rating"/>
+                                </group>
+                                <group string="Override Risk">
+                                    <field name="override_score"/>
+                                    <field name="override_rating"/>
+                                    <field name="override_reason" required="override_rating != False"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Final Risk">
+                                    <field name="final_score" readonly="1"/>
+                                    <field name="final_rating" readonly="1"/>
+                                </group>
+                            </group>
+                            <separator string="Risk Factors"/>
+                            <field name="item_ids" nolabel="1">
+                                <list editable="bottom">
+                                    <field name="factor_id"/>
+                                    <field name="source_type" readonly="1"/>
+                                    <field name="weight" readonly="1"/>
+                                    <field name="evidence"/>
+                                    <field name="comments"/>
+                                </list>
+                            </field>
+                        </form>
+                    </field>
+                </page>
+
+                <page string="Obligations" name="obligations">
+                    <div class="o_clm_empty" invisible="obligation_ids">
+                        <i class="fa fa-check-square-o" role="img" aria-label="No obligations"/>
+                        <div class="o_clm_empty_title">No obligations tracked</div>
+                        <div class="o_clm_empty_text">
+                            Record the deliverables, reports and payments this contract
+                            commits either side to, so they can be chased before they
+                            fall overdue.
+                        </div>
+                    </div>
+                    <field name="obligation_ids" nolabel="1">
+                        <list decoration-muted="status == 'completed'"
+                              decoration-danger="status == 'overdue'">
+                            <field name="name"/>
+                            <field name="obligation_type"/>
+                            <field name="owner_id"/>
+                            <field name="due_date"/>
+                            <field name="priority" optional="show"/>
+                            <field name="status" widget="badge"
+                                   decoration-info="status == 'pending'"
+                                   decoration-warning="status == 'in_progress'"
+                                   decoration-success="status == 'completed'"
+                                   decoration-danger="status == 'overdue'"/>
+                            <button name="action_mark_completed" type="object"
+                                    string="Complete" icon="fa-check"
+                                    invisible="status == 'completed'"/>
+                        </list>
+                    </field>
+                </page>
+
+                <page string="Alerts" name="alerts">
+                    <div class="o_clm_actions">
+                        <button name="action_ensure_default_alerts" type="object"
+                                string="Seed Default Alerts" class="btn-secondary"
+                                icon="fa-magic"
+                                groups="clm.group_clm_legal_admin"
+                                invisible="alert_ids"/>
+                        <button name="action_run_alerts_now" type="object"
+                                string="Run Alerts Now" class="btn-secondary"
+                                icon="fa-bell-o"
+                                groups="clm.group_clm_legal_admin"
+                                invisible="state not in ('active', 'executed', 'expiring_soon')"
+                                confirm="Process due alerts for this contract now? This will re-send emails for due alerts."/>
+                    </div>
+                    <div class="o_clm_empty mt-3" invisible="alert_ids">
+                        <i class="fa fa-bell-o" role="img" aria-label="No alerts"/>
+                        <div class="o_clm_empty_title">No alerts configured</div>
+                        <div class="o_clm_empty_text">
+                            Alerts warn the contract owner before renewal notice periods
+                            and expiry dates pass. Use <strong>Seed Default Alerts</strong>
+                            to add the standard set.
+                        </div>
+                    </div>
+                    <field name="alert_ids" nolabel="1" invisible="not alert_ids">
+                        <list editable="bottom"
+                              decoration-danger="is_due"
+                              decoration-muted="not active">
+                            <field name="alert_type"/>
+                            <field name="lead_days" width="95px"/>
+                            <field name="target_date"/>
+                            <field name="days_to_target" width="140px"/>
+                            <field name="is_due"/>
+                            <field name="active"/>
+                            <field name="last_notified" readonly="1" optional="show"/>
+                            <field name="notes" optional="show"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

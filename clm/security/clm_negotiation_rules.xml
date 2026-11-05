@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Document Comparison Rules -->
+        <record id="rule_clm_document_comparison_user" model="ir.rule">
+            <field name="name">Document Comparison: User Access</field>
+            <field name="model_id" ref="model_clm_document_comparison"/>
+            <field name="groups" eval="[(4, ref('clm.group_clm_user'))]"/>
+            <field name="domain_force">[
+                '&amp;',
+                ('base_version_id.contract_id.company_id', 'in', company_ids),
+                '|', '|', '|',
+                ('base_version_id.contract_id.user_id', '=', user.id),
+                ('base_version_id.contract_id.legal_owner_id', '=', user.id),
+                '&amp;', ('base_version_id.contract_id.department_id', '!=', False), ('base_version_id.contract_id.department_id', '=', user.employee_id.department_id.id),
+                ('base_version_id.contract_id.confidentiality_level', '!=', 'restricted')
+            ]</field>
+        </record>
+
+        <record id="rule_clm_document_comparison_legal" model="ir.rule">
+            <field name="name">Document Comparison: Legal Access</field>
+            <field name="model_id" ref="model_clm_document_comparison"/>
+            <field name="groups" eval="[(4, ref('clm.group_clm_legal'))]"/>
+            <field name="domain_force">[('base_version_id.contract_id.company_id', 'in', company_ids)]</field>
+        </record>
+    </data>
+
+    <!-- Portal access rule for contracts -->
+    <record id="clm_contract_portal_rule" model="ir.rule">
+        <field name="name">Portal Contract Access</field>
+        <field name="model_id" ref="clm.model_clm_contract"/>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="domain_force">[('portal_access_ids.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Portal access rule for portal access models -->
+    <record id="clm_portal_access_rule" model="ir.rule">
+        <field name="name">Portal Access View Self</field>
+        <field name="model_id" ref="model_clm_contract_portal_access"/>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Portal access rule for negotiation round -->
+    <record id="clm_negotiation_round_portal_rule" model="ir.rule">
+        <field name="name">Portal Negotiation Round Access</field>
+        <field name="model_id" ref="model_clm_negotiation_round"/>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="domain_force">[('contract_id.portal_access_ids.user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+</odoo>

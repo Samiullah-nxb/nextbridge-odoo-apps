@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        ─── Extraction Review ────────────────────────────────────────────────
+
+        A reviewer's screen, not a record editor: it says what the extraction
+        found, what is blocking confirmation, and offers exactly one primary
+        action — Confirm & Apply — once nothing is blocking it.
+    -->
+    <record id="view_clm_ai_job_review_form" model="ir.ui.view">
+        <field name="name">clm.ai.job.review.form</field>
+        <field name="model">clm.ai.job</field>
+        <field name="arch" type="xml">
+            <form string="Extraction Review" class="o_clm_form">
+                <header>
+                    <button name="action_confirm_review" type="object"
+                            string="Confirm &amp; Apply" class="btn-primary" icon="fa-check"
+                            invisible="review_state != 'pending_review' or not can_confirm"/>
+                    <button name="action_confirm_review" type="object"
+                            string="Confirm &amp; Apply"
+                            invisible="review_state != 'pending_review' or can_confirm"
+                            disabled="1"
+                            help="Resolve the items needing attention first."/>
+                    <button name="action_rerun_extraction" type="object"
+                            string="Run New Extraction" icon="fa-refresh"
+                            invisible="review_state == 'pending_review'"/>
+                    <button name="action_reject_review" type="object"
+                            string="Reject Extraction" class="o_clm_action_danger"
+                            icon="fa-times"
+                            invisible="review_state != 'pending_review'"/>
+                    <field name="review_state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title o_clm_page_header" name="clm_page_header">
+                        <div class="o_clm_kicker">
+                            Extraction Review · <field name="name" readonly="1" class="oe_inline"/>
+                        </div>
+                        <h1 class="o_clm_title">
+                            <field name="contract_id" readonly="1" options="{'no_open': True}"/>
+                        </h1>
+                        <div class="o_clm_subtitle">
+                            <span>
+                                <i class="fa fa-magic" role="img" aria-label="Provider"/>
+                                <field name="provider" readonly="1"/>
+                            </span>
+                            <span invisible="not page_count">
+                                <i class="fa fa-file-o" role="img" aria-label="Pages"/>
+                                <field name="pages_processed" readonly="1" class="oe_inline"/>
+                                <span>/</span>
+                                <field name="page_count" readonly="1" class="oe_inline"/>
+                                <span>pages</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning" role="alert"
+                         invisible="review_state != 'pending_review' or can_confirm">
+                        <strong>Not ready to confirm.</strong>
+                        <field name="blocker_summary" readonly="1" nolabel="1" class="o_clm_longtext"/>
+                    </div>
+                    <div class="alert alert-success" role="alert"
+                         invisible="review_state != 'pending_review' or not can_confirm">
+                        <i class="fa fa-check-circle me-1" role="img" aria-label="Ready"/>
+                        <strong>Ready to confirm.</strong>
+                        All fields reviewed, required fields complete, mappings resolved.
+                        Nothing is written to the contract until you confirm.
+                    </div>
+
+                    <group>
+                        <group string="Extraction">
+                            <field name="provider" readonly="1"/>
+                            <field name="model" readonly="1"/>
+                            <field name="status" readonly="1"/>
+                            <field name="page_count" readonly="1"/>
+                            <field name="pages_processed" readonly="1"/>
+                        </group>
+                        <group string="Cloud Processing" invisible="not cloud_processing_consent">
+                            <field name="consent_company_id" readonly="1"/>
+                            <field name="consent_user_id" readonly="1"/>
+                            <field name="consent_timestamp" readonly="1"/>
+                            <field name="transport" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <div invisible="status != 'failed'">
+                        <separator string="Failure Reason"/>
+                        <field name="failure_reason" readonly="1" nolabel="1" class="o_clm_longtext"/>
+                    </div>
+
+                    <notebook>
+                        <page string="Needs Attention" name="blockers">
+                            <div class="o_clm_empty" invisible="blocker_suggestion_ids">
+                                <i class="fa fa-check-circle-o" role="img" aria-label="Nothing blocking"/>
+                                <div class="o_clm_empty_title">Nothing needs attention</div>
+                                <div class="o_clm_empty_text">
+                                    No field came back below the low-confidence threshold and
+                                    no value needs mapping to a configured option.
+                                </div>
+                            </div>
+                            <field name="blocker_suggestion_ids" nolabel="1" readonly="1"
+                                   invisible="not blocker_suggestion_ids">
+                                <list decoration-danger="1" create="false" delete="false">
+                                    <field name="field_name"/>
+                                    <field name="suggested_value"/>
+                                    <field name="confidence" widget="percentage"/>
+                                    <field name="source_page" width="110px"/>
+                                    <field name="review_band" column_invisible="1"/>
+                                    <field name="status" widget="badge"
+                                           decoration-info="status == 'pending'"
+                                           decoration-warning="status == 'needs_mapping'"
+                                           decoration-success="status == 'approved'"
+                                           decoration-danger="status == 'rejected'"
+                                           decoration-muted="status == 'superseded'"/>
+                                    <button name="action_open_mapping_wizard" type="object"
+                                            string="Resolve" icon="fa-link"
+                                            invisible="status != 'needs_mapping'"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Review" name="review">
+                            <div class="o_clm_hint mb-2">
+                                Mid-confidence values. Correct them in place; they are applied
+                                with the rest when you confirm.
+                            </div>
+                            <div class="o_clm_empty" invisible="review_suggestion_ids">
+                                <i class="fa fa-search" role="img" aria-label="Nothing to review"/>
+                                <div class="o_clm_empty_title">Nothing in the review band</div>
+                                <div class="o_clm_empty_text">
+                                    Every extracted field either cleared the high-confidence
+                                    threshold or is listed under Needs Attention.
+                                </div>
+                            </div>
+                            <field name="review_suggestion_ids" nolabel="1"
+                                   invisible="not review_suggestion_ids">
+                                <list decoration-warning="1" create="false" delete="false" editable="bottom">
+                                    <field name="field_name" readonly="1"/>
+                                    <field name="suggested_value"/>
+                                    <field name="confidence" widget="percentage" readonly="1"/>
+                                    <field name="source_page" readonly="1" width="110px"/>
+                                    <field name="source_text" readonly="1" optional="show"/>
+                                    <field name="evidence_source" readonly="1" optional="hide"/>
+                                    <field name="review_band" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Verified" name="verified">
+                            <div class="o_clm_hint mb-2">
+                                These cleared the high-confidence threshold. They are shown in
+                                full, not hidden, and are applied only when you confirm.
+                            </div>
+                            <div class="o_clm_empty" invisible="verified_suggestion_ids">
+                                <i class="fa fa-check" role="img" aria-label="None verified"/>
+                                <div class="o_clm_empty_title">No high-confidence fields</div>
+                                <div class="o_clm_empty_text">
+                                    Nothing in this run cleared the high-confidence threshold.
+                                </div>
+                            </div>
+                            <field name="verified_suggestion_ids" nolabel="1" readonly="1"
+                                   invisible="not verified_suggestion_ids">
+                                <list decoration-success="1" create="false" delete="false">
+                                    <field name="field_name"/>
+                                    <field name="suggested_value"/>
+                                    <field name="confidence" widget="percentage"/>
+                                    <field name="source_page" width="110px"/>
+                                    <field name="source_text" optional="show"/>
+                                    <field name="review_band" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Source Document" name="source">
+                            <group>
+                                <group string="Document">
+                                    <field name="contract_version_id" readonly="1"/>
+                                </group>
+                            </group>
+                            <separator string="Extracted Text"/>
+                            <field name="extracted_text_preview" readonly="1" nolabel="1"
+                                   class="o_clm_longtext o_clm_longtext_tall"/>
+                        </page>
+
+                        <page string="Field Configuration Used" name="snapshot">
+                            <div class="o_clm_hint mb-2">
+                                The configuration frozen when this run executed. Later edits to
+                                field definitions do not change it.
+                            </div>
+                            <field name="field_snapshot_ids" nolabel="1" readonly="1">
+                                <list create="false" delete="false">
+                                    <field name="definition_code"/>
+                                    <field name="definition_name"/>
+                                    <field name="value_type"/>
+                                    <field name="is_core" optional="show"/>
+                                    <field name="option_codes" optional="show"/>
+                                    <field name="ai_hint" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Cost" name="cost" invisible="not input_tokens">
+                            <group>
+                                <group string="Tokens">
+                                    <field name="input_tokens" readonly="1"/>
+                                    <field name="output_tokens" readonly="1"/>
+                                </group>
+                                <group string="Estimate">
+                                    <field name="estimated_cost" readonly="1"/>
+                                    <field name="pricing_version" readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+
+                    <field name="can_confirm" invisible="1"/>
+                    <field name="cloud_processing_consent" invisible="1"/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_clm_ai_job_review_list" model="ir.ui.view">
+        <field name="name">clm.ai.job.review.list</field>
+        <field name="model">clm.ai.job</field>
+        <field name="arch" type="xml">
+            <list string="Extraction Reviews" class="o_clm_list" create="false">
+                <field name="contract_id"/>
+                <field name="name"/>
+                <field name="create_date" string="Run On"/>
+                <field name="provider" optional="show"/>
+                <field name="model" optional="hide"/>
+                <field name="page_count" optional="hide" width="105px"/>
+                <field name="can_confirm" column_invisible="1"/>
+                <field name="status" widget="badge"
+                       decoration-info="status == 'pending'"
+                       decoration-warning="status == 'processing'"
+                       decoration-success="status == 'completed'"
+                       decoration-danger="status == 'failed'"/>
+                <field name="review_state" widget="badge"
+                       decoration-warning="review_state == 'pending_review'"
+                       decoration-success="review_state == 'reviewed'"
+                       decoration-danger="review_state == 'rejected'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_clm_ai_review_queue" model="ir.actions.act_window">
+        <field name="name">Extraction Reviews</field>
+        <field name="res_model">clm.ai.job</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('is_reviewable', '=', True), ('review_state', '=', 'pending_review')]</field>
+        <field name="context">{'form_view_ref': 'clm_ai.view_clm_ai_job_review_form', 'list_view_ref': 'clm_ai.view_clm_ai_job_review_list'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No extractions awaiting review</p>
+            <p>Runs appear here until a reviewer confirms or rejects them.
+               Superseded runs drop out automatically but stay readable.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_clm_ai_review_queue"
+              name="Extraction Reviews"
+              parent="clm.menu_clm_root"
+              action="action_clm_ai_review_queue"
+              groups="clm.group_clm_legal"
+              sequence="50"/>
+</odoo>

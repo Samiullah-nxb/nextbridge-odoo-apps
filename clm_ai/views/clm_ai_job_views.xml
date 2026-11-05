@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_clm_ai_job_form" model="ir.ui.view">
+        <field name="name">clm.ai.job.form</field>
+        <field name="model">clm.ai.job</field>
+        <field name="arch" type="xml">
+            <form class="o_clm_form">
+                <header>
+                    <!-- action_run_sync accepts 'failed' as well as 'pending', so a
+                         run that died on a transient provider error (a 503, a
+                         quota spike) can be retried in place. Hiding the button
+                         on 'failed' left the only retry path as creating a whole
+                         new job. -->
+                    <button name="action_run_sync" type="object" string="Run Analysis"
+                            class="btn-primary" icon="fa-play" invisible="status != 'pending'"/>
+                    <button name="action_run_sync" type="object" string="Retry Analysis"
+                            class="btn-primary" icon="fa-refresh" invisible="status != 'failed'"/>
+                    <field name="status" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title o_clm_page_header" name="clm_page_header">
+                        <div class="o_clm_kicker">AI Analysis Job</div>
+                        <h1 class="o_clm_title"><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="contract_version_id"/>
+                            <field name="analysis_type"/>
+                            <field name="provider"/>
+                        </group>
+                        <group>
+                            <field name="requested_by_id" readonly="1"/>
+                            <field name="create_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Field Suggestions" name="suggestions" invisible="analysis_type == 'clause_analysis'">
+                            <field name="suggestion_ids">
+                                <list editable="bottom">
+                                    <field name="field_name" readonly="1"/>
+                                    <field name="suggested_value" readonly="1"/>
+                                    <field name="confidence" readonly="1" widget="percentage"/>
+                                    <field name="status" readonly="1" widget="badge"
+                                           decoration-info="status == 'pending'"
+                                           decoration-warning="status == 'needs_mapping'"
+                                           decoration-success="status == 'approved'"
+                                           decoration-danger="status == 'rejected'"
+                                           decoration-muted="status == 'superseded'"/>
+                                    <button name="action_approve" type="object" icon="fa-check" string="Approve" invisible="status != 'pending'"/>
+                                    <button name="action_reject" type="object" icon="fa-times" string="Reject" invisible="status != 'pending'"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Clause Deviations" name="deviations" invisible="analysis_type == 'field_extraction'">
+                            <field name="deviation_ids">
+                                <list>
+                                    <field name="matched_text"/>
+                                    <field name="ai_deviation_type"/>
+                                    <field name="ai_risk_level" widget="badge"
+                                           decoration-danger="ai_risk_level in ('high', 'critical')"
+                                           decoration-warning="ai_risk_level == 'medium'"
+                                           decoration-success="ai_risk_level == 'low'"/>
+                                    <field name="status" widget="badge"
+                                           decoration-info="status == 'pending'"
+                                           decoration-success="status == 'confirmed'"/>
+                                    <button name="action_confirm" type="object" string="Review" icon="fa-search"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Error Log" name="error_log" invisible="status != 'failed'">
+                            <field name="error_message" readonly="1" nolabel="1"
+                                   class="o_clm_longtext o_clm_longtext_tall"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

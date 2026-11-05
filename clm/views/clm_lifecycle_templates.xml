@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Server-rendered blocks for the Contract Lifecycle overview.
+
+        Colour comes from Bootstrap utility classes so the page follows the
+        Odoo theme; the SCSS next to this file only handles layout.
+
+        Two icons carry the meaning on every row: the phase's or stage's own
+        icon says *what* the step is (review, signing, archive …), and the
+        status icon beside the label says how far it got (completed, current,
+        pending, not used, stopped). Neither is decoration — a reader can name
+        the step and its state without reading a word.
+    -->
+
+    <!-- ─── The lifecycle: phases, each owning its stages ───────────────── -->
+    <template id="lifecycle_chart" name="NextContract Lifecycle Chart">
+        <div class="o_clm_lifecycle">
+            <!-- Where the contract stands, in one line -->
+            <div class="o_clm_lifecycle_summary">
+                <div class="o_clm_summary_item">
+                    <div class="o_clm_summary_label text-muted">Current Phase</div>
+                    <div class="o_clm_summary_value">
+                        <t t-out="current_phase_label or '—'"/>
+                    </div>
+                </div>
+                <div class="o_clm_summary_item">
+                    <div class="o_clm_summary_label text-muted">Current Stage</div>
+                    <div class="o_clm_summary_value">
+                        <t t-out="current_stage_label or '—'"/>
+                    </div>
+                </div>
+                <div class="o_clm_summary_item o_clm_summary_grow">
+                    <div class="o_clm_summary_label text-muted">Overall Progress</div>
+                    <div class="o_clm_summary_value">
+                        <span class="o_clm_summary_percent"><t t-out="progress"/>%</span>
+                        <span class="o_clm_summary_note text-muted">
+                            <t t-out="done_total"/> / <t t-out="stage_total"/> stages completed
+                        </span>
+                    </div>
+                    <div class="progress o_clm_lifecycle_progress" role="progressbar"
+                         t-attf-aria-label="{{done_total}} of {{stage_total}} stages completed"
+                         t-attf-aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100">
+                        <div t-attf-class="progress-bar {{'bg-danger' if cancelled else 'bg-success'}}"
+                             t-attf-style="width: {{progress}}%"/>
+                    </div>
+                </div>
+            </div>
+
+            <div t-if="cancelled" class="alert alert-danger o_clm_lifecycle_banner" role="alert">
+                <i class="fa fa-ban me-2" aria-hidden="true"/>
+                <span>This contract is <strong t-out="cancelled_label"/>. It stopped at the stage marked below.</span>
+            </div>
+
+            <!-- Expand / collapse every phase at once. Icon-only, because the
+                 pair sits above a list whose own chevrons already say what a
+                 phase card does; the accessible name carries the wording.
+                 Opening a card is UI state — it never touches the contract. -->
+            <div class="o_clm_lifecycle_toolbar">
+                <span class="o_clm_lifecycle_toolbar_label text-muted">Phases</span>
+                <!--
+                    One toggle, not two buttons. `aria-expanded` is the state,
+                    and the icon, the label and the tooltip all follow it, so
+                    the control says what it will do next rather than offering
+                    two commands of which one is always a no-op.
+
+                    The server renders the state the chart opens in; the script
+                    keeps it in step afterwards, including when the reader opens
+                    or closes a single phase by hand.
+                -->
+                <button type="button" class="btn btn-sm btn-secondary o_clm_lifecycle_tool"
+                        data-clm-lifecycle="toggle"
+                        t-att-aria-expanded="'true' if all_expanded else 'false'"
+                        t-attf-data-tooltip="{{'Collapse every phase' if all_expanded else 'Expand every phase to see its stages'}}"
+                        data-tooltip-position="left">
+                    <i t-attf-class="fa {{'fa-angle-double-up' if all_expanded else 'fa-angle-double-down'}}"
+                       aria-hidden="true"/>
+                    <span class="o_clm_lifecycle_tool_label">
+                        <t t-out="'Collapse all' if all_expanded else 'Expand all'"/>
+                    </span>
+                </button>
+            </div>
+
+            <!-- One card per phase; its stages live inside it. <details> gives
+                 the disclosure behaviour natively: click or keyboard toggles it,
+                 and screen readers announce expanded / collapsed without any
+                 script. The toolbar above only sets the same `open` flag. -->
+            <ol class="o_clm_phase_list">
+                <li t-foreach="phases" t-as="phase"
+                    t-attf-class="o_clm_phase o_clm_phase_{{phase['status']}}">
+                    <details class="o_clm_phase_card"
+                             t-att-open="'open' if phase['expanded'] else None">
+                        <summary class="o_clm_phase_header">
+                            <span t-attf-class="o_clm_phase_marker border {{phase['marker_class']}}"
+                                  t-attf-title="{{phase['label']}} — {{phase['title']}}"
+                                  aria-hidden="true">
+                                <i t-attf-class="fa {{phase['icon']}}"/>
+                            </span>
+                            <span class="o_clm_phase_heading">
+                                <span t-attf-class="o_clm_phase_label {{phase['label_class']}}">
+                                    <t t-out="phase['label']"/>
+                                </span>
+                                <span t-if="phase['detail']" class="o_clm_phase_detail text-muted">
+                                    <t t-out="phase['detail']"/>
+                                </span>
+                            </span>
+                            <span class="o_clm_phase_meta">
+                                <span t-if="phase['returned']" class="badge text-bg-warning"
+                                      t-attf-title="Sent back {{phase['returned']}} time(s) in this phase">
+                                    <i class="fa fa-reply me-1" aria-hidden="true"/>Returned
+                                </span>
+                                <span t-attf-class="o_clm_status {{phase['status_class']}}"
+                                      t-att-title="phase['title']">
+                                    <i t-attf-class="fa {{phase['status_icon']}}" aria-hidden="true"/>
+                                    <span class="o_clm_status_text"><t t-out="phase['status_label']"/></span>
+                                </span>
+                                <span class="o_clm_phase_count"
+                                      t-attf-title="{{phase['done']}} of {{phase['total']}} stages completed">
+                                    <t t-out="phase['done']"/> / <t t-out="phase['total']"/>
+                                </span>
+                                <span class="progress o_clm_phase_progress" role="progressbar"
+                                      t-attf-aria-label="{{phase['label']}}: {{phase['done']}} of {{phase['total']}} stages completed"
+                                      t-attf-aria-valuenow="{{phase['percent']}}"
+                                      aria-valuemin="0" aria-valuemax="100">
+                                    <div class="progress-bar bg-success"
+                                         t-attf-style="width: {{phase['percent']}}%"/>
+                                </span>
+                            </span>
+                            <i class="fa fa-chevron-down o_clm_phase_caret" aria-hidden="true"/>
+                        </summary>
+
+                        <ul class="o_clm_stage_list">
+                            <li t-foreach="phase['stages']" t-as="stage"
+                                t-attf-class="o_clm_stage o_clm_stage_{{stage['status']}}">
+                                <span t-attf-class="o_clm_stage_marker border {{stage['marker_class']}}"
+                                      t-attf-title="{{stage['label']}} — {{stage['title']}}"
+                                      aria-hidden="true">
+                                    <i t-attf-class="fa {{stage['icon']}}"/>
+                                </span>
+                                <span class="o_clm_stage_text">
+                                    <span t-attf-class="o_clm_stage_label {{stage['label_class']}}">
+                                        <t t-out="stage['label']"/>
+                                    </span>
+                                    <span class="o_clm_stage_notes">
+                                        <span class="o_clm_stage_meta text-muted"
+                                              t-foreach="stage['notes']" t-as="note">
+                                            <t t-out="note"/>
+                                        </span>
+                                        <span t-if="stage['returned']" class="badge text-bg-warning"
+                                              t-attf-title="Returned to this stage {{stage['returned']}} time(s)">
+                                            <i class="fa fa-reply me-1" aria-hidden="true"/>
+                                            <t t-out="stage['returned']"/> returned
+                                        </span>
+                                        <span t-if="stage['assessment']"
+                                              t-attf-class="badge {{stage['assessment']['class']}}">
+                                            <t t-out="stage['assessment']['label']"/>
+                                        </span>
+                                    </span>
+                                </span>
+                                <span class="o_clm_stage_date text-muted"
+                                      t-att-title="stage['date_title']">
+                                    <i t-if="stage['date']" class="fa fa-calendar-o me-1" aria-hidden="true"/>
+                                    <t t-out="stage['date']"/>
+                                </span>
+                                <span t-attf-class="o_clm_status o_clm_stage_status {{stage['status_class']}}"
+                                      t-att-title="stage['title']">
+                                    <i t-attf-class="fa {{stage['status_icon']}}" aria-hidden="true"/>
+                                    <span class="o_clm_status_text"><t t-out="stage['status_label']"/></span>
+                                </span>
+                            </li>
+                        </ul>
+                    </details>
+                </li>
+            </ol>
+
+            <div class="o_clm_lifecycle_legend text-muted small">
+                <span class="o_clm_legend_item o_clm_status_done">
+                    <i class="fa fa-check-circle" aria-hidden="true"/>Completed</span>
+                <span class="o_clm_legend_item o_clm_status_current">
+                    <i class="fa fa-dot-circle-o" aria-hidden="true"/>Current</span>
+                <span class="o_clm_legend_item o_clm_status_pending">
+                    <i class="fa fa-circle-o" aria-hidden="true"/>Pending</span>
+                <span class="o_clm_legend_item o_clm_status_skipped">
+                    <i class="fa fa-minus-circle" aria-hidden="true"/>Not used</span>
+                <span class="o_clm_legend_item text-warning">
+                    <i class="fa fa-reply" aria-hidden="true"/>Returned</span>
+            </div>
+        </div>
+    </template>
+
+    <!-- ─── State history, as a timeline ────────────────────────────────── -->
+    <template id="lifecycle_history" name="NextContract Lifecycle History">
+        <div t-if="entries" class="o_clm_timeline">
+            <div t-foreach="entries" t-as="entry" class="o_clm_timeline_item">
+                <div class="o_clm_timeline_marker_wrap">
+                    <span t-attf-class="o_clm_timeline_marker border {{entry['marker_class']}}">
+                        <i t-attf-class="fa {{entry['icon']}}" aria-hidden="true"/>
+                    </span>
+                </div>
+                <div class="o_clm_timeline_body">
+                    <div class="o_clm_timeline_title">
+                        <span class="fw-bold" t-out="entry['label']"/>
+                        <span t-if="entry['stage']" class="text-muted small ms-2">
+                            <t t-out="entry['stage']"/>
+                        </span>
+                        <span t-if="entry['returned']" class="badge text-bg-warning ms-2">
+                            <i class="fa fa-reply me-1" aria-hidden="true"/>Returned for changes
+                        </span>
+                        <span t-if="entry['current']" class="badge text-bg-primary ms-2">Current</span>
+                    </div>
+                    <div class="o_clm_timeline_meta text-muted small">
+                        <i class="fa fa-user-o me-1" aria-hidden="true"/><t t-out="entry['actor']"/>
+                        <i class="fa fa-clock-o ms-2 me-1" aria-hidden="true"/><t t-out="entry['date']"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p t-else="" class="text-muted mb-0">
+            No lifecycle history has been recorded for this contract yet.
+        </p>
+    </template>
+</odoo>

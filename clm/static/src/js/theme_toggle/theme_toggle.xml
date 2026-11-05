@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+
+    <t t-name="clm.ThemeToggleSystray">
+        <div class="o_clm_theme_toggle d-inline-block" t-on-click="toggle">
+            <button type="button"
+                    class="o_nav_entry"
+                    t-att-title="isDark ? 'Switch to light theme' : 'Switch to dark theme'"
+                    t-att-aria-label="isDark ? 'Switch to light theme' : 'Switch to dark theme'">
+                <i t-attf-class="fa fa-lg {{ isDark ? 'fa-moon-o' : 'fa-sun-o' }}" role="img"/>
+            </button>
+        </div>
+    </t>
+
+</templates>

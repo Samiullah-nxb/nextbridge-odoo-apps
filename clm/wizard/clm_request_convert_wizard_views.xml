@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_clm_request_convert_wizard_form" model="ir.ui.view">
+        <field name="name">clm.request.convert.wizard.form</field>
+        <field name="model">clm.request.convert.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Convert to Contract" class="o_clm_form o_clm_dialog">
+                <sheet>
+                    <group>
+                        <group string="Contract Details">
+                            <field name="name"/>
+                            <field name="contract_type_id"/>
+                            <field name="partner_id"/>
+                            <field name="partner_signatory_id"
+                                       invisible="not partner_id"
+                                       context="{'default_parent_id': partner_id, 'default_is_company': False}"/>
+                        </group>
+                        <group string="Ownership &amp; Assignment">
+                            <field name="user_id"/>
+                            <field name="department_id"/>
+                            <field name="company_id"/>
+                        </group>
+                        <group string="Financial">
+                            <field name="contract_value"/>
+                            <field name="currency_id"/>
+                        </group>
+                        <group string="Planned Dates">
+                            <field name="effective_date"/>
+                            <field name="expected_execution_date"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Drafting">
+                            <field name="template_id"/>
+                            <field name="copy_attachments"/>
+                        </group>
+                    </group>
+                    <!-- Prose, so it sits outside every group and gets the
+                         full dialog width rather than a third of it. -->
+                    <separator string="Purpose &amp; Business Need"/>
+                    <field name="purpose" nolabel="1" class="o_clm_longtext"/>
+                    <div class="o_clm_hint">
+                        Review the details above before creating the contract. The
+                        contract is linked back to this request as its origin.
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_convert" type="object" string="Create Contract" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_clm_request_convert_wizard" model="ir.actions.act_window">
+        <field name="name">Convert to Contract</field>
+        <field name="res_model">clm.request.convert.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

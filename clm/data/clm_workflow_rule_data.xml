@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="workflow_rule_legal_review" model="clm.workflow.rule">
+        <field name="name">Legal Review Approval</field>
+        <field name="stage_trigger">in_review</field>
+        <field name="task_type">approval</field>
+        <field name="task_name">Legal Review Approval</field>
+        <field name="is_required" eval="True"/>
+        <field name="assign_to_legal_admin" eval="True"/>
+    </record>
+    <record id="workflow_rule_management_approval" model="clm.workflow.rule">
+        <field name="name">Management Approval (DOP)</field>
+        <field name="stage_trigger">internal_review_done</field>
+        <field name="task_type">approval</field>
+        <field name="task_name">Management Approval per DOP</field>
+        <field name="is_required" eval="True"/>
+        <field name="assign_to_legal_admin" eval="True"/>
+    </record>
+</odoo>

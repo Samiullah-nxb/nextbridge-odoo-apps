@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_clm_contract_version_admin,clm.contract.version.admin,model_clm_contract_version,clm.group_clm_legal_admin,1,1,1,1
+access_clm_contract_version_legal,clm.contract.version.legal,model_clm_contract_version,clm.group_clm_legal,1,1,1,0
+access_clm_contract_version_user,clm.contract.version.user,model_clm_contract_version,clm.group_clm_user,1,1,1,0
