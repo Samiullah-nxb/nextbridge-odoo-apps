@@ -4,12 +4,6 @@
             <h1 class="mb-2">NextContract</h1>
             <p class="lead">Contract lifecycle management for Odoo 19 Enterprise, from the first request to renewal,
                 with a built-in Word editor for your contract templates.</p>
-            <div class="alert alert-info d-inline-block text-start mt-3" style="max-width: 760px;">
-                <b>One purchase, the complete suite.</b> Installing this app installs all NextContract modules:
-                <b>NextContract Core</b> (contract lifecycle), <b>NextContract AI</b> (field extraction and clause
-                analysis), <b>NextContract Migration</b> (import legacy contracts) and <b>NextContract Purchase</b>
-                (link contracts to purchase orders).
-            </div>
         </div>
     </div>
 
@@ -71,7 +65,9 @@
                 <li><b>Execution</b>: Odoo Sign, activation checklist, risk and obligations</li>
                 <li><b>Lifecycle</b>, <b>Reporting</b> (dashboards and Excel export), <b>Purchase</b> link,
                     <b>Migration</b> tools</li>
-                <li><b>AI</b> (optional): field extraction and clause analysis with Google Gemini</li>
+                <li><b>AI</b> (optional): field extraction and clause analysis with Google Gemini, OpenAI, Anthropic Claude
+                    or a self-hosted model (Ollama, vLLM, LM Studio). Bring your own key; every suggestion is
+                    reviewed by a person before it changes a contract.</li>
             </ul>
         </div>
     </div>
@@ -82,7 +78,7 @@
             <ul>
                 <li>Odoo <b>19.0 Enterprise</b>, self-hosted, with Documents, Sign and Employees. Purchase is needed only
                     for the purchase order link. Not available on Odoo Online, which does not allow custom modules.</li>
-                <li>Python packages listed in <code>clm/requirements.txt</code> (<code>pip install -r clm/requirements.txt</code>). On Odoo.sh, put them in the <code>requirements.txt</code> at the root of your repository.</li>
+                <li>Python packages listed in <code>requirements.txt</code> (<code>pip install -r requirements.txt</code>).</li>
                 <li>LibreOffice on the Odoo server for DOCX to PDF with Word layout:
                     <code>apt-get install libreoffice-writer-nogui</code></li>
                 <li>Chrome or Edge.</li>
@@ -100,14 +96,16 @@
 
             <h3 class="mt-4">Upgrading</h3>
             <p>Back up your database and filestore, replace the module folders, then upgrade with
-                <code>-u clm</code> (or Apps, then Upgrade on <b>NextContract</b>). Refresh the browser
+                <code>-u nextcontract</code> (or Apps, then Upgrade on <b>NextContract</b>). Refresh the browser
                 once afterwards. If the older <b>Universal Docs</b> module is still installed, uninstall it after
                 this upgrade, never before.</p>
 
             <h3 class="mt-4">Data and privacy</h3>
-            <p>Your contracts stay in your Odoo database. AI features are optional and use Google Gemini with your own
-                API key. Contract text and files are sent to Google only after an administrator enters the key and
-                gives cloud-processing consent in Settings. Consent can be revoked there.</p>
+            <p>Your contracts stay in your Odoo database. AI features are optional and use the AI provider you
+                connect, with your own API key: Google Gemini, OpenAI, Anthropic Claude, or an OpenAI-compatible
+                server. Contract text and files are sent to a third-party provider only after an administrator has
+                configured it and given cloud-processing consent in Settings. Consent can be revoked there. A model
+                you host on your own network keeps contracts in-house and needs no consent.</p>
             <p>The Word editor runs in the browser and saves to your Odoo server. Common fonts are bundled. Choosing
                 a font that is not bundled may load it from Google Fonts, which receives the font name, not
                 document content.</p>

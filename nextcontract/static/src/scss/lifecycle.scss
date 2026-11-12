@@ -1,0 +1,596 @@
+// Part of NextContract. See LICENSE file for full copyright and licensing details.
+//
+// The lifecycle chart itself — phases, stages, connectors and the history
+// timeline. Everything this screen shares with the rest of NextContract (the
+// page header, sections, action rows, badge rows) comes from the design system
+// in nextcontract_base; only what is unique to drawing a lifecycle lives here.
+//
+// Every colour comes from a Bootstrap utility class chosen in Python, from a
+// design token, or from a grey alpha, so the screen follows the active Odoo
+// theme (light or dark) instead of carrying a palette of its own.
+
+.o_nextcontract_lifecycle {
+    // Local aliases onto the design tokens, so the long selectors below stay
+    // readable. The connector colours have no utility-class equivalent.
+    --o-nextcontract-connector: rgba(128, 128, 128, 0.35);
+    --o-nextcontract-connector-done: var(--bs-success, #198754);
+    --o-nextcontract-track: rgba(128, 128, 128, 0.25);
+    // One padding and one marker size drive every connector offset below, so
+    // resizing a marker can never leave the rails pointing somewhere else.
+    --o-nextcontract-phase-marker-size: 2.25rem;
+    --o-nextcontract-stage-marker-size: 1.6rem;
+    --o-nextcontract-phase-pad: 0.9rem;
+    --o-nextcontract-rail: calc(var(--o-nextcontract-phase-pad) + var(--o-nextcontract-phase-marker-size) / 2);
+    --o-nextcontract-border: var(--nextcontract-border, rgba(128, 128, 128, 0.3));
+    --o-nextcontract-surface: var(--o-view-background-color, var(--bs-body-bg, transparent));
+    --o-nextcontract-radius: var(--nextcontract-radius-lg, 0.5rem);
+
+    margin: var(--nextcontract-space-2) 0 0;
+}
+
+// ─── Lifecycle summary ──────────────────────────────────────────────
+//
+// Laid out like the shared facts strip, but it carries a progress bar, so it
+// keeps its own flex rules rather than forcing o_nextcontract_facts to grow a variant.
+
+.o_nextcontract_lifecycle_summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--nextcontract-space-3) var(--nextcontract-space-7);
+    padding: var(--nextcontract-space-3) var(--nextcontract-space-4);
+    margin-bottom: var(--nextcontract-space-4);
+    border: 1px solid var(--o-nextcontract-border);
+    border-radius: var(--o-nextcontract-radius);
+    background-color: var(--nextcontract-surface-section, transparent);
+}
+
+.o_nextcontract_summary_item {
+    min-width: 0;
+}
+
+.o_nextcontract_summary_grow {
+    flex: 1 1 14rem;
+}
+
+.o_nextcontract_summary_label {
+    font-size: var(--nextcontract-font-label, 0.75rem);
+    font-weight: var(--nextcontract-weight-label, 600);
+    letter-spacing: var(--nextcontract-tracking-label, 0.06em);
+    text-transform: uppercase;
+}
+
+.o_nextcontract_summary_value {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+    font-size: var(--nextcontract-font-value, 0.9375rem);
+    font-weight: var(--nextcontract-weight-value, 500);
+    line-height: 1.4;
+}
+
+// The number first, the wording after it: progress is what the eye comes here
+// for, and a percentage reads faster than a fraction.
+.o_nextcontract_summary_percent {
+    font-size: 1.125rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.o_nextcontract_summary_note {
+    font-size: var(--nextcontract-font-support, 0.8125rem);
+    font-weight: 400;
+}
+
+.o_nextcontract_lifecycle_progress {
+    height: 0.4rem;
+    margin-top: 0.4rem;
+    // An explicit track, so a phase at 0% still reads as an empty bar rather
+    // than as nothing at all.
+    background-color: var(--o-nextcontract-track);
+}
+
+.o_nextcontract_lifecycle_banner {
+    padding: 0.5rem 0.75rem;
+}
+
+// ─── Chart toolbar ───────────────────────────────────────────────────────────
+
+.o_nextcontract_lifecycle_toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--nextcontract-space-3);
+    margin-bottom: var(--nextcontract-space-2);
+}
+
+.o_nextcontract_lifecycle_toolbar_label {
+    font-size: var(--nextcontract-font-label, 0.75rem);
+    font-weight: var(--nextcontract-weight-label, 600);
+    letter-spacing: var(--nextcontract-tracking-label, 0.06em);
+    text-transform: uppercase;
+}
+
+// The single expand/collapse toggle. It carries its own label, so it never
+// depends on the tooltip to say what it does — the tooltip only adds the
+// longer wording for anyone who pauses on it.
+.o_nextcontract_lifecycle_tool {
+    --bs-btn-padding-x: 0.5rem;
+    --bs-btn-padding-y: 0.15rem;
+
+    display: inline-flex;
+    align-items: center;
+    gap: var(--nextcontract-icon-gap, 0.375rem);
+    line-height: 1.2;
+    font-size: var(--nextcontract-font-support, 0.8125rem);
+    // Readable at rest like every other NextContract button; hover enhances.
+    color: inherit;
+    border-color: var(--nextcontract-border-strong, rgba(128, 128, 128, 0.45));
+
+    &:hover {
+        background-color: var(--nextcontract-surface-hover, rgba(128, 128, 128, 0.09));
+        color: inherit;
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--nextcontract-focus-ring, var(--bs-primary, #0d6efd));
+        outline-offset: 1px;
+    }
+
+    > .fa {
+        font-size: var(--nextcontract-icon-size, 0.875rem);
+    }
+}
+
+// On a narrow chart the label is the first thing to go; the icon plus the
+// tooltip still carry the control.
+@media (max-width: 575.98px) {
+    .o_nextcontract_lifecycle_tool_label {
+        display: none;
+    }
+}
+
+// ─── Status pill ─────────────────────────────────────────────────────────────
+//
+// The same component on a phase header and on a stage row: an icon that names
+// the state plus its wording. The icon is the signal — the text is there for
+// anyone who does not read icons, and both are driven by the status class
+// Python picked, so a state can never be drawn two different ways.
+
+.o_nextcontract_status {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    line-height: 1.2;
+    white-space: nowrap;
+
+    > .fa {
+        font-size: 0.85rem;
+    }
+}
+
+.o_nextcontract_status_done {
+    color: var(--nextcontract-status-positive, var(--bs-success, #198754));
+}
+
+.o_nextcontract_status_current {
+    color: var(--bs-primary, #0d6efd);
+    font-weight: 600;
+}
+
+.o_nextcontract_status_halted {
+    color: var(--nextcontract-status-negative, var(--bs-danger, #dc3545));
+    font-weight: 600;
+}
+
+.o_nextcontract_status_pending,
+.o_nextcontract_status_skipped {
+    color: inherit;
+    color: color-mix(in srgb, currentColor var(--nextcontract-text-muted, 64%), transparent);
+}
+
+.o_nextcontract_status_skipped {
+    font-style: italic;
+}
+
+// ─── Phase cards ─────────────────────────────────────────────────────────────
+
+.o_nextcontract_phase_list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.o_nextcontract_phase {
+    position: relative;
+
+    // The connector down from the previous phase.
+    + .o_nextcontract_phase {
+        margin-top: 1.5rem;
+
+        &::before {
+            content: "";
+            position: absolute;
+            top: -1.5rem;
+            left: calc(var(--o-nextcontract-rail) - 1px);
+            width: 2px;
+            height: 1.5rem;
+            background-color: var(--o-nextcontract-connector);
+        }
+
+        &::after {
+            content: "";
+            position: absolute;
+            top: -0.6rem;
+            left: calc(var(--o-nextcontract-rail) - 0.25rem);
+            width: 0.5rem;
+            height: 0.5rem;
+            border-top: 2px solid var(--o-nextcontract-connector);
+            border-right: 2px solid var(--o-nextcontract-connector);
+            transform: rotate(135deg);
+        }
+    }
+
+    // A phase the contract reached colours the connector leading into it.
+    &.o_nextcontract_phase_done::before,
+    &.o_nextcontract_phase_current::before,
+    &.o_nextcontract_phase_halted::before {
+        background-color: var(--o-nextcontract-connector-done);
+    }
+
+    &.o_nextcontract_phase_done::after,
+    &.o_nextcontract_phase_current::after,
+    &.o_nextcontract_phase_halted::after {
+        border-top-color: var(--o-nextcontract-connector-done);
+        border-right-color: var(--o-nextcontract-connector-done);
+    }
+}
+
+.o_nextcontract_phase_card {
+    border: 1px solid var(--o-nextcontract-border);
+    border-radius: var(--o-nextcontract-radius);
+    background-color: var(--o-nextcontract-surface);
+}
+
+// The current phase carries the emphasis; everything else stays quiet.
+.o_nextcontract_phase_current > .o_nextcontract_phase_card {
+    border-color: var(--bs-primary, #0d6efd);
+    box-shadow: 0 0 0 1px var(--bs-primary, #0d6efd);
+}
+
+.o_nextcontract_phase_halted > .o_nextcontract_phase_card {
+    border-color: var(--bs-danger, #dc3545);
+}
+
+// A phase that never ran should not compete with the ones that did.
+.o_nextcontract_phase_skipped > .o_nextcontract_phase_card,
+.o_nextcontract_phase_pending > .o_nextcontract_phase_card {
+    background-color: transparent;
+}
+
+.o_nextcontract_phase_header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.7rem var(--o-nextcontract-phase-pad);
+    cursor: pointer;
+    user-select: none;
+    border-radius: inherit;
+
+    // Hide the native disclosure triangle; the caret on the right replaces it.
+    list-style: none;
+
+    &::-webkit-details-marker {
+        display: none;
+    }
+
+    &::marker {
+        content: "";
+    }
+
+    &:hover {
+        background-color: var(--nextcontract-surface-hover, rgba(128, 128, 128, 0.09));
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--nextcontract-focus-ring, var(--bs-primary, #0d6efd));
+        outline-offset: -2px;
+    }
+}
+
+// The marker carries the phase's own icon — review, signing, archive — so a
+// card is recognisable before its label is read.
+.o_nextcontract_phase_marker {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: var(--o-nextcontract-phase-marker-size);
+    height: var(--o-nextcontract-phase-marker-size);
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 50%;
+    font-size: 0.95rem;
+    line-height: 1;
+}
+
+.o_nextcontract_phase_pending .o_nextcontract_phase_marker,
+.o_nextcontract_phase_skipped .o_nextcontract_phase_marker {
+    border-style: dashed;
+}
+
+.o_nextcontract_phase_current .o_nextcontract_phase_marker {
+    box-shadow: 0 0 0 4px rgba(128, 128, 128, 0.22);
+}
+
+.o_nextcontract_phase_heading {
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.o_nextcontract_phase_label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1.25;
+}
+
+// The stage the contract actually sits on, under the phase name.
+.o_nextcontract_phase_detail {
+    font-size: 0.75rem;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+}
+
+.o_nextcontract_phase_meta {
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem 0.75rem;
+}
+
+.o_nextcontract_phase_count {
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.o_nextcontract_phase_progress {
+    width: 4.5rem;
+    height: 0.35rem;
+    background-color: var(--o-nextcontract-track);
+}
+
+.o_nextcontract_phase_caret {
+    flex: 0 0 auto;
+    color: var(--o-nextcontract-connector);
+    transition: transform 0.15s ease-in-out;
+}
+
+.o_nextcontract_phase_card[open] > .o_nextcontract_phase_header .o_nextcontract_phase_caret {
+    transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .o_nextcontract_phase_caret {
+        transition: none;
+    }
+}
+
+// ─── Stages inside a phase ───────────────────────────────────────────────────
+
+.o_nextcontract_stage_list {
+    position: relative;
+    margin: 0;
+    padding: 0.5rem var(--o-nextcontract-phase-pad) 0.75rem calc(var(--o-nextcontract-rail) + 1rem);
+    border-top: 1px solid var(--o-nextcontract-border);
+    list-style: none;
+
+    // The rail the stages hang from, aligned under the phase marker.
+    &::before {
+        content: "";
+        position: absolute;
+        top: 0.5rem;
+        bottom: 1.35rem;
+        left: calc(var(--o-nextcontract-rail) - 1px);
+        width: 2px;
+        background-color: var(--o-nextcontract-connector);
+    }
+}
+
+.o_nextcontract_stage {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.3rem 0.4rem;
+    border-radius: var(--nextcontract-radius, 0.375rem);
+
+    // The tick joining this stage to the phase rail.
+    &::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: -0.95rem;
+        width: 0.7rem;
+        height: 2px;
+        background-color: var(--o-nextcontract-connector);
+    }
+
+    &:hover {
+        background-color: var(--nextcontract-surface-hover, rgba(128, 128, 128, 0.09));
+    }
+}
+
+// The stage the contract is on is the one line a reader looks for.
+.o_nextcontract_stage_current {
+    background-color: rgba(128, 128, 128, 0.07);
+}
+
+// Same idea as the phase marker, one size down: the stage's own icon.
+.o_nextcontract_stage_marker {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: var(--o-nextcontract-stage-marker-size);
+    height: var(--o-nextcontract-stage-marker-size);
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    line-height: 1;
+}
+
+.o_nextcontract_stage_pending .o_nextcontract_stage_marker,
+.o_nextcontract_stage_skipped .o_nextcontract_stage_marker {
+    border-style: dashed;
+}
+
+.o_nextcontract_stage_text {
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem 0.5rem;
+}
+
+.o_nextcontract_stage_label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.o_nextcontract_stage_notes {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.o_nextcontract_stage_meta {
+    font-size: 0.75rem;
+}
+
+.o_nextcontract_stage_date {
+    flex: 0 0 auto;
+    font-size: 0.78rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.o_nextcontract_stage_status {
+    flex: 0 0 6.5rem;
+    justify-content: flex-start;
+}
+
+// ─── Narrow screens ──────────────────────────────────────────────────────────
+
+@media (max-width: 767.98px) {
+    .o_nextcontract_phase_header {
+        flex-wrap: wrap;
+    }
+
+    .o_nextcontract_phase_meta {
+        width: 100%;
+        justify-content: flex-start;
+        padding-left: calc(var(--o-nextcontract-phase-marker-size) + 0.75rem);
+    }
+
+    .o_nextcontract_stage {
+        flex-wrap: wrap;
+    }
+
+    .o_nextcontract_stage_date,
+    .o_nextcontract_stage_status {
+        flex: 0 0 auto;
+        text-align: left;
+        padding-left: calc(var(--o-nextcontract-stage-marker-size) + 0.6rem);
+    }
+}
+
+// ─── History timeline ────────────────────────────────────────────────────────
+
+.o_nextcontract_timeline {
+    display: flex;
+    flex-direction: column;
+}
+
+.o_nextcontract_timeline_item {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding-bottom: 1rem;
+
+    &:not(:last-child) .o_nextcontract_timeline_marker_wrap::after {
+        content: "";
+        position: absolute;
+        top: 1.75rem;
+        left: calc(0.875rem - 1px);
+        width: 2px;
+        height: calc(100% - 1.5rem);
+        background-color: rgba(128, 128, 128, 0.35);
+    }
+}
+
+.o_nextcontract_timeline_marker_wrap {
+    position: relative;
+    flex: 0 0 auto;
+}
+
+.o_nextcontract_timeline_marker {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    line-height: 1;
+}
+
+.o_nextcontract_timeline_body {
+    padding-top: 0.1rem;
+}
+
+.o_nextcontract_timeline_title {
+    line-height: 1.3;
+}
+
+// ─── Legend ──────────────────────────────────────────────────────────────────
+//
+// The same five icons the chart uses, in the same colours — a key, not a
+// second vocabulary.
+
+.o_nextcontract_lifecycle_legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.25rem;
+    margin-top: 0.75rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--o-nextcontract-border);
+}
+
+.o_nextcontract_legend_item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.o_nextcontract_lifecycle_form {
+    .o_field_html {
+        width: 100%;
+    }
+}

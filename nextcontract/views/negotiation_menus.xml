@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_nextcontract_negotiation" name="Negotiation" parent="nextcontract.menu_nextcontract_root" sequence="40"/>
+    <menuitem id="menu_nextcontract_negotiation_rounds" name="Negotiation Rounds" parent="menu_nextcontract_negotiation" action="action_nextcontract_negotiation_round" sequence="10"/>
+    <menuitem id="menu_nextcontract_document_comparisons" name="Version Comparisons" parent="menu_nextcontract_negotiation" action="action_nextcontract_document_comparison" sequence="20"/>
+</odoo>
