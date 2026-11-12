@@ -7,7 +7,7 @@ request through legal review, drafting, negotiation, signature and activation, a
 is renewed, terminated or archived. Everything happens inside Odoo, on the same contacts, documents, signatures and
 users you already have.
 
-.. figure:: ../static/description/doc_home.png
+.. figure:: https://apps.odoocdn.com/apps/assets/19.0/nextcontract/doc_home.png
    :alt: The NextContract home screen
    :width: 100%
 
@@ -176,7 +176,7 @@ User roles
 #. Go to **Settings ‣ Users & Companies ‣ Users** and open the user.
 #. On the **Access Rights** tab, choose a role in the **NextContract** field.
 
-.. figure:: ../static/description/doc_user_roles.png
+.. figure:: https://apps.odoocdn.com/apps/assets/19.0/nextcontract/doc_user_roles.png
    :alt: The NextContract role on a user's Access Rights tab
    :width: 85%
 
@@ -330,7 +330,7 @@ Step 1: Switch on AI and give consent
 #. Optionally, adjust the review thresholds and document limits, described below.
 #. Click **Save**.
 
-.. figure:: ../static/description/doc_ai_settings.png
+.. figure:: https://apps.odoocdn.com/apps/assets/19.0/nextcontract/doc_ai_settings.png
    :alt: The NextContract AI Configuration settings
    :width: 100%
 
@@ -356,14 +356,14 @@ Step 2: Add a provider
 #. Click **Test Connection**. A green message confirms the provider answered, and which model replied. The test
    sends one short sentence and no contract content, so it works before consent is given.
 
-.. figure:: ../static/description/doc_ai_providers.png
+.. figure:: https://apps.odoocdn.com/apps/assets/19.0/nextcontract/doc_ai_providers.png
    :alt: The AI Providers list with Gemini, OpenAI, Claude and a local Ollama server
    :width: 100%
 
    Four providers side by side. *Third party* shows which ones send contract content outside your network; the
    on-premise Ollama server does not. Drag the handle to change the order: the first provider is offered by default.
 
-.. figure:: ../static/description/doc_ai_provider_form.png
+.. figure:: https://apps.odoocdn.com/apps/assets/19.0/nextcontract/doc_ai_provider_form.png
    :alt: An OpenAI provider with its connection, behaviour and models
    :width: 100%
 
@@ -493,7 +493,7 @@ Step 1: Request a contract
    estimated value, start date and urgency. Attach any supporting documents.
 #. Click **Submit Request**.
 
-.. figure:: ../static/description/doc_request_submitted.png
+.. figure:: https://apps.odoocdn.com/apps/assets/19.0/nextcontract/doc_request_submitted.png
    :alt: A submitted contract request
    :width: 85%
 
@@ -510,7 +510,7 @@ Step 2: Screen the request (Legal)
 #. Check the details and documents, then click **Accept Request**, or **Reject Request** with a reason.
 #. On an accepted request, click **Convert to Contract**.
 
-.. figure:: ../static/description/doc_requests.png
+.. figure:: https://apps.odoocdn.com/apps/assets/19.0/nextcontract/doc_requests.png
    :alt: The list of contract requests with their status
    :width: 100%
 
@@ -537,7 +537,7 @@ combines a contract type, its clauses and a **Document Template**: the Word file
 #. Click **Validate**, then **Save Changes**, or **Save as New Template Version**.
 #. Click **Submit for Review**, then **Approve**, then **Publish**.
 
-.. figure:: ../static/description/doc_template.png
+.. figure:: https://apps.odoocdn.com/apps/assets/19.0/nextcontract/doc_template.png
    :alt: The Document Template tab with template versions and the placeholders panel
    :width: 100%
 
@@ -546,7 +546,7 @@ combines a contract type, its clauses and a **Document Template**: the Word file
 
 To edit the Word file without leaving Odoo, click **Word Editor** on the **Document Template** tab.
 
-.. figure:: ../static/description/doc_word_editor.png
+.. figure:: https://apps.odoocdn.com/apps/assets/19.0/nextcontract/doc_word_editor.png
    :alt: The Word editor with the Tags panel
    :width: 100%
 
@@ -573,7 +573,7 @@ Step 4: Draft the contract
 #. Change the wording for this contract with **Edit Contract**. Keep a new version with **Create New Version**.
 #. **Preview Contract**, **Generate DOCX** and **Generate PDF** produce the current version at any time.
 
-.. figure:: ../static/description/doc_contract_draft.png
+.. figure:: https://apps.odoocdn.com/apps/assets/19.0/nextcontract/doc_contract_draft.png
    :alt: A draft contract with its actions
    :width: 85%
 
@@ -594,7 +594,7 @@ Step 5: Review and approve
    **Request Procurement Input** or **Request Compliance Review**.
 #. When the legal review is done, click **Complete Internal Review**. This creates the management approval task.
 
-.. figure:: ../static/description/doc_contract_review.png
+.. figure:: https://apps.odoocdn.com/apps/assets/19.0/nextcontract/doc_contract_review.png
    :alt: A contract under legal review with its workflow tasks
    :width: 85%
 
@@ -603,7 +603,7 @@ Step 5: Review and approve
 Approvers do not need to search for contracts. Their tasks wait in **NextContract ‣ Workflow ‣ My Tasks**, where
 they click **Approve**, **Reject** or **Delegate**.
 
-.. figure:: ../static/description/doc_my_tasks.png
+.. figure:: https://apps.odoocdn.com/apps/assets/19.0/nextcontract/doc_my_tasks.png
    :alt: The My Tasks list with approve and reject buttons
    :width: 100%
 
@@ -630,13 +630,13 @@ Step 6: Negotiate with the counterparty
 #. On a version, **Compare Versions** or **Compare with previous** shows a redline of the changes. Comparisons are
    kept in **NextContract ‣ Negotiation ‣ Version Comparisons**.
 
-.. figure:: ../static/description/doc_send_counterparty.png
+.. figure:: https://apps.odoocdn.com/apps/assets/19.0/nextcontract/doc_send_counterparty.png
    :alt: The Send to Counterparty dialog
    :width: 70%
 
    Sending a version to the counterparty, with a response deadline and a note.
 
-.. figure:: ../static/description/doc_portal_contract.png
+.. figure:: https://apps.odoocdn.com/apps/assets/19.0/nextcontract/doc_portal_contract.png
    :alt: The counterparty's view of the contract in the Odoo portal
    :width: 85%
 
@@ -654,7 +654,7 @@ Step 7: Sign
 #. Click **Send for Signature**. Every signer needs a valid email address.
 #. Follow progress on the **Signature & Execution** tab.
 
-.. figure:: ../static/description/doc_contract_signature.png
+.. figure:: https://apps.odoocdn.com/apps/assets/19.0/nextcontract/doc_contract_signature.png
    :alt: An approved contract ready to be sent for signature
    :width: 85%
 
@@ -675,7 +675,7 @@ Step 8: Activate
    signing dates.
 #. Click **Activate Contract**.
 
-.. figure:: ../static/description/doc_activation_checklist.png
+.. figure:: https://apps.odoocdn.com/apps/assets/19.0/nextcontract/doc_activation_checklist.png
    :alt: The activation checklist of a contract
    :width: 85%
 
@@ -698,7 +698,7 @@ Step 9: Manage the live contract
 - **Terminate** records the date and reason and stops the alerts. **Mark Expired** and **Archive** close the
   contract.
 
-.. figure:: ../static/description/doc_obligations.png
+.. figure:: https://apps.odoocdn.com/apps/assets/19.0/nextcontract/doc_obligations.png
    :alt: The obligations of an active contract
    :width: 85%
 
@@ -707,7 +707,7 @@ Step 9: Manage the live contract
 Click **View Lifecycle** on any contract to see its whole journey: which steps are done, skipped, current or to
 come, who it is waiting on, and the overall progress.
 
-.. figure:: ../static/description/doc_lifecycle.png
+.. figure:: https://apps.odoocdn.com/apps/assets/19.0/nextcontract/doc_lifecycle.png
    :alt: The lifecycle overview of a contract
    :width: 85%
 
@@ -782,7 +782,7 @@ Step 1: Start an analysis
    document; upload or generate one first.
 #. Click **Extract via AI**.
 
-.. figure:: ../static/description/doc_ai_extract_button.png
+.. figure:: https://apps.odoocdn.com/apps/assets/19.0/nextcontract/doc_ai_extract_button.png
    :alt: The Extract via AI button on a contract version
    :width: 100%
 
@@ -794,7 +794,7 @@ Step 1: Start an analysis
    you need to.
 #. Click **Run AI Analysis**. The analysis job opens, with the status *Ready*.
 
-.. figure:: ../static/description/doc_ai_wizard.png
+.. figure:: https://apps.odoocdn.com/apps/assets/19.0/nextcontract/doc_ai_wizard.png
    :alt: The Extract via AI dialog with analysis type, provider and model
    :width: 70%
 
@@ -802,7 +802,7 @@ Step 1: Start an analysis
 
 #. Check the job, then click **Run Analysis**.
 
-.. figure:: ../static/description/doc_ai_job_run.png
+.. figure:: https://apps.odoocdn.com/apps/assets/19.0/nextcontract/doc_ai_job_run.png
    :alt: A ready AI analysis job with the Run Analysis button
    :width: 100%
 
@@ -821,7 +821,7 @@ Every run is listed in two places:
 - on the version, in the **AI Analysis Jobs** tab;
 - for reviewers, in **NextContract ‣ Extraction Reviews**, the queue of all runs.
 
-.. figure:: ../static/description/doc_ai_queue.png
+.. figure:: https://apps.odoocdn.com/apps/assets/19.0/nextcontract/doc_ai_queue.png
    :alt: The Extraction Reviews queue
    :width: 100%
 
@@ -845,7 +845,7 @@ Open a completed run in **NextContract ‣ Extraction Reviews**. The top of the 
 read the document, how many pages it read, and the consent under which the document was sent. A banner says
 whether the run is *Ready to confirm*, or what still needs attention.
 
-.. figure:: ../static/description/doc_ai_review.png
+.. figure:: https://apps.odoocdn.com/apps/assets/19.0/nextcontract/doc_ai_review.png
    :alt: An extraction review with one value that needs attention
    :width: 100%
 
@@ -874,13 +874,13 @@ The suggestions are sorted into three tabs by confidence, using the thresholds s
      - At or above the high threshold
      - Very likely right. They are shown in full, with their source text, so you can still check them.
 
-.. figure:: ../static/description/doc_ai_review_mid.png
+.. figure:: https://apps.odoocdn.com/apps/assets/19.0/nextcontract/doc_ai_review_mid.png
    :alt: The Review tab, with the source text next to each suggested value
    :width: 100%
 
    The **Review** tab. Each value is shown with the page and the sentence it was read from.
 
-.. figure:: ../static/description/doc_ai_review_verified.png
+.. figure:: https://apps.odoocdn.com/apps/assets/19.0/nextcontract/doc_ai_review_verified.png
    :alt: The Verified tab
    :width: 100%
 
@@ -920,7 +920,7 @@ For *Clause Analysis* and *Full Analysis*, open the run from the version's **AI 
 **Clause Deviations** tab. It lists every clause the AI compared with your library, with its classification and
 risk.
 
-.. figure:: ../static/description/doc_ai_deviations.png
+.. figure:: https://apps.odoocdn.com/apps/assets/19.0/nextcontract/doc_ai_deviations.png
    :alt: The list of clause deviations found by the AI
    :width: 85%
 
@@ -933,13 +933,13 @@ Click **Review** on a line to open it:
 - **Classification & Risk** shows the AI's classification, risk level, confidence and explanation, which you cannot
   edit, next to the **Legal Confirmation**, which you fill in.
 
-.. figure:: ../static/description/doc_ai_deviation_compare.png
+.. figure:: https://apps.odoocdn.com/apps/assets/19.0/nextcontract/doc_ai_deviation_compare.png
    :alt: A clause shown next to its standard wording
    :width: 85%
 
    The standard wording and the counterparty's wording, side by side.
 
-.. figure:: ../static/description/doc_ai_deviation_risk.png
+.. figure:: https://apps.odoocdn.com/apps/assets/19.0/nextcontract/doc_ai_deviation_risk.png
    :alt: The AI's classification of a clause, and where Legal records its own
    :width: 85%
 
@@ -979,7 +979,7 @@ Reports and Excel export
 **Obligation Analysis** reports, as graphs, pivot tables or lists. **Export Excel** exports contracts, requests,
 obligations or workflow tasks, filtered by status, dates, contract type or counterparty.
 
-.. figure:: ../static/description/doc_dashboard.png
+.. figure:: https://apps.odoocdn.com/apps/assets/19.0/nextcontract/doc_dashboard.png
    :alt: The contract portfolio report by contract type
    :width: 100%
 
