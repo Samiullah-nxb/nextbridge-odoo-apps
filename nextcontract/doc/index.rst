@@ -1274,7 +1274,7 @@ Contact us from your order page on the Odoo Apps store. Please include your Odoo
 Release notes
 =============
 
-19.0.2.0.0
+19.0.1.1.0
 ----------
 
 - First release on the Odoo Apps store.
