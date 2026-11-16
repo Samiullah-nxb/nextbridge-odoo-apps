@@ -5,6 +5,14 @@
     'version': '19.0.1.0.0',
     'category': 'Legal/Contract Management',
     'summary': 'Contract Lifecycle Management: intake, drafting, negotiation, signature and obligations',
+    "author": "Nextbridge",
+    "maintainer": "Nextbridge",
+    "company": "Nextbridge",
+    "website": "https://www.nextbridge.pk",
+    "support": "samiullah.3277@nxb.com.pk",
+    "license": "OPL-1",
+    "price": 499.00,
+    "currency": "USD",
     'description': """
 NextContract
 ============
