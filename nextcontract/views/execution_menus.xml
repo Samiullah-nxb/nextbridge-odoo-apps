@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_nextcontract_activation_checklist"
+              name="Activation Checklist"
+              parent="nextcontract.menu_nextcontract_configuration"
+              action="action_nextcontract_activation_checklist_item"
+              sequence="40"
+              groups="nextcontract.group_nextcontract_legal_admin"/>
+
+    <menuitem id="menu_nextcontract_process_alerts"
+              name="Process Contract Alerts"
+              parent="nextcontract.menu_nextcontract_configuration"
+              action="action_nextcontract_process_all_alerts"
+              sequence="60"
+              groups="nextcontract.group_nextcontract_legal_admin"/>
+</odoo>

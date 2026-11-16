@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_nextcontract_contract_version_admin,nextcontract.contract.version.admin,model_nextcontract_contract_version,nextcontract.group_nextcontract_legal_admin,1,1,1,1
+access_nextcontract_contract_version_legal,nextcontract.contract.version.legal,model_nextcontract_contract_version,nextcontract.group_nextcontract_legal,1,1,1,0
+access_nextcontract_contract_version_user,nextcontract.contract.version.user,model_nextcontract_contract_version,nextcontract.group_nextcontract_user,1,1,1,0

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nextcontract_ai_provider_list" model="ir.ui.view">
+        <field name="name">nextcontract.ai.provider.list</field>
+        <field name="model">nextcontract.ai.provider</field>
+        <field name="arch" type="xml">
+            <list string="AI Providers">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="provider_type"/>
+                <field name="default_model_name" string="Default Model"/>
+                <field name="sends_data_off_host" string="Third party"/>
+                <field name="active" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nextcontract_ai_provider_form" model="ir.ui.view">
+        <field name="name">nextcontract.ai.provider.form</field>
+        <field name="model">nextcontract.ai.provider</field>
+        <field name="arch" type="xml">
+            <form string="AI Provider">
+                <header>
+                    <button name="action_test_connection" type="object"
+                            string="Test Connection" class="btn-primary"
+                            invisible="not id"/>
+                    <button name="action_fetch_models" type="object"
+                            string="Fetch Models" invisible="not id"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <field name="active" invisible="1"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. OpenAI (Legal team)"/></h1>
+                    </div>
+                    <group>
+                        <group string="Connection">
+                            <field name="provider_type"/>
+                            <field name="api_key" password="True"
+                                   required="provider_type in ('gemini', 'openai', 'anthropic')"/>
+                            <field name="base_url"
+                                   invisible="provider_type == 'gemini'"
+                                   required="provider_type == 'custom'"
+                                   placeholder="Leave empty for the vendor default"/>
+                        </group>
+                        <group string="Behaviour">
+                            <field name="default_model_id"
+                                   options="{'no_create': True}"/>
+                            <field name="fallback_model_id"
+                                   options="{'no_create': True}"/>
+                            <field name="structured_mode"
+                                   invisible="provider_type not in ('openai', 'custom')"/>
+                            <field name="max_output_tokens"
+                                   invisible="provider_type != 'anthropic'"/>
+                            <field name="supports_vision"
+                                   invisible="provider_type == 'gemini'"/>
+                            <field name="is_cloud"
+                                   invisible="provider_type != 'custom'"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-info" role="alert"
+                         invisible="not sends_data_off_host">
+                        <field name="sends_data_off_host" invisible="1"/>
+                        Contract content is sent to this provider. It only runs
+                        once the company has acknowledged cloud AI processing
+                        in Settings → NextContract AI Configuration.
+                    </div>
+                    <notebook>
+                        <page string="Models" name="models">
+                            <field name="model_ids">
+                                <list editable="bottom">
+                                    <field name="name"/>
+                                    <field name="active" widget="boolean_toggle"/>
+                                </list>
+                            </field>
+                            <p class="text-muted">
+                                Add model ids by hand, or press Fetch Models to
+                                list what this key can call.
+                            </p>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_nextcontract_ai_provider" model="ir.actions.act_window">
+        <field name="name">AI Providers</field>
+        <field name="res_model">nextcontract.ai.provider</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add your first AI provider</p>
+            <p>Connect Gemini, OpenAI, Claude or any OpenAI-compatible server
+               with your own API key, then choose it when running an analysis.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_nextcontract_ai_providers"
+              name="AI Providers"
+              parent="nextcontract.menu_nextcontract_configuration"
+              action="action_nextcontract_ai_provider"
+              groups="nextcontract.group_nextcontract_legal_admin"
+              sequence="40"/>
+</odoo>

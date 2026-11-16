@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_nextcontract_library" name="Library" parent="nextcontract.menu_nextcontract_root" sequence="60"/>
+    <menuitem id="menu_nextcontract_templates" name="Templates" parent="menu_nextcontract_library" action="action_nextcontract_template" sequence="10"/>
+    <menuitem id="menu_nextcontract_clauses" name="Clauses" parent="menu_nextcontract_library" action="action_nextcontract_clause" sequence="20"/>
+</odoo>
