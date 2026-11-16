@@ -1,1 +1,0 @@
-# Part of NextContract. See LICENSE file for full copyright and licensing details.

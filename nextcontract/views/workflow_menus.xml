@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
-    <menuitem id="menu_nextcontract_workflow" name="Workflow" parent="nextcontract.menu_nextcontract_root" sequence="30"/>
-    <menuitem id="menu_nextcontract_workflow_tasks" name="My Tasks" parent="menu_nextcontract_workflow" action="action_nextcontract_workflow_task" sequence="10"/>
-    <menuitem id="menu_nextcontract_workflow_rules" name="Workflow Rules" parent="nextcontract.menu_nextcontract_configuration" action="action_nextcontract_workflow_rule" sequence="30" groups="nextcontract.group_nextcontract_legal_admin"/>
-</odoo>

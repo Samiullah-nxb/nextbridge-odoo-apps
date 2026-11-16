@@ -1,4 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_nextcontract_excel_export_wizard_user,nextcontract.excel.export.wizard.user,model_nextcontract_excel_export_wizard,nextcontract.group_nextcontract_user,1,1,1,1
-access_nextcontract_excel_export_wizard_manager,nextcontract.excel.export.wizard.manager,model_nextcontract_excel_export_wizard,nextcontract.group_nextcontract_manager,1,1,1,1
-access_nextcontract_excel_export_wizard_admin,nextcontract.excel.export.wizard.admin,model_nextcontract_excel_export_wizard,nextcontract.group_nextcontract_legal_admin,1,1,1,1
