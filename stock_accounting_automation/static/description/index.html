@@ -1,0 +1,253 @@
+<!--
+  Odoo Apps description of Stock Accounting Automation.
+  The store sanitiser removes <style>, <script> and <link>, so every style is inline and the layout
+  uses inline-block columns with a max-width (they wrap on narrow screens without media queries).
+  Image paths are relative to static/description: Odoo rewrites them to
+  /stock_accounting_automation/static/description/<path>, the store to its CDN.
+-->
+<section style="font-family: Inter, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1d2939; background-color: #f4f8fd; border-bottom: 1px solid #e4e7ec; padding: 48px 0 32px;">
+    <div style="max-width: 1080px; margin: 0 auto; padding: 0 16px; text-align: center;">
+        <div style="display: inline-block; vertical-align: middle; width: 100%; max-width: 560px; margin: 0 6px 24px; text-align: left;">
+            <p style="font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #0b6bcb; margin: 0 0 12px;">Odoo 19 &#183; Inventory &#183; Accounting</p>
+            <h1 style="font-size: 36px; line-height: 1.15; font-weight: 700; margin: 0 0 12px; color: #101828;">Stock Accounting Automation</h1>
+            <p style="font-size: 20px; line-height: 1.4; color: #344054; margin: 0 0 20px;">Automated Journal Entries for Inventory Operations</p>
+            <p style="font-size: 16px; line-height: 1.6; color: #475467; margin: 0;">Every receipt, delivery, return, stock count and scrap of your perpetual-valuation products posts its own journal entry. Vendor bills and customer invoices clear the matching interim accounts automatically, so your <b>Stock Valuation account always equals the value of the goods on hand</b>.</p>
+        </div>
+        <div style="display: inline-block; vertical-align: middle; width: 100%; max-width: 380px; margin: 0 6px 24px; text-align: left;">
+            <div style="background-color: #ffffff; border: 1px solid #e4e7ec; border-radius: 12px; padding: 20px 22px; box-shadow: 0 1px 3px rgba(16, 24, 40, 0.08);">
+                <p style="font-size: 13px; font-weight: 600; color: #667085; margin: 0 0 12px; text-transform: uppercase; letter-spacing: 0.06em;">Receipt of 10 units @ 100</p>
+                <table style="width: 100%; font-size: 14px; border-collapse: collapse;">
+                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #f2f4f7;">Stock Valuation</td><td style="padding: 8px 0; border-bottom: 1px solid #f2f4f7; text-align: right; color: #067647; font-weight: 600;">Dr 1,000.00</td></tr>
+                    <tr><td style="padding: 8px 0;">Stock Interim (Received)</td><td style="padding: 8px 0; text-align: right; color: #b42318; font-weight: 600;">Cr 1,000.00</td></tr>
+                </table>
+                <p style="font-size: 13px; line-height: 1.5; color: #667085; margin: 12px 0 0;">Posted automatically when the receipt is validated, then matched with the vendor bill.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section style="font-family: Inter, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1d2939; padding: 40px 0 24px;">
+    <div style="max-width: 1080px; margin: 0 auto; padding: 0 16px; text-align: center;">
+        <div style="display: inline-block; vertical-align: top; width: 100%; max-width: 470px; min-height: 270px; margin: 0 6px 16px; text-align: left; border-left: 4px solid #f79009; background-color: #fffaf0; border-radius: 8px; padding: 20px 22px; box-sizing: border-box;">
+            <h2 style="font-size: 22px; font-weight: 700; margin: 0 0 12px; color: #101828;">The problem</h2>
+            <p style="font-size: 15px; line-height: 1.6; color: #475467; margin: 0 0 10px;">Odoo 19 no longer posts a journal entry when goods move. With perpetual valuation the stock account only changes when bills and invoices are posted:</p>
+            <ul style="font-size: 15px; line-height: 1.6; color: #475467; margin: 0; padding-left: 20px;">
+                <li>Goods received but not yet billed are missing from the balance sheet.</li>
+                <li>Goods delivered but not yet invoiced still count as stock.</li>
+                <li>Stock counts and scrap leave no trace unless the location has its own account.</li>
+            </ul>
+        </div>
+        <div style="display: inline-block; vertical-align: top; width: 100%; max-width: 470px; min-height: 270px; margin: 0 6px 16px; text-align: left; border-left: 4px solid #0b6bcb; background-color: #f4f8fd; border-radius: 8px; padding: 20px 22px; box-sizing: border-box;">
+            <h2 style="font-size: 22px; font-weight: 700; margin: 0 0 12px; color: #101828;">The solution</h2>
+            <p style="font-size: 15px; line-height: 1.6; color: #475467; margin: 0 0 10px;">The classic perpetual (anglo-saxon) flow, restored with two interim accounts:</p>
+            <ul style="font-size: 15px; line-height: 1.6; color: #475467; margin: 0; padding-left: 20px;">
+                <li><b>Stock Interim (Received)</b> holds goods received, not billed.</li>
+                <li><b>Stock Interim (Delivered)</b> holds goods delivered, not invoiced.</li>
+                <li>Bills and invoices clear them and are reconciled automatically. Warehouse, purchase and sales users work exactly as before.</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section style="font-family: Inter, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1d2939; padding: 16px 0 32px;">
+    <div style="max-width: 1080px; margin: 0 auto; padding: 0 16px; text-align: center;">
+        <h2 style="font-size: 26px; font-weight: 700; margin: 0 0 8px; color: #101828;">Key features</h2>
+        <p style="font-size: 16px; color: #667085; margin: 0 0 28px;">Built on Odoo 19's own valuation engine. No core changes, no new models.</p>
+        <div style="display: inline-block; vertical-align: top; width: 100%; max-width: 310px; min-height: 180px; margin: 0 6px 16px; text-align: left; border: 1px solid #e4e7ec; border-radius: 10px; padding: 20px; box-sizing: border-box; background-color: #ffffff;">
+            <p style="font-size: 24px; line-height: 1; margin: 0 0 10px;">&#128230;</p>
+            <h3 style="font-size: 17px; font-weight: 700; margin: 0 0 8px; color: #101828;">An entry for every move</h3>
+            <p style="font-size: 14px; line-height: 1.6; color: #475467; margin: 0;">Receipts, deliveries, customer and vendor returns, inventory adjustments, scrap and manufacturing. FIFO, Average Cost and Standard Price.</p>
+        </div>
+        <div style="display: inline-block; vertical-align: top; width: 100%; max-width: 310px; min-height: 180px; margin: 0 6px 16px; text-align: left; border: 1px solid #e4e7ec; border-radius: 10px; padding: 20px; box-sizing: border-box; background-color: #ffffff;">
+            <p style="font-size: 24px; line-height: 1; margin: 0 0 10px;">&#128279;</p>
+            <h3 style="font-size: 17px; font-weight: 700; margin: 0 0 8px; color: #101828;">Automatic reconciliation</h3>
+            <p style="font-size: 14px; line-height: 1.6; color: #475467; margin: 0;">Interim lines are matched with bills, invoices, credit notes and refunds. What stays open is a real difference to follow up.</p>
+        </div>
+        <div style="display: inline-block; vertical-align: top; width: 100%; max-width: 310px; min-height: 180px; margin: 0 6px 16px; text-align: left; border: 1px solid #e4e7ec; border-radius: 10px; padding: 20px; box-sizing: border-box; background-color: #ffffff;">
+            <p style="font-size: 24px; line-height: 1; margin: 0 0 10px;">&#9878;&#65039;</p>
+            <h3 style="font-size: 17px; font-weight: 700; margin: 0 0 8px; color: #101828;">Price differences, done right</h3>
+            <p style="font-size: 14px; line-height: 1.6; color: #475467; margin: 0;">A bill at another price revalues the goods still in stock; the part already sold goes to the price difference account.</p>
+        </div>
+        <div style="display: inline-block; vertical-align: top; width: 100%; max-width: 310px; min-height: 180px; margin: 0 6px 16px; text-align: left; border: 1px solid #e4e7ec; border-radius: 10px; padding: 20px; box-sizing: border-box; background-color: #ffffff;">
+            <p style="font-size: 24px; line-height: 1; margin: 0 0 10px;">&#128197;</p>
+            <h3 style="font-size: 17px; font-weight: 700; margin: 0 0 8px; color: #101828;">Clean month-end</h3>
+            <p style="font-size: 14px; line-height: 1.6; color: #475467; margin: 0;">Adjustments are dated on the stock move date and respect lock dates. The Inventory Valuation closing has nothing to correct, and accruals never duplicate the interim balances.</p>
+        </div>
+        <div style="display: inline-block; vertical-align: top; width: 100%; max-width: 310px; min-height: 180px; margin: 0 6px 16px; text-align: left; border: 1px solid #e4e7ec; border-radius: 10px; padding: 20px; box-sizing: border-box; background-color: #ffffff;">
+            <p style="font-size: 24px; line-height: 1; margin: 0 0 10px;">&#128737;&#65039;</p>
+            <h3 style="font-size: 17px; font-weight: 700; margin: 0 0 8px; color: #101828;">Never booked twice</h3>
+            <p style="font-size: 14px; line-height: 1.6; color: #475467; margin: 0;">One initial entry per stock move, guaranteed by a tracking flag, a row lock and a database unique index. Landed costs are booked once.</p>
+        </div>
+        <div style="display: inline-block; vertical-align: top; width: 100%; max-width: 310px; min-height: 180px; margin: 0 6px 16px; text-align: left; border: 1px solid #e4e7ec; border-radius: 10px; padding: 20px; box-sizing: border-box; background-color: #ffffff;">
+            <p style="font-size: 24px; line-height: 1; margin: 0 0 10px;">&#127970;</p>
+            <h3 style="font-size: 17px; font-weight: 700; margin: 0 0 8px; color: #101828;">Multi-company ready</h3>
+            <p style="font-size: 14px; line-height: 1.6; color: #475467; margin: 0;">Switch and interim accounts per company, overrides per product category. Warehouse users need no accounting rights.</p>
+        </div>
+    </div>
+</section>
+
+<section style="font-family: Inter, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1d2939; padding: 40px 0; background-color: #f9fafb; border-top: 1px solid #e4e7ec; border-bottom: 1px solid #e4e7ec;">
+    <div style="max-width: 1080px; margin: 0 auto; padding: 0 16px;">
+        <h2 style="font-size: 26px; font-weight: 700; text-align: center; margin: 0 0 8px; color: #101828;">Journal entries posted automatically</h2>
+        <p style="font-size: 16px; text-align: center; color: #667085; margin: 0 0 28px;">For storable products in categories with <b>Inventory Valuation = Perpetual</b>.</p>
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px; line-height: 1.5; background-color: #ffffff; border: 1px solid #e4e7ec; word-wrap: break-word; overflow-wrap: break-word;">
+                <tr style="background-color: #eef4fb;">
+                    <th style="padding: 12px 8px; text-align: left; border-bottom: 1px solid #e4e7ec; color: #344054;">Operation</th>
+                    <th style="padding: 12px 8px; text-align: left; border-bottom: 1px solid #e4e7ec; color: #344054;">Odoo 19 standard</th>
+                    <th style="padding: 12px 8px; text-align: left; border-bottom: 1px solid #e4e7ec; color: #344054;">With Stock Accounting Automation</th>
+                </tr>
+                <tr><td style="padding: 10px 8px; border-bottom: 1px solid #f2f4f7; font-weight: 600;">Receipt from vendor</td><td style="padding: 10px 8px; border-bottom: 1px solid #f2f4f7; color: #667085;">No entry</td><td style="padding: 10px 8px; border-bottom: 1px solid #f2f4f7;">Dr Stock Valuation / Cr Stock Interim (Received)</td></tr>
+                <tr><td style="padding: 10px 8px; border-bottom: 1px solid #f2f4f7; font-weight: 600;">Vendor bill</td><td style="padding: 10px 8px; border-bottom: 1px solid #f2f4f7; color: #667085;">Dr Stock Valuation / Cr Payable</td><td style="padding: 10px 8px; border-bottom: 1px solid #f2f4f7;">Dr Stock Interim (Received) / Cr Payable</td></tr>
+                <tr><td style="padding: 10px 8px; border-bottom: 1px solid #f2f4f7; font-weight: 600;">Delivery to customer</td><td style="padding: 10px 8px; border-bottom: 1px solid #f2f4f7; color: #667085;">No entry</td><td style="padding: 10px 8px; border-bottom: 1px solid #f2f4f7;">Dr Stock Interim (Delivered) / Cr Stock Valuation</td></tr>
+                <tr><td style="padding: 10px 8px; border-bottom: 1px solid #f2f4f7; font-weight: 600;">Customer invoice (COGS)</td><td style="padding: 10px 8px; border-bottom: 1px solid #f2f4f7; color: #667085;">Dr Expense / Cr Stock Valuation</td><td style="padding: 10px 8px; border-bottom: 1px solid #f2f4f7;">Dr Expense / Cr Stock Interim (Delivered)</td></tr>
+                <tr><td style="padding: 10px 8px; border-bottom: 1px solid #f2f4f7; font-weight: 600;">Customer return</td><td style="padding: 10px 8px; border-bottom: 1px solid #f2f4f7; color: #667085;">No entry until the credit note</td><td style="padding: 10px 8px; border-bottom: 1px solid #f2f4f7;">Dr Stock Valuation / Cr Stock Interim (Delivered)</td></tr>
+                <tr><td style="padding: 10px 8px; border-bottom: 1px solid #f2f4f7; font-weight: 600;">Return to vendor</td><td style="padding: 10px 8px; border-bottom: 1px solid #f2f4f7; color: #667085;">No entry until the refund</td><td style="padding: 10px 8px; border-bottom: 1px solid #f2f4f7;">Dr Stock Interim (Received) / Cr Stock Valuation</td></tr>
+                <tr><td style="padding: 10px 8px; border-bottom: 1px solid #f2f4f7; font-weight: 600;">Inventory count, scrap</td><td style="padding: 10px 8px; border-bottom: 1px solid #f2f4f7; color: #667085;">Only if the location has an account</td><td style="padding: 10px 8px; border-bottom: 1px solid #f2f4f7;">Location account, otherwise Expense vs Stock Valuation</td></tr>
+                <tr><td style="padding: 10px 8px; border-bottom: 1px solid #f2f4f7; font-weight: 600;">Production (Manufacturing)</td><td style="padding: 10px 8px; border-bottom: 1px solid #f2f4f7; color: #667085;">Only if the location has an account</td><td style="padding: 10px 8px; border-bottom: 1px solid #f2f4f7;">Components and finished goods against the production location account, otherwise expense</td></tr>
+                <tr><td style="padding: 10px 8px; border-bottom: 1px solid #f2f4f7; font-weight: 600;">Cost change, Adjust Valuation</td><td style="padding: 10px 8px; border-bottom: 1px solid #f2f4f7; color: #667085;">Left to the periodic closing</td><td style="padding: 10px 8px; border-bottom: 1px solid #f2f4f7;">Stock Valuation vs Stock Variation for the quantity on hand</td></tr>
+                <tr><td style="padding: 10px 8px; font-weight: 600;">Landed costs</td><td style="padding: 10px 8px; color: #667085;">Landed-cost entry</td><td style="padding: 10px 8px;">Unchanged: booked once, never added to the receipt a second time</td></tr>
+            </table>
+        </div>
+    </div>
+</section>
+
+<section style="font-family: Inter, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1d2939; padding: 40px 0 8px;">
+    <div style="max-width: 1080px; margin: 0 auto; padding: 0 16px; text-align: center;">
+        <div style="display: inline-block; vertical-align: middle; width: 100%; max-width: 390px; margin: 0 6px 32px; text-align: left;">
+            <p style="font-size: 13px; font-weight: 600; color: #0b6bcb; text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 8px;">Purchase</p>
+            <h2 style="font-size: 22px; font-weight: 700; margin: 0 0 12px; color: #101828;">Vendor bills that clear the receipt</h2>
+            <ul style="font-size: 15px; line-height: 1.6; color: #475467; margin: 0; padding-left: 20px;">
+                <li>Bill lines of perpetual products go to Stock Interim (Received) and are matched with the receipt.</li>
+                <li>A different bill price posts an adjustment dated on the receipt date.</li>
+                <li>Bill reset to draft, cancelled or reversed: the receipt is revalued from the bills still posted.</li>
+                <li>Standard cost: receipts at standard price, the difference goes to the price difference account.</li>
+            </ul>
+        </div>
+        <div style="display: inline-block; vertical-align: middle; width: 100%; max-width: 560px; margin: 0 6px 32px;">
+            <img src="screenshots/bill-price-adjustment.jpg" alt="Valuation adjustment entry after a bill at another price" style="display: block; width: 100%; max-width: 100%; height: auto; border: 1px solid #e4e7ec; border-radius: 8px;"/>
+            <p style="font-size: 13px; color: #667085; margin: 8px 0 0;">Bill at 110 instead of 100: the receipt is revalued by 100.</p>
+        </div>
+    </div>
+</section>
+
+<section style="font-family: Inter, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1d2939; padding: 0 0 8px;">
+    <div style="max-width: 1080px; margin: 0 auto; padding: 0 16px; text-align: center;">
+        <div style="display: inline-block; vertical-align: middle; width: 100%; max-width: 390px; margin: 0 6px 32px; text-align: left;">
+            <p style="font-size: 13px; font-weight: 600; color: #0b6bcb; text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 8px;">Sales</p>
+            <h2 style="font-size: 22px; font-weight: 700; margin: 0 0 12px; color: #101828;">Invoices that match the delivery</h2>
+            <ul style="font-size: 15px; line-height: 1.6; color: #475467; margin: 0; padding-left: 20px;">
+                <li>The delivery credits stock at its real cost (FIFO layers, average or standard).</li>
+                <li>The invoice books COGS at exactly the value that left the stock and clears Stock Interim (Delivered).</li>
+                <li>Invoice before delivery, partial deliveries, several invoices and credit notes are all matched.</li>
+            </ul>
+        </div>
+        <div style="display: inline-block; vertical-align: middle; width: 100%; max-width: 560px; margin: 0 6px 32px;">
+            <img src="screenshots/invoice-cogs.jpg" alt="Customer invoice with COGS lines on Stock Interim (Delivered)" style="display: block; width: 100%; max-width: 100%; height: auto; border: 1px solid #e4e7ec; border-radius: 8px;"/>
+            <p style="font-size: 13px; color: #667085; margin: 8px 0 0;">Customer invoice: cost of goods sold credited to Stock Interim (Delivered).</p>
+        </div>
+    </div>
+</section>
+
+<section style="font-family: Inter, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1d2939; padding: 0 0 16px;">
+    <div style="max-width: 1080px; margin: 0 auto; padding: 0 16px; text-align: center;">
+        <div style="display: inline-block; vertical-align: middle; width: 100%; max-width: 390px; margin: 0 6px 32px; text-align: left;">
+            <p style="font-size: 13px; font-weight: 600; color: #0b6bcb; text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 8px;">Valuation</p>
+            <h2 style="font-size: 22px; font-weight: 700; margin: 0 0 12px; color: #101828;">Books that agree with the warehouse</h2>
+            <ul style="font-size: 15px; line-height: 1.6; color: #475467; margin: 0; padding-left: 20px;">
+                <li>Stock Valuation equals Odoo's inventory valuation at every date.</li>
+                <li>Open interim balances are your received-not-billed and delivered-not-invoiced lists.</li>
+                <li>Every journal item keeps a link to its source stock move; each move has a Valuation Entries button.</li>
+            </ul>
+        </div>
+        <div style="display: inline-block; vertical-align: middle; width: 100%; max-width: 560px; margin: 0 6px 32px;">
+            <img src="screenshots/journal-items-by-account.jpg" alt="Journal items grouped by account" style="display: block; width: 100%; max-width: 100%; height: auto; border: 1px solid #e4e7ec; border-radius: 8px;"/>
+            <p style="font-size: 13px; color: #667085; margin: 8px 0 0;">10 chairs on hand at 110 = 1,100 on Stock Valuation; 550 received, not billed.</p>
+        </div>
+    </div>
+</section>
+
+<section style="font-family: Inter, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1d2939; padding: 40px 0 16px; background-color: #f9fafb; border-top: 1px solid #e4e7ec; border-bottom: 1px solid #e4e7ec;">
+    <div style="max-width: 1080px; margin: 0 auto; padding: 0 16px; text-align: center;">
+        <h2 style="font-size: 26px; font-weight: 700; margin: 0 0 8px; color: #101828;">Configuration</h2>
+        <p style="font-size: 16px; color: #667085; margin: 0 0 28px;">Ready after installation: the interim accounts are created for each company and the feature is switched on.</p>
+        <div style="display: inline-block; vertical-align: top; width: 100%; max-width: 470px; margin: 0 6px 24px; text-align: left;">
+            <h3 style="font-size: 18px; font-weight: 700; margin: 0 0 8px; color: #101828;">1. Check the setting</h3>
+            <p style="font-size: 14px; line-height: 1.6; color: #475467; margin: 0 0 12px;"><b>Inventory &#8250; Configuration &#8250; Settings &#8250; Valuation &#8250; Journal Entries on Stock Moves</b>, per company, with the default Interim Received and Interim Delivered accounts.</p>
+            <img src="screenshots/settings.jpg" alt="Journal Entries on Stock Moves setting" style="display: block; width: 100%; max-width: 100%; height: auto; border: 1px solid #e4e7ec; border-radius: 8px;"/>
+        </div>
+        <div style="display: inline-block; vertical-align: top; width: 100%; max-width: 470px; margin: 0 6px 24px; text-align: left;">
+            <h3 style="font-size: 18px; font-weight: 700; margin: 0 0 8px; color: #101828;">2. Set up product categories</h3>
+            <p style="font-size: 14px; line-height: 1.6; color: #475467; margin: 0 0 12px;"><b>Inventory &#8250; Configuration &#8250; Product Categories</b>: Inventory Valuation = Perpetual. Interim accounts can be overridden per category; leave them empty to use the company defaults.</p>
+            <img src="screenshots/product-category.jpg" alt="Product category with interim account fields" style="display: block; width: 100%; max-width: 100%; height: auto; border: 1px solid #e4e7ec; border-radius: 8px;"/>
+        </div>
+        <div style="max-width: 952px; margin: 0 auto 24px; text-align: left;">
+            <h3 style="font-size: 18px; font-weight: 700; margin: 0 0 12px; color: #101828;">3. Accounts used</h3>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.5; background-color: #ffffff; border: 1px solid #e4e7ec;">
+                    <tr style="background-color: #eef4fb;">
+                        <th style="padding: 10px 8px; text-align: left; border-bottom: 1px solid #e4e7ec; color: #344054;">Account</th>
+                        <th style="padding: 10px 8px; text-align: left; border-bottom: 1px solid #e4e7ec; color: #344054;">Where</th>
+                        <th style="padding: 10px 8px; text-align: left; border-bottom: 1px solid #e4e7ec; color: #344054;">Needed</th>
+                    </tr>
+                    <tr><td style="padding: 9px 8px; border-bottom: 1px solid #f2f4f7; font-weight: 600;">Stock Valuation</td><td style="padding: 9px 8px; border-bottom: 1px solid #f2f4f7;">Product category &#8250; Stock Account</td><td style="padding: 9px 8px; border-bottom: 1px solid #f2f4f7;">Required</td></tr>
+                    <tr><td style="padding: 9px 8px; border-bottom: 1px solid #f2f4f7; font-weight: 600;">Expense (COGS)</td><td style="padding: 9px 8px; border-bottom: 1px solid #f2f4f7;">Product or product category</td><td style="padding: 9px 8px; border-bottom: 1px solid #f2f4f7;">Required: cost of goods sold, counts, scrap</td></tr>
+                    <tr><td style="padding: 9px 8px; border-bottom: 1px solid #f2f4f7; font-weight: 600;">Stock Interim (Received / Delivered)</td><td style="padding: 9px 8px; border-bottom: 1px solid #f2f4f7;">Inventory settings, optional override per category</td><td style="padding: 9px 8px; border-bottom: 1px solid #f2f4f7;">Created at installation</td></tr>
+                    <tr><td style="padding: 9px 8px; border-bottom: 1px solid #f2f4f7; font-weight: 600;">Price Difference</td><td style="padding: 9px 8px; border-bottom: 1px solid #f2f4f7;">Product category</td><td style="padding: 9px 8px; border-bottom: 1px solid #f2f4f7;">Required for Standard Price, recommended otherwise</td></tr>
+                    <tr><td style="padding: 9px 8px; border-bottom: 1px solid #f2f4f7; font-weight: 600;">Stock Variation</td><td style="padding: 9px 8px; border-bottom: 1px solid #f2f4f7;">On the Stock Valuation account</td><td style="padding: 9px 8px; border-bottom: 1px solid #f2f4f7;">Recommended: cost changes, Adjust Valuation</td></tr>
+                    <tr><td style="padding: 9px 8px; font-weight: 600;">Location valuation account</td><td style="padding: 9px 8px;">Inventory adjustment, scrap, production locations</td><td style="padding: 9px 8px;">Optional: keeps losses or WIP out of expense</td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section style="font-family: Inter, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1d2939; padding: 40px 0 24px;">
+    <div style="max-width: 1080px; margin: 0 auto; padding: 0 16px; text-align: center;">
+        <div style="max-width: 952px; margin: 0 auto; text-align: left; border-left: 4px solid #f79009; background-color: #fffaf0; border-radius: 8px; padding: 20px 22px; box-sizing: border-box;">
+            <h2 style="font-size: 22px; font-weight: 700; margin: 0 0 12px; color: #101828;">Good to know</h2>
+            <ul style="font-size: 15px; line-height: 1.7; color: #475467; margin: 0; padding-left: 20px;">
+                <li><b>Install at the start of an accounting period.</b> Only moves validated after installation are posted; older moves are not back-posted.</li>
+                <li><b>Switch the feature off only at a period end</b>, with a reclassification entry for the open interim balances, otherwise bills and invoices of goods that already moved book stock twice.</li>
+                <li>Valuation entries cannot be reset to draft: use <b>Adjust Valuation</b> on the stock move instead.</li>
+                <li>Internal transfers, dropshipping, Periodic categories, consumables and services keep standard Odoo behaviour.</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section style="font-family: Inter, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1d2939; padding: 24px 0 16px;">
+    <div style="max-width: 1080px; margin: 0 auto; padding: 0 16px; text-align: center;">
+        <h2 style="font-size: 26px; font-weight: 700; margin: 0 0 24px; color: #101828;">Screenshots</h2>
+        <div style="display: inline-block; vertical-align: top; width: 100%; max-width: 470px; margin: 0 6px 24px;">
+            <img src="screenshots/receipt-entry.jpg" alt="Receipt journal entry" style="display: block; width: 100%; max-width: 100%; height: auto; border: 1px solid #e4e7ec; border-radius: 8px;"/>
+            <p style="font-size: 13px; color: #667085; margin: 8px 0 0;">Receipt entry, posted when the receipt is validated.</p>
+        </div>
+        <div style="display: inline-block; vertical-align: top; width: 100%; max-width: 470px; margin: 0 6px 24px;">
+            <img src="screenshots/delivery-entry.jpg" alt="Delivery journal entry" style="display: block; width: 100%; max-width: 100%; height: auto; border: 1px solid #e4e7ec; border-radius: 8px;"/>
+            <p style="font-size: 13px; color: #667085; margin: 8px 0 0;">Delivery entry: stock credited, Stock Interim (Delivered) debited.</p>
+        </div>
+        <div style="display: inline-block; vertical-align: top; width: 100%; max-width: 470px; margin: 0 6px 24px;">
+            <img src="screenshots/stock-move-valuation-button.jpg" alt="Stock move with the Valuation Entries button" style="display: block; width: 100%; max-width: 100%; height: auto; border: 1px solid #e4e7ec; border-radius: 8px;"/>
+            <p style="font-size: 13px; color: #667085; margin: 8px 0 0;">Every valued stock move gets a Valuation Entries button.</p>
+        </div>
+        <div style="display: inline-block; vertical-align: top; width: 100%; max-width: 470px; margin: 0 6px 24px;">
+            <img src="screenshots/inventory-adjustment-entry.jpg" alt="Inventory adjustment journal entry" style="display: block; width: 100%; max-width: 100%; height: auto; border: 1px solid #e4e7ec; border-radius: 8px;"/>
+            <p style="font-size: 13px; color: #667085; margin: 8px 0 0;">Inventory count difference booked against expense.</p>
+        </div>
+    </div>
+</section>
+
+<section style="font-family: Inter, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1d2939; padding: 32px 0 40px; background-color: #f4f8fd; border-top: 1px solid #e4e7ec;">
+    <div style="max-width: 1080px; margin: 0 auto; padding: 0 16px; text-align: center;">
+        <div style="max-width: 640px; margin: 0 auto; text-align: left;">
+            <h2 style="font-size: 22px; font-weight: 700; margin: 0 0 12px; color: #101828;">Compatibility and dependencies</h2>
+            <table style="font-size: 15px; line-height: 1.5; color: #475467; width: 100%; border-collapse: collapse;">
+                <tr><td style="padding: 4px 12px 4px 0; font-weight: 600; color: #344054; vertical-align: top; width: 112px;">Odoo</td><td style="padding: 4px 0;">19.0, Community and Enterprise</td></tr>
+                <tr><td style="padding: 4px 12px 4px 0; font-weight: 600; color: #344054; vertical-align: top;">Depends on</td><td style="padding: 4px 0;">Inventory valuation (stock_account), Purchase Stock, Sale Stock</td></tr>
+                <tr><td style="padding: 4px 12px 4px 0; font-weight: 600; color: #344054; vertical-align: top;">Optional</td><td style="padding: 4px 0;">Landed Costs, Manufacturing</td></tr>
+                <tr><td style="padding: 4px 12px 4px 0; font-weight: 600; color: #344054; vertical-align: top;">Scope</td><td style="padding: 4px 0;">Storable products in Perpetual valuation categories; FIFO, Average Cost, Standard Price</td></tr>
+            </table>
+        </div>
+    </div>
+</section>

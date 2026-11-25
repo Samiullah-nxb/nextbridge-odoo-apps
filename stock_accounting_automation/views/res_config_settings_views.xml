@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.stock.accounting.automation</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="stock_account.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <block name="valuation_setting_container" position="inside">
+                <setting id="stock_move_accounting_setting" company_dependent="1"
+                         help="Post a journal entry for every receipt, delivery, return, adjustment and scrap of products in perpetual valuation.">
+                    <field name="stock_move_accounting"/>
+                    <div class="content-group" invisible="not stock_move_accounting">
+                        <div class="row mt8">
+                            <label for="account_stock_input_id" string="Interim Received" class="col-lg-5 o_light_label"/>
+                            <field name="account_stock_input_id" options="{'no_create': True}"/>
+                        </div>
+                        <div class="row mt8">
+                            <label for="account_stock_output_id" string="Interim Delivered" class="col-lg-5 o_light_label"/>
+                            <field name="account_stock_output_id" options="{'no_create': True}"/>
+                        </div>
+                        <div class="text-muted pt-2">
+                            Only applies to product categories with a Perpetual inventory valuation.
+                            Interim accounts can be overridden per product category.
+                        </div>
+                    </div>
+                </setting>
+            </block>
+        </field>
+    </record>
+</odoo>

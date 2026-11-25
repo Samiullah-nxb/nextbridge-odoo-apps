@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_move_form" model="ir.ui.view">
+        <field name="name">stock.move.form.inherit.stock.accounting.automation</field>
+        <field name="model">stock.move</field>
+        <field name="inherit_id" ref="stock.view_move_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button name="action_view_account_valuation_entries" type="object" class="oe_stat_button"
+                        icon="fa-book" invisible="not account_valuation_entry_count"
+                        groups="account.group_account_readonly">
+                    <field name="account_valuation_entry_count" widget="statinfo" string="Valuation Entries"/>
+                </button>
+            </div>
+        </field>
+    </record>
+
+    <record id="stock_move_view_list" model="ir.ui.view">
+        <field name="name">stock.move.list.inherit.stock.accounting.automation</field>
+        <field name="model">stock.move</field>
+        <field name="inherit_id" ref="stock_account.stock_move_view_list"/>
+        <field name="arch" type="xml">
+            <field name="value" position="after">
+                <field name="account_valuation_posted" optional="hide" groups="account.group_account_readonly"/>
+            </field>
+        </field>
+    </record>
+</odoo>
